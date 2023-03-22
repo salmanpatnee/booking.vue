@@ -1,0 +1,5 @@
+{
+    "apiEndpoints": {
+        "categories": "api/categories"
+    }
+}
