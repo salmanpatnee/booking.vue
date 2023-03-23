@@ -23,19 +23,11 @@ const columns = [
     :sortColumn="sortColumn"
     @onSort="$emit('onSort', sortColumn)"
   >
-    <template #action="{id}">
-      <button
-        v-if="can('category-edit')"
-        @click="$emit('onEdit', id)"
-        class="btn btn-sm btn-info me-1"
-      >
+    <template #action="{ id }">
+      <button @click="$emit('onEdit', id)" class="btn btn-sm btn-info me-1">
         <i class="fa fa-edit"></i>
       </button>
-      <button
-        v-if="can('category-delete')"
-        @click="$emit('onDelete', id)"
-        class="btn btn-sm btn-danger"
-      >
+      <button @click="$emit('onDelete', id)" class="btn btn-sm btn-danger">
         <i class="fa fa-trash"></i>
       </button>
     </template>

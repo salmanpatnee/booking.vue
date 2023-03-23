@@ -55,49 +55,10 @@ onMounted(async () => {
             </dd>
           </dl>
         </div>
-        <div class="col">
-          <dl class="row">
-            <dt class="col-sm-5">Brand</dt>
-            <dd class="col-sm-7" v-if="product.brand">
-              {{ product.brand.name }}
-            </dd>
-          </dl>
-        </div>
-        <div class="col">
-          <dl class="row">
-            <dt class="col-sm-5">Alert quantity</dt>
-            <dd class="col-sm-7">{{ product.quantity_threshold }}</dd>
-          </dl>
-        </div>
-        <!-- <div class="col">
-          <dl class="row">
-            <dt class="col-sm-5">Expires in</dt>
-            <dd class="col-sm-7">12.00 Months</dd>
-          </dl>
-        </div> -->
+        <div class="col"></div>
+        <div class="col"></div>
       </div>
-      <div class="row">
-        <div class="col">
-          <dl class="row">
-            <dt class="col-sm-5">UOM of Boxes</dt>
-            <dd class="col-sm-7">
-              {{ product.uom_of_boxes }}
-            </dd>
-          </dl>
-        </div>
-        <div class="col">
-          <dl class="row">
-            <dt class="col-sm-5">UOM of Strip</dt>
-            <dd class="col-sm-7">
-              {{ product.uom_of_strips }}
-            </dd>
-          </dl>
-        </div>
-        <div class="col">
-         
-        </div>
-        
-      </div>
+
       <hr />
       <div class="row mt-4">
         <div class="table-responsive">
@@ -106,7 +67,7 @@ onMounted(async () => {
               <tr>
                 <th width="25%">Default Purchase Price</th>
                 <th width="25%">Default Selling Price</th>
-                <th width="25%">VAT</th>
+
                 <th width="25%">Profit Margin(%)</th>
               </tr>
             </thead>
@@ -114,7 +75,7 @@ onMounted(async () => {
               <tr>
                 <td>{{ product.default_purchase_price.toFixed(2) }}</td>
                 <td>{{ product.default_selling_price }}</td>
-                <td>{{ product.vat_amount }}</td>
+
                 <td>{{ profitMarginDisplay }}</td>
               </tr>
             </tbody>
@@ -131,14 +92,10 @@ onMounted(async () => {
         <table class="table table-bordered table-hover table-striped">
           <thead class="bg-primary text-light">
             <tr>
-              <th>Location</th>
               <th>Unit Cost</th>
               <th>Current Stock</th>
               <th>Current Stock Value</th>
               <th>Total Unit Sold</th>
-              <th>Total Unit Transfered</th>
-              <th>Total Unit Adjusted</th>
-              <th>Expired At</th>
             </tr>
           </thead>
           <tbody>

@@ -128,19 +128,18 @@ onMounted(async () => {
       <h1 class="h3 mb-0 text-middle">Products</h1>
       <div>
         <router-link
-          v-if="can('product-add')"
-          class="btn btn-primary btn-lg me-4"
+          class="btn btn-primary btn-lg"
           :to="{ name: 'products.create' }"
         >
           Add Product
         </router-link>
-        <button
+        <!-- <button
           v-if="can('product-view')"
           class="btn btn-lg btn-info"
           @click="handleExportClick"
         >
           <i class="fa fa-download"></i> Export Products
-        </button>
+        </button> -->
       </div>
     </template>
     <div class="mb-3 row">

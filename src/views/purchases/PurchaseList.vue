@@ -187,11 +187,7 @@ onMounted(async () => {
   <Panel>
     <template #header>
       <h1 class="h3 mb-0 text-middle">Purchases</h1>
-      <router-link
-        v-if="can('purchase-add')"
-        class="btn btn-primary"
-        :to="{ name: 'purchases.create' }"
-      >
+      <router-link class="btn btn-primary" :to="{ name: 'purchases.create' }">
         Add Purchase
       </router-link>
     </template>
@@ -215,7 +211,7 @@ onMounted(async () => {
             <th>#</th>
             <th>Date</th>
             <th>Purchase ID</th>
-            <th>Supplier</th>
+            <!-- <th>Supplier</th> -->
             <th>Purchase Status</th>
             <th>Payment Status</th>
             <th>Grand Total</th>
@@ -228,7 +224,7 @@ onMounted(async () => {
             <td>{{ index + 1 }}</td>
             <td><AppDate :timestamp="purchase.date" /></td>
             <td>{{ purchase.reference_number }}</td>
-            <td>{{ purchase.account.name }}</td>
+            <!-- <td>{{ purchase.account.name }}</td> -->
             <td>
               <span
                 class="text-capitalize badge"
@@ -268,14 +264,12 @@ onMounted(async () => {
             <td>
               <div class="text-center">
                 <router-link
-                  v-if="can('purchase-view')"
                   class="btn btn-success btn-sm me-1 mb-1"
                   :to="{ name: 'purchases.show', params: { id: purchase.id } }"
                   ><i class="mr-1 fa fa-eye"></i>
                 </router-link>
 
                 <router-link
-                  v-if="can('purchase-view')"
                   class="btn btn-warning btn-sm me-1 mb-1"
                   target="_blank"
                   :to="{
@@ -284,8 +278,11 @@ onMounted(async () => {
                   }"
                   ><i class="mr-1 fa fa-print"></i>
                 </router-link>
-                <router-link
-                  v-if="can('purchase-return-add') && (purchase.status !== 'returned' && purchase.status !== 'final' ) "
+                <!-- <router-link
+                  v-if="
+                    purchase.status !== 'returned' &&
+                    purchase.status !== 'final'
+                  "
                   class="btn btn-danger btn-sm me-1 mb-1"
                   target="_blank"
                   :to="{
@@ -294,11 +291,9 @@ onMounted(async () => {
                   }"
                 >
                   <i class="fa fa-undo" aria-hidden="true"></i>
-                </router-link>
+                </router-link> -->
                 <a
-                  v-if="
-                    purchase.payment_status === 'due' && can('purchase-edit')
-                  "
+                  v-if="purchase.payment_status === 'due'"
                   class="btn btn-info btn-sm me-1 mb-1"
                   @click.prevent="handlePayment(purchase.id)"
                 >
@@ -368,7 +363,8 @@ onMounted(async () => {
           class="form-control form-control-lg"
           id="amount_paid"
           v-model="form.amount"
-          required min="0"
+          required
+          min="0"
         />
         <HasError :form="form" field="amount" />
       </div>

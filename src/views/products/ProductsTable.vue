@@ -11,7 +11,7 @@ const columns = [
   { path: "#", label: "#" },
   { path: "name", label: "Name", sortable: true },
   { path: "category", label: "Category", sortable: false },
-  { path: "brand", label: "Brand", sortable: false },
+  { path: "default_selling_price", label: "Price", sortable: false },
   { path: "quantity", label: "Qty", sortable: false },
   { path: "", label: "Action" },
 ];
@@ -24,21 +24,22 @@ const columns = [
     :sortColumn="sortColumn"
     @onSort="$emit('onSort', sortColumn)"
   >
-    <template #action="{id}">
+    <template #action="{ id }">
       <div class="text-center">
-        <button v-if="can('product-view')"
+        <button
           @click.prevent="$emit('onShow', id)"
           class="btn btn-success btn-sm me-1 mb-1"
         >
           <i class="mr-1 fa fa-eye"></i>
         </button>
-        <button v-if="can('product-view')"
+        <!-- <button
+          
           @click.prevent="$emit('showProductStock', id)"
           class="btn btn-info btn-sm me-1 mb-1"
         >
           <i class="mr-1 fa fa-th-large"></i>
-        </button>
-        <button v-if="can('product-edit')"
+        </button> -->
+        <button
           @click.prevent="$emit('onEdit', id)"
           class="btn btn-warning btn-sm me-1 mb-1"
         >

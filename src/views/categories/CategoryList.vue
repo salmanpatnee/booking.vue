@@ -131,12 +131,7 @@ onMounted(async () => {
   <Panel>
     <template #header>
       <h1 class="h3 mb-0 text-middle">Categories</h1>
-      <button
-        v-if="can('category-add')"
-        type="button"
-        class="btn btn-primary"
-        @click="handleCreate"
-      >
+      <button type="button" class="btn btn-primary" @click="handleCreate">
         Add Category
       </button>
     </template>
@@ -151,17 +146,16 @@ onMounted(async () => {
     </div>
     <div v-if="!isLoading">
       <CategoriesTable
-      :categories="categories.data"
-      :sortColumn="sortColumn"
-      @onEdit="handleEdit"
-      @onDelete="handleDelete"
-      @onSort="handleSort"
-    />
+        :categories="categories.data"
+        :sortColumn="sortColumn"
+        @onEdit="handleEdit"
+        @onDelete="handleDelete"
+        @onSort="handleSort"
+      />
     </div>
     <div v-else class="text-center">
       <h3>Loading...</h3>
     </div>
-    
 
     <template #footer v-if="!isLoading">
       <Pagination :data="categories" @pagination-change-page="getCategories" />

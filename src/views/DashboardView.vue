@@ -25,11 +25,15 @@ onMounted(async () => {
 <template>
   <div class="align-items-center d-flex justify-content-between mb-5">
     <h1 class="h3">Dashboard</h1>
-    <button @click="getDashboardStats" class="btn btn-sm btn-info btn-outline-info rounded-circle" title="Refresh Dashboard">
+    <button
+      @click="getDashboardStats"
+      class="btn btn-sm btn-info btn-outline-info rounded-circle"
+      title="Refresh Dashboard"
+    >
       <i class="fa fa-refresh"></i>
     </button>
   </div>
-  <div v-if="!stats.isLoading ">
+  <div v-if="!stats.isLoading">
     <div class="row">
       <div class="col d-flex">
         <div class="w-100">
@@ -102,14 +106,18 @@ onMounted(async () => {
             <div class="col">
               <stat-card
                 title="PURCHASE RETURN"
-                :figure="parseFloat(stats.data.todays_total_purchase_return_amount)"
+                :figure="
+                  parseFloat(stats.data.todays_total_purchase_return_amount)
+                "
                 type="danger"
               />
             </div>
             <div class="col">
               <stat-card
                 title="SALES RETURN"
-                :figure="parseFloat(stats.data.todays_total_sales_return_amount)"
+                :figure="
+                  parseFloat(stats.data.todays_total_sales_return_amount)
+                "
                 type="danger"
               />
             </div>
@@ -117,37 +125,8 @@ onMounted(async () => {
         </div>
       </div>
     </div>
-    <Panel>
-      <template #header>
-        <h1 class="h3 mb-0 text-middle">Alert Products</h1>
-      </template>
-      <div class="table-responsive">
-        <table
-          class="card-1 mb-0 table table-bordered table-hover table-striped"
-        >
-          <thead class="bg-primary text-bg-dark">
-            <tr>
-              <th>#</th>
-              <th>Name</th>
-              <th>Category</th>
-              <th>Brand</th>
-              <th>Qty</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(product, index) in stats.data.alert_quantity_products">
-              <td>{{ index + 1 }}</td>
-              <td>{{ product.name }}</td>
-              <td>{{ product.category }}</td>
-              <td>{{ product.brand }}</td>
-              <td>{{ product.quantity }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </Panel>
   </div>
   <div class="text-center" v-else>
-    <app-loader  />
+    <app-loader />
   </div>
 </template>

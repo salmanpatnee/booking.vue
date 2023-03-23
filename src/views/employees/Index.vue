@@ -9,15 +9,15 @@ import { useRouter } from "vue-router";
 
 // Data
 // const { can } = useCan();
-const customers = ref([]);
+const employees = ref([]);
 const router = useRouter();
 const editMode = ref(false);
 const paginate = ref(10);
 const search = ref("");
-const baseEndpoint = "/api/accounts";
+const baseEndpoint = "/api/employees";
 const swal = inject("$swal");
 const { flash } = useFlash();
-let modalID = "customersModal";
+let modalID = "employeeModal";
 const isLoading = ref(true);
 let orderBy = ref("created_at");
 let sortOrder = ref("desc");
@@ -28,9 +28,8 @@ const form = ref(
     name: "",
     email: "",
     phone: "",
-    trader: "",
-    balance: 0.0,
-    account_type: "customer",
+    address: "",
+    joining_date: null,
   })
 );
 
@@ -39,18 +38,18 @@ let modal = null;
 watch(
   () => paginate.value,
   (paginate, prevCount) => {
-    getCustomers();
+    getEmployees();
   }
 );
 watch(
   () => search.value,
   (search, prevCount) => {
-    getCustomers();
+    getEmployees();
   }
 );
 
 // Methods
-const getCustomers = async (page = 1) => {
+const getEmployees = async (page = 1) => {
   isLoading.value = true;
   const { data: response } = await axios.get(baseEndpoint, {
     params: {
@@ -61,7 +60,7 @@ const getCustomers = async (page = 1) => {
       orderBy: orderBy.value,
     },
   });
-  customers.value = response;
+  employees.value = response;
   isLoading.value = false;
 };
 const create = () => {
@@ -76,7 +75,7 @@ const store = () => {
       if (response.data.status == "success") {
         modal.hide();
         flash(response.data.message);
-        getCustomers();
+        getEmployees();
       }
     })
     .catch((error) => console.log(error));
@@ -95,7 +94,7 @@ const update = async () => {
     .then((response) => {
       if (response.data.status == "success") {
         modal.hide();
-        getCustomers();
+        getEmployees();
         editMode.value = false;
         flash(response.data.message);
       }
@@ -118,7 +117,7 @@ const destroy = async (id) => {
           .delete(`${baseEndpoint}/${id}`)
           .then((response) => {
             if (response.data.status == "success") {
-              getCustomers();
+              getEmployees();
               flash(response.data.message);
             } else {
               flash(response.data.message);
@@ -136,7 +135,7 @@ const show = async (id) => {
 const handleSort = (col) => {
   orderBy.value = col;
   sortOrder.value = sortOrder.value == "desc" ? "asc" : "desc";
-  getCustomers();
+  getEmployees();
 };
 
 const handleSubmit = () => {
@@ -171,7 +170,7 @@ const handleExportClick = async () => {
 
 // Hooks
 onMounted(() => {
-  getCustomers();
+  getEmployees();
   modal = new Modal(document.getElementById(modalID), {
     keyboard: false,
   });
@@ -181,10 +180,10 @@ onMounted(() => {
 <template>
   <Panel>
     <template #header>
-      <h1 class="h3 mb-0 text-middle">Customers</h1>
+      <h1 class="h3 mb-0 text-middle">Employees</h1>
       <div>
         <button type="button" class="btn btn-primary" @click="create">
-          Add Customer
+          Add Employee
         </button>
         <!-- <button
           v-if="can('customer-view')"
@@ -227,17 +226,17 @@ onMounted(() => {
               <th>Name</th>
               <th>Email</th>
               <th>Phone</th>
-              <th>Trader</th>
+              <th>Joining Date</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(customer, index) in customers.data" :key="customer.id">
+            <tr v-for="(employee, index) in employees.data" :key="employee.id">
               <td>{{ index + 1 }}</td>
-              <td>{{ customer.name }}</td>
-              <td>{{ customer.email }}</td>
-              <td>{{ customer.phone }}</td>
-              <td>{{ customer.trader }}</td>
+              <td>{{ employee.name }}</td>
+              <td>{{ employee.email }}</td>
+              <td>{{ employee.phone }}</td>
+              <td><AppDate :timestamp="employee.joining_date" /></td>
               <td>
                 <div>
                   <!-- <router-link
@@ -251,7 +250,7 @@ onMounted(() => {
                   </router-link> -->
                   <a
                     class="btn btn-sm btn-info me-1 mb-1"
-                    @click.prevent="edit(customer.id)"
+                    @click.prevent="edit(employee.id)"
                   >
                     <i class="mr-1 fa fa-pencil"></i>
                   </a>
@@ -273,18 +272,18 @@ onMounted(() => {
       <h3>Loading...</h3>
     </div>
     <template #footer v-if="!isLoading">
-      <Pagination :data="customers" @pagination-change-page="getCustomers" />
+      <Pagination :data="employees" @pagination-change-page="getEmployees" />
       <div class="text-center">
         <small>
-          Showing {{ customers.meta.from }} to {{ customers.meta.to }} of
-          {{ customers.meta.total }}
+          Showing {{ employees.meta.from }} to {{ employees.meta.to }} of
+          {{ employees.meta.total }}
         </small>
       </div>
     </template>
   </Panel>
 
   <VueModal :id="modalID" @onSubmit="handleSubmit">
-    <template #title> {{ editMode ? "Edit" : "Add" }} Customer </template>
+    <template #title> {{ editMode ? "Edit" : "Add" }} Employee </template>
     <div class="mb-3">
       <label class="form-label" for="name">Name:</label>
       <input
@@ -318,14 +317,24 @@ onMounted(() => {
       <HasError :form="form" field="phone" />
     </div>
     <div class="mb-3">
-      <label class="form-label" for="company">Trader:</label>
+      <label class="form-label" for="address">Address:</label>
       <input
-        v-model="form.trader"
+        v-model="form.address"
         type="text"
         class="form-control"
-        id="trader"
+        id="address"
       />
-      <HasError :form="form" field="company" />
+      <HasError :form="form" field="address" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="joining_date">Joining Date:</label>
+      <input
+        v-model="form.joining_date"
+        type="date"
+        class="form-control"
+        id="joining_date"
+      />
+      <HasError :form="form" field="joining_date" />
     </div>
     <template #footer>
       <Button :form="form" class="btn btn-primary">Save</Button>

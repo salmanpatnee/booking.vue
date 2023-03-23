@@ -23,8 +23,8 @@ const selectedProduct = ref(null);
 const form = ref(
   new Form({
     id: "",
-    account_id: "",
-    payment_method_id: 1,
+    account_id: 1,
+    payment_method_id: 2,
     reference_number: "",
     discount_type: "",
     discount_rate: 0,
@@ -41,69 +41,39 @@ const form = ref(
     gross_amount: 0.0,
     paid_amount: 0.0,
     created_by: 1,
-    box_qty: null, 
+    box_qty: null,
   })
 );
 
 // Methods
-const debounce = (fn, delay) => {
-  let timeout;
-
-  return (...args) => {
-    if (timeout) {
-      clearTimeout(timeout);
-    }
-
-    timeout = setTimeout(() => {
-      fn(...args);
-    }, delay);
-  };
-};
-
-const getSuppliers = async () => {
-  const { data: response } = await supplierService.getSuppliers();
-  suppliers.value = response.data;
-};
-
-// const getProducts = async (search, loading) => {
-//   if (search.length) {
-//     loading(true);
-//     searchProducts(loading, search);
-//   }
-// };
-
-const handleAjaxSelect = () => {
-  form.value.account_id = selectedSupplier.value.id;
-};
 
 const handleAmountChange = (index) => {
   const purchaseDetail = form.value.purchase_details[index];
+
   setUnitCost(index, purchaseDetail.amount, purchaseDetail.quantity);
 };
 
 const handleChange = (index, $event) => {
   const item = form.value.purchase_details[index];
 
-  let quantity = 0;
+  // let quantity = 0;
 
-  if (item.units_in_box && item.quantity_boxes)
-    quantity += item.units_in_box * item.quantity_boxes;
-  if (item.units_in_strip && item.quantity_strips)
-    quantity += item.units_in_strip * item.quantity_strips;
-  if (item.quantity_units) quantity += item.quantity_units;
+  // if (item.units_in_box && item.quantity_boxes)
+  //   quantity += item.units_in_box * item.quantity_boxes;
+  // if (item.units_in_strip && item.quantity_strips)
+  //   quantity += item.units_in_strip * item.quantity_strips;
+  // if (item.quantity_units) quantity += item.quantity_units;
 
-  form.value.purchase_details[index].quantity = quantity;
+  // form.value.purchase_details[index].quantity = quantity;
 
   /* set price */
-  setUnitCost(index, item.amount, quantity);
+  setUnitCost(index, item.amount, $event.target.value);
 };
 
 const handleProductSelect = (selectedOption) => {
-  
   selectedProduct.value = selectedOption;
 
   const product = selectedOption;
-
   /* Check whether product already selected */
   const productExist = form.value.purchase_details.findIndex((sD) => {
     return sD.product_id === product.id;
@@ -117,20 +87,24 @@ const handleProductSelect = (selectedOption) => {
     return;
   }
 
+  console.log(product);
+
   const obj = {
     product_id: product.id,
     product_name: product.name,
     price: product.default_purchase_price,
     default_selling_price: product.default_selling_price,
-    default_box_sale_price: product.default_box_sale_price,
-    quantity: 1,
+    // default_box_sale_price: product.default_box_sale_price,
+    // quantity: 1,
     stock: product.quantity,
-    expiry_date: moment().add(1, "M").format("YYYY-MM-DD"),
+    // expiry_date: moment().add(1, "M").format("YYYY-MM-DD"),
     units_in_box: product.uom_of_boxes,
     units_in_strip: product.uom_of_strips,
     quantity_boxes: null,
     quantity_strips: null,
     quantity_units: null,
+    units_in_box: null,
+    units_in_strip: null,
     quantity: 0,
   };
 
@@ -141,13 +115,15 @@ const handleProductSelect = (selectedOption) => {
 };
 
 const handleBoxSalePriceChange = (index) => {
-  if (form.value.purchase_details[index].box_sale_price != "") {
+  if (form.value.purchase_details[index].sale_price != "") {
     form.value.purchase_details[index].total_sale_price =
-      form.value.purchase_details[index].box_sale_price *
-      form.value.purchase_details[index].quantity_boxes;
-    form.value.purchase_details[index].sale_price =
-      form.value.purchase_details[index].box_sale_price /
-      form.value.purchase_details[index].units_in_box;
+      form.value.purchase_details[index].sale_price *
+      form.value.purchase_details[index].quantity;
+    form.value.purchaseDetails[index].units_in_box =
+      form.value.purchase_details[index].quantity;
+    form.value.purchase_details[index].box_sale_price =
+      form.value.purchase_details[index].sale_price /
+      form.value.purchase_details[index].quantity;
   }
 };
 
@@ -164,62 +140,6 @@ const handleTotalPriceChange = (index) => {
       form.value.purchase_details[index].total_sale_price /
       form.value.purchase_details[index].quantity;
   }
-};
-
-const populatePurchase = async () => {
-  if (!route.params.id) return;
-  if (route.name == "purchase-orders.purchases.create") {
-    const purchaseOrderId = route.params.id;
-
-    try {
-      const response = await getPurchaseOrder(purchaseOrderId);
-
-      const purchaseDetails = [];
-
-      response.data.data.purchase_order_details.forEach(
-        (purchaseOrderDetail) => {
-          const obj = {
-            price: purchaseOrderDetail.product.default_purchase_price,
-            product_id: purchaseOrderDetail.product_id,
-            product_name: purchaseOrderDetail.product.name,
-            quantity: purchaseOrderDetail.quantity_demanded,
-          };
-          purchaseDetails.push(obj);
-        }
-      );
-
-      form.value.purchase_details = purchaseDetails;
-      form.value.purchase_order_id = purchaseOrderId;
-    } catch (error) {
-      console.log(error);
-    }
-  } else {
-    const purchaseId = route.params.id;
-
-    editMode.value = true;
-    try {
-      const response = await getPurchase(purchaseId);
-
-      response.data.data.purchase_details.forEach((purchaseDetail) => {
-        purchaseDetail.product_name = purchaseDetail.product.name;
-      });
-
-      // response.data.data
-
-      form.value.fill(response.data.data);
-
-      selectedSupplier.value = response.data.data.account;
-    } catch (error) {}
-  }
-};
-
-const getPurchase = (id) => purchaseService.getPurchase(id);
-
-const getPurchaseOrder = async (id) => {
-  return await purchaseOrderService.getPurchaseOrder(
-    id,
-    "?for=purchases.create"
-  );
 };
 
 const setUnitCost = (index, amount, quantity) => {
@@ -275,27 +195,27 @@ const netAmount = computed(
 
 const dueAmount = computed(() => netAmount.value - form.value.paid_amount);
 
-const calculateDiscount = () => {
-  let type = form.value.discount_type;
+// const calculateDiscount = () => {
+//   let type = form.value.discount_type;
 
-  if (type !== "") {
-    if (type === "fixed") {
-      form.value.discount_amount = form.value.discount_rate;
-    } else {
-      form.value.discount_amount =
-        (grossAmountTotal.value * form.value.discount_rate) / 100;
-    }
-  } else {
-    form.value.discount_rate = form.value.discount_amount = 0;
-  }
-};
+//   if (type !== "") {
+//     if (type === "fixed") {
+//       form.value.discount_amount = form.value.discount_rate;
+//     } else {
+//       form.value.discount_amount =
+//         (grossAmountTotal.value * form.value.discount_rate) / 100;
+//     }
+//   } else {
+//     form.value.discount_rate = form.value.discount_amount = 0;
+//   }
+// };
 
-watch(
-  () => form.value.discount_rate,
-  (discount_rate, prevCount) => {
-    calculateDiscount();
-  }
-);
+// watch(
+//   () => form.value.discount_rate,
+//   (discount_rate, prevCount) => {
+//     calculateDiscount();
+//   }
+// );
 
 watch(
   () => grossAmountTotal.value,
@@ -303,15 +223,12 @@ watch(
     form.value.gross_amount = grossAmountTotal;
     form.value.net_amount =
       grossAmountTotal.value - form.value.discount_rate + form.value.tax_amount;
-    calculateDiscount();
+    // calculateDiscount();
   }
 );
 
 const handleFullPaid = () => (form.value.paid_amount = netAmount.value);
 
-const handleUpdateQty = (qty, uom) => {
-  console.log({ qty });
-};
 const displayQty = computed(() => {
   return form.value.purchase_details.map((item) => {
     return (
@@ -324,18 +241,10 @@ const displayQty = computed(() => {
 const displayUnitCost = (amount, qty) => {
   return amount > 0 && qty > 0 ? (amount / qty).toFixed(2) : 0;
 };
-
-// Hooks
-onMounted(async () => {
-  // await getSuppliers();
-  await populatePurchase();
-
-  isLoaded.value = true;
-});
 </script>
 
 <template>
-  <form @submit.prevent="editMode ? update() : store()" v-if="isLoaded">
+  <form @submit.prevent="editMode ? update() : store()">
     <Panel>
       <template #header>
         <h1 class="h3 mb-0 text-middle">
@@ -346,7 +255,7 @@ onMounted(async () => {
         </router-link>
       </template>
       <div class="row">
-        <div class="col mb-3">
+        <!-- <div class="col mb-3">
           <FormAjaxSelect
             name="supplier"
             slug="suppliers"
@@ -355,7 +264,7 @@ onMounted(async () => {
             @update:modelValue="handleAjaxSelect"
           />
           <HasError :form="form" field="account_id" />
-        </div>
+        </div> -->
         <div class="col">
           <div class="mb-3">
             <label class="form-label" for="reference_number"
@@ -426,12 +335,12 @@ onMounted(async () => {
               <th>#</th>
               <th>Product</th>
               <th>Total Cost</th>
-              <th>Qty</th>
+              <!-- <th>Qty</th> -->
               <th>Total Qty</th>
               <th>Unit Cost</th>
               <th>Retai Price</th>
-              <th>Profit %</th>
-              <th>Expiry Date</th>
+              <!-- <th>Profit %</th>
+              <th>Expiry Date</th> -->
               <th class="text-center">Action</th>
             </tr>
           </thead>
@@ -458,7 +367,7 @@ onMounted(async () => {
                   :field="`purchase_details.${i}.amount`"
                 />
               </td>
-              <td>
+              <!-- <td>
                 <div class="d-flex align-items-center mb-1">
                   <label class="form-label mb-0 me-1"
                     ><b>Box&nbsp;&nbsp;</b></label
@@ -526,12 +435,13 @@ onMounted(async () => {
                     />
                   </div>
                 </div>
-              </td>
+              </td> -->
               <td>
                 <input
                   :id="`purchase-details-${i}-quantity`"
                   type="number"
-                  class="form-control readonly"
+                  @input="handleChange(i, $event)"
+                  class="form-control"
                   v-model="purchaseDetail.quantity"
                   min="1"
                 />
@@ -547,7 +457,17 @@ onMounted(async () => {
               </td>
 
               <td class="text-center">
-                <div class="d-flex flex-column gap-2">
+                <input
+                  :id="`purchase-details-${i}-sale_price`"
+                  type="number"
+                  class="form-control"
+                  v-model="purchaseDetail.sale_price"
+                  @input="handleBoxSalePriceChange(i)"
+                  :min="purchaseDetail.price.toFixed(2)"
+                  step="any"
+                />
+
+                <!-- <div class="d-flex flex-column gap-2">
                   <div class="d-flex gap-2 align-items-center">
                     <label class="form-label mb-0">Box</label>
                     <input
@@ -555,17 +475,20 @@ onMounted(async () => {
                       type="number"
                       class="form-control"
                       step=".01"
-                      required :placeholder="purchaseDetail.default_box_sale_price"
+                      required
+                      :placeholder="purchaseDetail.default_box_sale_price"
                       :min="
                         purchaseDetail.amount && purchaseDetail.quantity_boxes
-                          ? (purchaseDetail.amount /
-                            purchaseDetail.quantity_boxes).toFixed(2)
+                          ? (
+                              purchaseDetail.amount /
+                              purchaseDetail.quantity_boxes
+                            ).toFixed(2)
                           : null
                       "
                       @input="handleBoxSalePriceChange(i)"
                     />
                   </div>
-          
+
                   <div class="d-flex flex-column">
                     <div class="d-flex gap-2 align-items-center">
                       <label class="form-label mb-0">Unit</label>
@@ -605,10 +528,10 @@ onMounted(async () => {
                       readonly="true"
                     />
                   </div>
-                </div>
+                </div> -->
               </td>
 
-              <td>
+              <!-- <td>
                 {{
                   (
                     ((purchaseDetail.sale_price -
@@ -625,7 +548,7 @@ onMounted(async () => {
                   v-model="purchaseDetail.expiry_date"
                   :min="moment().add(1, 'M').format('YYYY-MM-DD')"
                 />
-              </td>
+              </td> -->
               <td class="text-center">
                 <button
                   type="button"
@@ -641,7 +564,7 @@ onMounted(async () => {
       </div>
     </Panel>
 
-    <Panel>
+    <!-- <Panel>
       <template #header>
         <h1 class="h3 mb-0 text-middle">Discount</h1>
       </template>
@@ -706,7 +629,7 @@ onMounted(async () => {
           <label> <b>Tax:</b>(+) {{ form.tax_amount }} </label>
         </div>
       </div>
-    </Panel>
+    </Panel> -->
 
     <Panel>
       <template #header>
