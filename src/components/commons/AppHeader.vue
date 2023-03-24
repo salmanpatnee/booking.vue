@@ -179,7 +179,7 @@ const handlePrepareDayClose = async () => {
 };
 
 onMounted(() => {
-  getExpenseTypes();
+  // getExpenseTypes();
   moment().format();
   registerModal = new Modal(document.getElementById(registerModalId), {
     keyboard: false,
@@ -364,7 +364,10 @@ onMounted(() => {
             POS
           </router-link>
         </li>
-        <li class="nav-item" v-if="can('sale-view') && authStore.isRegisterOpen ">
+        <li
+          class="nav-item"
+          v-if="can('sale-view') && authStore.isRegisterOpen"
+        >
           <router-link
             class="btn btn-primary btn-lg mx-2"
             :to="{ name: 'todays.sales.index' }"

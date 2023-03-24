@@ -25,7 +25,14 @@ const sale = ref({
 const route = useRoute();
 const router = useRouter();
 const toast = ref(useToast());
-const customers = ref([]);
+const customers = ref({
+  isLoading: false,
+  data: [],
+});
+const employees = ref({
+  isLoading: false,
+  data: [],
+});
 const products = ref([]);
 const baseEndpoint = "/api/sales";
 const swal = inject("$swal");
@@ -41,6 +48,15 @@ const bankAccounts = ref([]);
 // const isRegisterOpen = computed(() => {
 //   return authStore.user.cash_registers.length;
 // });
+
+const getEmployees = async (page = 1) => {
+  // const params = `?page=${page}&paginate=${paginate.value}&search=${search.value}`;
+  const params = `?for=sales.create`;
+  employees.value.loading = true;
+  const { data: response } = await axios.get(`/api/employees`);
+  employees.value.data = response.data;
+  employees.value.loading = false;
+};
 
 const handleShipment = () => {
   if (form.value.is_deliverable) {
@@ -61,13 +77,14 @@ const form = ref(
   new Form({
     id: "",
     account_id: "",
+    employee_id: "",
     date: moment().format("YYYY-MM-DD"),
     device_name: null,
     model_no: null,
     imei: null,
     charges: null,
     issue: null,
-    status: "inprocess",
+    // status: "inprogress",
   })
 );
 
@@ -246,8 +263,35 @@ const searchProductsWithBarcode = debounce(async (query) => {
   }
 }, 350);
 
-const handleSubmit = () => {
-  console.log("Submit");
+const handleSubmit = async () => {
+  try {
+    const { data: response } = await form.value.post(`/api/bookings`);
+
+    if (response.status == "success") {
+      form.value.reset();
+      selectedCustomer.value = "";
+
+      swal
+        .fire({
+          title: "Success!",
+          text: "Do You Want To Print ?",
+          icon: "success",
+          showCancelButton: true,
+          confirmButtonText: "Yes!",
+        })
+        .then(async (result) => {
+          if (result.isConfirmed) {
+            let routeData = router.resolve({
+              name: "bookings.proceed.invoice",
+              params: { id: response.data.id },
+            });
+            window.open(routeData.href, "_blank");
+          }
+        });
+    }
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 const update = async () => {
@@ -364,6 +408,7 @@ const showCustomerModal = () => {
 
 // Hooks
 onMounted(async () => {
+  await getEmployees();
   if (barcodeInput.value) {
     barcodeInput.value.focus();
   }
@@ -377,11 +422,9 @@ onMounted(async () => {
   <form @submit.prevent="handleSubmit">
     <Panel>
       <template #header>
-        <h1 class="h3 mb-0 text-middle">
-          Add Booking
-        </h1>
+        <h1 class="h3 mb-0 text-middle">Add Booking</h1>
       </template>
-      <div class="d-flex g-0 align-items-end mb-5 col-4">
+      <div class="d-flex g-0 align-items-end mb-5 col-8">
         <div class="col">
           <FormAjaxSelect
             ref="customerInput"
@@ -452,7 +495,7 @@ onMounted(async () => {
             </div>
           </div>
         </div>
-        <div class="row">
+        <div class="row mb-3">
           <div class="col-4">
             <label class="form-label" for="charges"><b>Charges:</b></label>
             <input
@@ -465,19 +508,36 @@ onMounted(async () => {
             />
             <HasError :form="form" field="charges" />
           </div>
-          <div class="col-8">
-            <label class="form-label" for="imei"><b>Issue:</b></label>
-            <textarea
-              v-model="form.issue"
-              id="issue"
-              class="form-control w-100"
-              placeholder="Display panel"
-              required
-            ></textarea>
-
-            <HasError :form="form" field="issue" />
+          <div class="col-4">
+            <label class="form-label" for="charges"
+              ><b>Employee / Technician:</b></label
+            >
+            <select class="form-control" v-model="form.employee_id" required>
+              <option value="">--Select--</option>
+              <option
+                :value="employee.id"
+                v-for="employee in employees.data"
+                :key="employee.id"
+              >
+                {{ employee.name }}
+              </option>
+            </select>
+            <HasError :form="form" field="employee_id" />
           </div>
-          <div class="col"></div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-8">
+          <label class="form-label" for="imei"><b>Issue:</b></label>
+          <textarea
+            v-model="form.issue"
+            id="issue"
+            class="form-control w-100"
+            placeholder="Display panel"
+            required
+          ></textarea>
+
+          <HasError :form="form" field="issue" />
         </div>
       </div>
       <template #footer>

@@ -13,7 +13,7 @@ const sales = ref([]);
 const paginate = ref(25);
 const search = ref("");
 const id = ref("");
-const baseEndpoint = "/api/sales";
+const baseEndpoint = "/api/bookings";
 let orderBy = ref("created_at");
 let sortOrder = ref("desc");
 let start_date = ref("");
@@ -24,19 +24,19 @@ const isLoading = ref(true);
 watch(
   () => paginate.value,
   (paginate, prevCount) => {
-    getSales();
+    getBookings();
   }
 );
 watch(
   () => search.value,
   (search, prevCount) => {
-    getSales();
+    getBookings();
   }
 );
 watch(
   () => id.value,
   (id, prevCount) => {
-    getSales();
+    getBookings();
   }
 );
 
@@ -76,7 +76,7 @@ const handleExportClick = async () => {
   link.click();
 };
 
-const getSales = async (page = 1) => {
+const getBookings = async (page = 1) => {
   isLoading.value = true;
   const response = await axios.get(
     baseEndpoint +
@@ -88,10 +88,6 @@ const getSales = async (page = 1) => {
       search.value +
       "&id=" +
       id.value +
-      "&sortOrder=" +
-      sortOrder.value +
-      "&orderBy=" +
-      orderBy.value +
       "&start_date=" +
       start_date.value +
       "&end_date=" +
@@ -102,13 +98,13 @@ const getSales = async (page = 1) => {
 };
 
 const handleFilterSales = async () => {
-  await getSales();
+  await getBookings();
 };
 
 const handleSort = (col) => {
   orderBy.value = col;
   sortOrder.value = sortOrder.value == "desc" ? "asc" : "desc";
-  getSales();
+  getBookings();
 };
 
 const displayProfit = (netAmount, cost, shipping_charges) => {
@@ -120,7 +116,7 @@ const displayProfit = (netAmount, cost, shipping_charges) => {
 
 // Hooks
 onMounted(() => {
-  getSales();
+  getBookings();
 });
 </script>
 
@@ -172,7 +168,7 @@ onMounted(() => {
   </Panel>
   <Panel>
     <template #header>
-      <h1 class="h3 mb-0 text-middle">Sales</h1>
+      <h1 class="h3 mb-0 text-middle">Bookings</h1>
       <div>
         <router-link
           v-if="can('sale-add')"
@@ -181,10 +177,10 @@ onMounted(() => {
         >
           Add Sale
         </router-link>
-        <button class="btn btn-lg btn-info" @click="handleExportClick">
+        <!-- <button class="btn btn-lg btn-info" @click="handleExportClick">
           <i class="fa fa-download"></i>
           Export to Excel
-        </button>
+        </button> -->
       </div>
     </template>
     <div class="mb-3 row">
@@ -209,13 +205,27 @@ onMounted(() => {
         />
       </div>
       <div class="col">
-        <input
+        <select class="form-control">
+          <option value="">--Filter by Status--</option>
+          <option value="in progress">In Progress</option>
+          <option value="repaired">Repaired</option>
+          <option value="complete">Complete</option>
+          <option value="can not be repaired">Can't Repaired</option>
+          <option value="customer collected CBR">Customer Collected CBR</option>
+          <option value="customer collected payment pending">
+            Payment Pending
+          </option>
+          <option value="shop property">Shop Property</option>
+          <option value="awaiting customer response">Awaiting Response</option>
+          <option value="awaiting parts">Awaiting Parts</option>
+        </select>
+        <!-- <input
           type="search"
           placeholder="Search by other fields"
           v-model.trim.lazy="search"
           class="form-control"
           id="search"
-        />
+        /> -->
         <!-- <div class="form-check">
           <input
             class="form-check-input"
@@ -236,114 +246,29 @@ onMounted(() => {
         <thead class="bg-primary text-bg-dark">
           <tr>
             <th>#</th>
+            <th>ID</th>
             <th>Date</th>
-            <th>Invoice No</th>
             <th>Customer</th>
-            <th>Status</th>
+            <th>Device</th>
+            <th>Issue</th>
             <th>Cost</th>
-            <th>Total</th>
-            <th>Profit</th>
-            <th class="text-center" style="width: 160px;">Action</th>
+            <th>Status</th>
+            <th>Repair By</th>
+            <th class="text-center" style="width: 160px">Action</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(sale, index) in sales.data" :key="sale.id">
+          <tr v-for="(sale, index) in sales" :key="sale.id">
             <td>{{ index + 1 }}</td>
-            <td>
-              <AppDate :timestamp="sale.date" /><br />
-              <AppTime :timestamp="sale.created_at" />
-            </td>
-            <td>
-              <router-link
-                :to="{ name: 'sales.show', params: { id: sale.id } }"
-              >
-                {{ sale.id }}
-              </router-link>
-            </td>
+            <td>{{ sale.booking_id }}</td>
+            <td><AppDate :timestamp="sale.date" /></td>
             <td>{{ sale.account.name }}</td>
-            <td>
-              <span
-                class="text-capitalize badge"
-                :class="{
-                  'bg-info': sale.status == 'ordered',
-                  'bg-warning': sale.status == 'draft',
-                  'bg-success':
-                    sale.status == 'final' || sale.status == 'completed',
-                  'bg-danger': sale.status == 'returned',
-                }"
-                >{{ sale.status }}</span
-              >
-            </td>
-            <td>{{ sale.purchase_amount.toFixed(2) }}</td>
-            <td>{{ sale.net_amount }}</td>
-            <td>
-              {{
-                displayProfit(
-                  sale.net_amount,
-                  sale.purchase_amount,
-                  sale.shipping_charges
-                )
-              }}
-            </td>
-
-            <td>
-              <div class="text-center">
-                <router-link
-                  v-if="can('sale-view')"
-                  class="btn btn-sm btn-primary me-1 mb-1"
-                  :to="{ name: 'sales.show', params: { id: sale.id } }"
-                >
-                  <i class="mr-1 fa fa-eye"></i>
-                </router-link>
-                <router-link
-                  v-if="can('sale-view')"
-                  class="btn btn-sm btn-success me-1 mb-1"
-                  :to="{ name: 'sales.invoice', params: { id: sale.id } }"
-                  target="_blank"
-                >
-                  <i class="mr-1 fa fa-print"></i>
-                </router-link>
-                <!--
-                   <router-link
-                  v-if="
-                    can('sale-return-add') &&
-                    sale.status != 'final' &&
-                    sale.status != 'returned'
-                  "
-                  class="btn btn-sm btn-info me-1 mb-1"
-                  :to="{
-                    name: 'sales.return.create',
-                    params: { id: sale.id },
-                  }"
-                >
-                  <i class="fa fa-refresh" aria-hidden="true"></i>
-                </router-link>
-                -->
-                <router-link
-                  class="btn btn-sm btn-info me-1 mb-1"
-                  :to="{
-                    name: 'sales.return.create',
-                    params: { id: sale.id },
-                  }"
-                >
-                  <i class="fa fa-refresh" aria-hidden="true"></i>
-                </router-link>
-                <router-link
-                  v-if="
-                    can('sale-return-add') &&
-                    sale.status != 'final' &&
-                    sale.status != 'returned'
-                  "
-                  class="btn btn-sm btn-warning me-1 mb-1"
-                  :to="{
-                    name: 'exchanges.create',
-                    params: { id: sale.id },
-                  }"
-                >
-                  <i class="fa fa-exchange" aria-hidden="true"></i>
-                </router-link>
-              </div>
-            </td>
+            <td>{{ sale.device_name }}</td>
+            <td>{{ sale.issue }}</td>
+            <td>{{ sale.charges }}</td>
+            <td class="text-capitalize">{{ sale.status }}</td>
+            <td>{{ sale.employee.name }}</td>
+            <td></td>
           </tr>
         </tbody>
       </table>
@@ -352,7 +277,7 @@ onMounted(() => {
       <h3>Loading...</h3>
     </div>
     <template #footer v-if="!isLoading">
-      <Pagination :data="sales" @pagination-change-page="getSales" />
+      <Pagination :data="sales" @pagination-change-page="getBookings" />
       <div class="text-center">
         <small>
           Showing {{ sales.from }} to {{ sales.to }} of

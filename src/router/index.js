@@ -51,6 +51,7 @@ import StockReport from "@@/views/stock/StockReport.vue";
 
 import BookingIndex from "@@/views/bookings/Index.vue";
 import BookingCreate from "@@/views/bookings/Create.vue";
+import BookingsProceedInvoice from "@@/views/bookings/ProceedInvoice.vue";
 
 // import SaleIndex from "@@/views/sales/Index.vue";
 // import TodaySaleIndex from "@@/views/sales/TodaySaleIndex.vue";
@@ -338,6 +339,12 @@ const router = createRouter({
           path: "/bookings/create",
           name: "bookings.create",
           component: BookingCreate,
+        },
+        {
+          path: "/bookings/:id/proceed/invoice",
+          name: "bookings.proceed.invoice",
+          component: BookingsProceedInvoice,
+          // meta: { authorize: ["pos-manage"] },
         },
 
         // {
