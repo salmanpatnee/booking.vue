@@ -49,6 +49,9 @@ import StockReport from "@@/views/stock/StockReport.vue";
 // import StockTransfer from "@@/views/stock/StockTransfer.vue";
 // import StockManagement from "@@/views/stock/StockManagement.vue";
 
+import BookingIndex from "@@/views/bookings/Index.vue";
+import BookingCreate from "@@/views/bookings/Create.vue";
+
 // import SaleIndex from "@@/views/sales/Index.vue";
 // import TodaySaleIndex from "@@/views/sales/TodaySaleIndex.vue";
 // import SaleShow from "@@/views/sales/Show.vue";
@@ -65,7 +68,7 @@ import StockReport from "@@/views/stock/StockReport.vue";
 // import SaleReturnCreate from "@@/views/sales-return/ReturnsCreate.vue";
 // import SalesReturnPrint from "@@/views/sales-return/SalesReturnPrint.vue";
 
-// import PosCreate from "@@/views/pos/PosCreate.vue";
+import PosCreate from "@@/views/pos/PosCreate.vue";
 
 // import ExchangeList from "@@/views/exchange/ExchangeList.vue";
 // import ExchangeShow from "@@/views/exchange/ExchangeShow.vue";
@@ -326,6 +329,17 @@ const router = createRouter({
         //   component: StockManagement,
         // },
 
+        {
+          path: "/bookings",
+          name: "bookings.index",
+          component: BookingIndex,
+        },
+        {
+          path: "/bookings/create",
+          name: "bookings.create",
+          component: BookingCreate,
+        },
+
         // {
         //   path: "/sales",
         //   name: "sales.index",
@@ -387,12 +401,12 @@ const router = createRouter({
         //   // meta: { authorize: ["sale-edit"] },
         // },
 
-        // {
-        //   path: "/pos",
-        //   name: "pos.create",
-        //   component: PosCreate,
-        //   // meta: { authorize: ["pos-manage"] },
-        // },
+        {
+          path: "/pos",
+          name: "pos.create",
+          component: PosCreate,
+          // meta: { authorize: ["pos-manage"] },
+        },
 
         // {
         //   path: "/sales-return",

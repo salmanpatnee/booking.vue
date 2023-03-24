@@ -80,6 +80,45 @@ const { can } = useCan();
             <span class="align-middle">Customers</span>
           </router-link>
         </li>
+
+        <li class="sidebar-item">
+          <a
+            data-bs-target="#bookings"
+            data-bs-toggle="collapse"
+            class="sidebar-link collapsed"
+            aria-expanded="false"
+          >
+            <i class="fa fa-calendar" aria-hidden="true"></i>
+            <span class="align-middle">Bookings</span>
+          </a>
+          <ul
+            id="bookings"
+            class="sidebar-dropdown list-unstyled collapse"
+            data-bs-parent="#sidebar"
+            style=""
+          >
+            <li class="sidebar-item">
+              <router-link
+                class="sidebar-link"
+                :to="{ name: 'bookings.create' }"
+              >
+                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                <span class="align-middle">Add Booking</span>
+              </router-link>
+            </li>
+
+            <li class="sidebar-item">
+              <router-link
+                class="sidebar-link"
+                :to="{ name: 'bookings.index' }"
+              >
+                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                <span class="align-middle">Manage Bookings</span>
+              </router-link>
+            </li>
+          </ul>
+        </li>
+
         <!-- <li class="sidebar-item">
           <router-link class="sidebar-link" :to="{ name: 'locations.index' }">
             <i class="fa fa-location-arrow" aria-hidden="true"></i>
@@ -241,7 +280,7 @@ const { can } = useCan();
           </ul>
         </li>
 
-        <!-- <li class="sidebar-item">
+        <li class="sidebar-item">
           <a
             data-bs-target="#sale"
             data-bs-toggle="collapse"
@@ -257,12 +296,12 @@ const { can } = useCan();
             data-bs-parent="#sidebar"
             style=""
           >
-            <li class="sidebar-item">
+            <!-- <li class="sidebar-item">
               <router-link class="sidebar-link" :to="{ name: 'sales.index' }">
                 <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
                 <span class="align-middle">Sales</span>
               </router-link>
-            </li>
+            </li> -->
             <li class="sidebar-item">
               <router-link class="sidebar-link" :to="{ name: 'pos.create' }">
                 <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
@@ -270,7 +309,7 @@ const { can } = useCan();
               </router-link>
             </li>
           </ul>
-        </li> -->
+        </li>
 
         <!-- <li class="sidebar-item">
           <a
