@@ -181,24 +181,7 @@ const handlePrepareDayClose = async () => {
 onMounted(() => {
   // getExpenseTypes();
   moment().format();
-  registerModal = new Modal(document.getElementById(registerModalId), {
-    keyboard: false,
-  });
 
-  openRegisterModal = new Modal(
-    document.getElementById("openRegisterModalId"),
-    {
-      keyboard: false,
-    }
-  );
-
-  dayClosingModal = new Modal(document.getElementById("dayClosingModalId"), {
-    keyboard: false,
-  });
-
-  modal = new Modal(document.getElementById("expensesModal"), {
-    keyboard: false,
-  });
 });
 </script>
 
@@ -210,229 +193,28 @@ onMounted(() => {
 
     <div class="navbar-collapse collapse">
       <ul class="navbar-nav navbar-align align-items-center">
-        <!-- <li class="nav-item dropdown">
-                    <a class="nav-icon dropdown-toggle" href="#" id="alertsDropdown" data-bs-toggle="dropdown">
-                        <div class="position-relative">
-                            <i class="align-middle" data-feather="bell"></i>
-                            <span class="indicator">4</span>
-                        </div>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0" aria-labelledby="alertsDropdown">
-                        <div class="dropdown-menu-header">
-                            4 New Notifications
-                        </div>
-                        <div class="list-group">
-                            <a href="#" class="list-group-item">
-                                <div class="row g-0 align-items-center">
-                                    <div class="col-2">
-                                        <i class="text-danger" data-feather="alert-circle"></i>
-                                    </div>
-                                    <div class="col-10">
-                                        <div class="text-dark">Update completed</div>
-                                        <div class="text-muted small mt-1">Restart server 12 to complete the
-                                            update.</div>
-                                        <div class="text-muted small mt-1">30m ago</div>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="#" class="list-group-item">
-                                <div class="row g-0 align-items-center">
-                                    <div class="col-2">
-                                        <i class="text-warning" data-feather="bell"></i>
-                                    </div>
-                                    <div class="col-10">
-                                        <div class="text-dark">Lorem ipsum</div>
-                                        <div class="text-muted small mt-1">Aliquam ex eros, imperdiet vulputate
-                                            hendrerit et.</div>
-                                        <div class="text-muted small mt-1">2h ago</div>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="#" class="list-group-item">
-                                <div class="row g-0 align-items-center">
-                                    <div class="col-2">
-                                        <i class="text-primary" data-feather="home"></i>
-                                    </div>
-                                    <div class="col-10">
-                                        <div class="text-dark">Login from 192.186.1.8</div>
-                                        <div class="text-muted small mt-1">5h ago</div>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="#" class="list-group-item">
-                                <div class="row g-0 align-items-center">
-                                    <div class="col-2">
-                                        <i class="text-success" data-feather="user-plus"></i>
-                                    </div>
-                                    <div class="col-10">
-                                        <div class="text-dark">New connection</div>
-                                        <div class="text-muted small mt-1">Christina accepted your request.
-                                        </div>
-                                        <div class="text-muted small mt-1">14h ago</div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="dropdown-menu-footer">
-                            <a href="#" class="text-muted">Show all notifications</a>
-                        </div>
-                    </div>
-                </li>
-                <li class="nav-item dropdown">
-                    <a class="nav-icon dropdown-toggle" href="#" id="messagesDropdown" data-bs-toggle="dropdown">
-                        <div class="position-relative">
-                            <i class="align-middle" data-feather="message-square"></i>
-                        </div>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0"
-                        aria-labelledby="messagesDropdown">
-                        <div class="dropdown-menu-header">
-                            <div class="position-relative">
-                                4 New Messages
-                            </div>
-                        </div>
-                        <div class="list-group">
-                            <a href="#" class="list-group-item">
-                                <div class="row g-0 align-items-center">
-                                    <div class="col-2">
-                                        <img src="/src/assets/img/avatars/avatar-5.jpg"
-                                            class="avatar img-fluid rounded-circle" alt="Vanessa Tucker">
-                                    </div>
-                                    <div class="col-10 ps-2">
-                                        <div class="text-dark">Vanessa Tucker</div>
-                                        <div class="text-muted small mt-1">Nam pretium turpis et arcu. Duis arcu
-                                            tortor.</div>
-                                        <div class="text-muted small mt-1">15m ago</div>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="#" class="list-group-item">
-                                <div class="row g-0 align-items-center">
-                                    <div class="col-2">
-                                        <img src="/src/assets/img/avatars/avatar-2.jpg"
-                                            class="avatar img-fluid rounded-circle" alt="William Harris">
-                                    </div>
-                                    <div class="col-10 ps-2">
-                                        <div class="text-dark">William Harris</div>
-                                        <div class="text-muted small mt-1">Curabitur ligula sapien euismod
-                                            vitae.</div>
-                                        <div class="text-muted small mt-1">2h ago</div>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="#" class="list-group-item">
-                                <div class="row g-0 align-items-center">
-                                    <div class="col-2">
-                                        <img src="/src/assets/img/avatars/avatar-4.jpg"
-                                            class="avatar img-fluid rounded-circle" alt="Christina Mason">
-                                    </div>
-                                    <div class="col-10 ps-2">
-                                        <div class="text-dark">Christina Mason</div>
-                                        <div class="text-muted small mt-1">Pellentesque auctor neque nec urna.
-                                        </div>
-                                        <div class="text-muted small mt-1">4h ago</div>
-                                    </div>
-                                </div>
-                            </a>
-                            <a href="#" class="list-group-item">
-                                <div class="row g-0 align-items-center">
-                                    <div class="col-2">
-                                        <img src="/src/assets/img/avatars/avatar-3.jpg"
-                                            class="avatar img-fluid rounded-circle" alt="Sharon Lessman">
-                                    </div>
-                                    <div class="col-10 ps-2">
-                                        <div class="text-dark">Sharon Lessman</div>
-                                        <div class="text-muted small mt-1">Aenean tellus metus, bibendum sed,
-                                            posuere ac, mattis non.</div>
-                                        <div class="text-muted small mt-1">5h ago</div>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                        <div class="dropdown-menu-footer">
-                            <a href="#" class="text-muted">Show all messages</a>
-                        </div>
-                    </div>
-                </li> -->
+      
 
-        <li class="nav-item" v-if="can('pos-manage')">
+        <li class="nav-item" >
           <router-link
             class="btn btn-primary btn-lg mx-2"
-            :to="{ name: 'pos.create' }"
+            :to="{ name: 'bookings.create' }"
           >
-            <i class="fa fa-th-large" aria-hidden="true"></i>
-            POS
+            <i class="fa fa-plus-circle" aria-hidden="true"></i>
+            New Booking
           </router-link>
         </li>
         <li
           class="nav-item"
-          v-if="can('sale-view') && authStore.isRegisterOpen"
+          
         >
           <router-link
             class="btn btn-primary btn-lg mx-2"
-            :to="{ name: 'todays.sales.index' }"
+            :to="{ name: 'bookings.index' }"
           >
             <i class="fa fa-calendar-minus-o" aria-hidden="true"></i>
-            Todays Sales
+            All Bookings
           </router-link>
-        </li>
-        <li class="nav-item" v-if="can('sale-edit')">
-          <router-link
-            class="btn btn-primary btn-lg mx-2"
-            :to="{ name: 'sales.parking.index' }"
-          >
-            <i class="fa fa-level-down" aria-hidden="true"></i> Parking
-          </router-link>
-        </li>
-        <li
-          class="nav-item"
-          v-if="can('sale-edit') && authStore.isRegisterOpen"
-        >
-          <router-link
-            class="btn btn-primary btn-lg mx-2"
-            :to="{ name: 'sales.parking' }"
-          >
-            <i class="fa fa-money" aria-hidden="true"></i>
-            Cash Counter
-          </router-link>
-        </li>
-        <li
-          class="nav-item"
-          v-if="can('expense-add') && authStore.isRegisterOpen"
-        >
-          <button
-            type="button"
-            class="btn btn-primary btn-lg mx-2"
-            @click="handleAddExpense"
-          >
-            <i class="fa fa-book" aria-hidden="true"></i> Add Expense
-          </button>
-        </li>
-
-        <li
-          class="nav-item"
-          v-if="can('sale-edit') && authStore.isRegisterOpen"
-        >
-          <button class="btn btn-lg btn-danger me-4" @click="showClosingModal">
-            <i class="fa fa-close" aria-hidden="true"></i> Close
-          </button>
-        </li>
-
-        <li
-          class="nav-item"
-          v-if="!authStore.isRegisterOpen && can('sale-edit')"
-        >
-          <button
-            class="btn btn-lg btn-primary me-4"
-            @click.prevent="handleOpenRegister"
-          >
-            <i class="fa fa-book" aria-hidden="true"></i> Open Register
-          </button>
-        </li>
-        <li class="nav-item" v-if="authStore.isRegisterOpen">
-          <span class="badge bg-dark fs-5 ms-2 p-2 text-white">
-            <app-date :timestamp="authStore.getRegisterDate" />
-          </span>
         </li>
 
         <li class="nav-item dropdown">

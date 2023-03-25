@@ -13,6 +13,7 @@ const sales = ref([]);
 const paginate = ref(25);
 const search = ref("");
 const id = ref("");
+const status = ref("");
 const baseEndpoint = "/api/bookings";
 let orderBy = ref("created_at");
 let sortOrder = ref("desc");
@@ -91,11 +92,13 @@ const getBookings = async (page = 1) => {
       "&start_date=" +
       start_date.value +
       "&end_date=" +
-      end_date.value
+      end_date.value + "&status=" + status.value
   );
-  sales.value = response.data.data;
+  sales.value = response.data;
   isLoading.value = false;
 };
+
+
 
 const handleFilterSales = async () => {
   await getBookings();
@@ -205,7 +208,7 @@ onMounted(() => {
         />
       </div>
       <div class="col">
-        <select class="form-control">
+        <select class="form-control" v-model="status" @change="getBookings()">
           <option value="">--Filter by Status--</option>
           <option value="in progress">In Progress</option>
           <option value="repaired">Repaired</option>
@@ -258,7 +261,7 @@ onMounted(() => {
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(sale, index) in sales" :key="sale.id">
+          <tr v-for="(sale, index) in sales.data" :key="sale.id">
             <td>{{ index + 1 }}</td>
             <td>{{ sale.booking_id }}</td>
             <td><AppDate :timestamp="sale.date" /></td>
@@ -268,7 +271,15 @@ onMounted(() => {
             <td>{{ sale.charges }}</td>
             <td class="text-capitalize">{{ sale.status }}</td>
             <td>{{ sale.employee.name }}</td>
-            <td></td>
+            <td>
+              <router-link
+                  
+                  class="btn btn-sm btn-info me-1 mb-1"
+                  :to="{ name: 'bookings.edit', params: { id: sale.id } }"
+                >
+                  <i class="mr-1 fa fa-pencil"></i>
+                </router-link>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -280,8 +291,8 @@ onMounted(() => {
       <Pagination :data="sales" @pagination-change-page="getBookings" />
       <div class="text-center">
         <small>
-          Showing {{ sales.from }} to {{ sales.to }} of
-          {{ sales.total }}
+          Showing {{ sales.meta.from }} to {{ sales.meta.to }} of
+          {{ sales.meta.total }}
         </small>
       </div>
     </template>

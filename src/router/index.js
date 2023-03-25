@@ -51,6 +51,7 @@ import StockReport from "@@/views/stock/StockReport.vue";
 
 import BookingIndex from "@@/views/bookings/Index.vue";
 import BookingCreate from "@@/views/bookings/Create.vue";
+import BookingEdit from "@@/views/bookings/Edit.vue";
 import BookingsProceedInvoice from "@@/views/bookings/ProceedInvoice.vue";
 
 // import SaleIndex from "@@/views/sales/Index.vue";
@@ -339,6 +340,11 @@ const router = createRouter({
           path: "/bookings/create",
           name: "bookings.create",
           component: BookingCreate,
+        },
+        {
+          path: "/bookings/edit/:id",
+          name: "bookings.edit",
+          component: BookingEdit,
         },
         {
           path: "/bookings/:id/proceed/invoice",
