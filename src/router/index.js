@@ -53,6 +53,7 @@ import BookingIndex from "@@/views/bookings/Index.vue";
 import BookingCreate from "@@/views/bookings/Create.vue";
 import BookingEdit from "@@/views/bookings/Edit.vue";
 import BookingsProceedInvoice from "@@/views/bookings/ProceedInvoice.vue";
+import BookingsInvoice from "@@/views/bookings/Invoice.vue";
 
 // import SaleIndex from "@@/views/sales/Index.vue";
 // import TodaySaleIndex from "@@/views/sales/TodaySaleIndex.vue";
@@ -351,6 +352,11 @@ const router = createRouter({
           name: "bookings.proceed.invoice",
           component: BookingsProceedInvoice,
           // meta: { authorize: ["pos-manage"] },
+        },
+        {
+          path: "/bookings/:id/invoice",
+          name: "bookings.invoice",
+          component: BookingsInvoice,
         },
 
         // {

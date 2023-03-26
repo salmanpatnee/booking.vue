@@ -13,7 +13,6 @@ import { Modal } from "bootstrap";
 import { useFlash } from "@@/composables/useFlash";
 
 // Data
-const authStore = useAuthStore();
 
 const isLoaded = ref(false);
 const { flash } = useFlash();
@@ -25,37 +24,27 @@ const sale = ref({
 const route = useRoute();
 const router = useRouter();
 const toast = ref(useToast());
-const customers = ref({
-  isLoading: false,
-  data: [],
-});
+
 const employees = ref({
   isLoading: false,
   data: [],
 });
+
 const products = ref([]);
 const baseEndpoint = "/api/sales";
 const swal = inject("$swal");
-const barcodeInput = ref(null);
-const productBarcodeInput = ref(null);
 
-let discountRateKey = "discount_rate_cash";
-let modal = null;
-let modalID = "customersModal";
 let shouldSubmit = true;
-const bankAccounts = ref([]);
 
 // const isRegisterOpen = computed(() => {
 //   return authStore.user.cash_registers.length;
 // });
 
 const getEmployees = async (page = 1) => {
-  // const params = `?page=${page}&paginate=${paginate.value}&search=${search.value}`;
-  const params = `?for=sales.create`;
-  employees.value.loading = true;
+  employees.value.isLoading = true;
   const { data: response } = await axios.get(`/api/employees`);
   employees.value.data = response.data;
-  employees.value.loading = false;
+  employees.value.isLoading = false;
 };
 
 const getBooking = async () => {
@@ -66,24 +55,10 @@ const getBooking = async () => {
   form.value.fill(response.data);
   form.value.employee_id = response.data.employee.id;
   form.value.status = response.data.status;
+  form.value.booking_details = response.data.booking_details;
   //   console.log({ response });
 
   sale.value.isLoading = false;
-};
-
-const handleShipment = () => {
-  if (form.value.is_deliverable) {
-    discountRateKey = "discount_rate_shipment";
-  } else {
-    discountRateKey = "discount_rate_cash";
-  }
-
-  form.value.sale_details.forEach((sD) => {
-    console.log(sD[discountRateKey]);
-    sD.discount_rate = sD[discountRateKey];
-    console.log(sD[discountRateKey] / 100);
-    sD.price = sD["original_price"] * ((100 - sD[discountRateKey]) / 100);
-  });
 };
 
 const form = ref(
@@ -97,6 +72,7 @@ const form = ref(
     imei: null,
     charges: null,
     issue: null,
+    booking_details: [],
     // status: "inprogress",
   })
 );
@@ -104,35 +80,7 @@ const form = ref(
 const selectedProduct = ref(null);
 const selectedCustomer = ref(null);
 
-const customerForm = ref(
-  new Form({
-    id: "",
-    name: "",
-    email: "",
-    phone: "",
-    trader: "",
-    balance: 0.0,
-    account_type: "customer",
-    for: "pos",
-  })
-);
-
 // Methods
-
-const addCustomer = () => {
-  customerForm.value
-    .post(`api/sales/customers`)
-    .then((response) => {
-      if (response.data.status == "success") {
-        selectedCustomer.value = response.data.data;
-        form.value.account_id = selectedCustomer.value.id;
-        modal.hide();
-      }
-    })
-    .catch((error) => {
-      flash(error.response.data.message, "error");
-    });
-};
 
 const debounce = (fn, delay) => {
   let timeout;
@@ -153,17 +101,19 @@ const handleProductSelect = (selectedOption) => {
 
   const product = selectedOption;
 
-  /* Check whether product already selected */
-  const productExist = form.value.sale_details.findIndex((sD) => {
-    return sD.product_id === product.id;
-  });
+  if (form.value.booking_details.length) {
+    /* Check whether product already selected */
+    const productExist = form.value.booking_details.findIndex((sD) => {
+      return sD.product_id === product.id;
+    });
 
-  if (productExist !== -1) {
-    alert("This product is already selected");
-    setTimeout(() => {
-      selectedProduct.value = null;
-    }, 300);
-    return;
+    if (productExist !== -1) {
+      alert("This product is already selected");
+      setTimeout(() => {
+        selectedProduct.value = null;
+      }, 300);
+      return;
+    }
   }
 
   if (product.stock < 1) {
@@ -177,36 +127,23 @@ const handleProductSelect = (selectedOption) => {
     product_id: product.id,
     product_name: product.name,
     original_price: product.default_selling_price,
-    price:
-      product.default_selling_price * ((100 - product[discountRateKey]) / 100),
+    price: product.default_selling_price,
     quantity: 1,
     stock: product.stock,
-    discount_rate: product[discountRateKey],
     product: product,
-
-    discount_rate_cash: product.discount_rate_cash,
-    discount_rate_card: product.discount_rate_card,
-    discount_rate_shipment: product.discount_rate_shipment,
   };
 
-  form.value.sale_details.push(obj);
+  form.value.booking_details.push(obj);
   setTimeout(() => {
     selectedProduct.value = null;
   }, 300);
 };
 
 const handleRemoveItem = ($event, productId) => {
-  const saleDetails = form.value["sale_details"].filter(
+  const saleDetails = form.value["booking_details"].filter(
     (pD) => pD.product_id !== productId
   );
-  form.value["sale_details"] = saleDetails;
-};
-
-const handleBarcodeScan = async (barcode) => {
-  if (barcode.length) {
-    await getSale(barcode);
-    barcodeInput.value = "";
-  }
+  form.value["booking_details"] = saleDetails;
 };
 
 const handleAddToCart = async (product) => {
@@ -278,29 +215,12 @@ const searchProductsWithBarcode = debounce(async (query) => {
 
 const handleSubmit = async () => {
   try {
-    const { data: response } = await form.value.post(`/api/bookings`);
+    const { data: response } = await form.value.patch(
+      `/api/bookings/${sale.value.data.id}`
+    );
 
     if (response.status == "success") {
-      form.value.reset();
-      selectedCustomer.value = "";
-
-      swal
-        .fire({
-          title: "Success!",
-          text: "Do You Want To Print ?",
-          icon: "success",
-          showCancelButton: true,
-          confirmButtonText: "Yes!",
-        })
-        .then(async (result) => {
-          if (result.isConfirmed) {
-            let routeData = router.resolve({
-              name: "bookings.proceed.invoice",
-              params: { id: response.data.id },
-            });
-            window.open(routeData.href, "_blank");
-          }
-        });
+      router.push({ name: "bookings.index" });
     }
   } catch (error) {
     console.log(error);
@@ -327,16 +247,13 @@ const update = async () => {
                 params: { id: form.value.id },
               });
               window.open(routeData.href, "_blank");
-              modal.hide();
+
               isLoaded.value = false;
               form.value.reset();
               sale.value = {};
-              barcodeInput.value.focus();
             } else {
-              modal.hide();
               isLoaded.value = false;
               sale.value = {};
-              barcodeInput.value.focus();
             }
           });
 
@@ -392,41 +309,17 @@ const getSale = async (id) => {
     form.value.sale_details = saleDetails;
     sale.value.isLoading = true;
     isLoaded.value = true;
-    // productBarcodeInput.value.focus();
   } catch (error) {
     // console.log({ error });
     flash(error.response.data.message, "error");
-    productBarcodeInput.value = "";
-    // productBarcodeInput.value.focus();
     isLoaded.value = false;
   }
-};
-
-const handleProductScan = (barcode) => {
-  shouldSubmit = false;
-  if (barcode.length) {
-    searchProductsWithBarcode(barcode);
-    productBarcodeInput.value.value = "";
-  }
-};
-
-const handleSelectedCustomer = () => {
-  form.value.account_id = selectedCustomer.value.id;
-};
-
-const showCustomerModal = () => {
-  customerForm.value.reset();
-  modal.show();
 };
 
 // Hooks
 onMounted(async () => {
   await getEmployees();
   await getBooking();
-
-  modal = new Modal(document.getElementById(modalID), {
-    keyboard: false,
-  });
 });
 </script>
 
@@ -436,7 +329,7 @@ onMounted(async () => {
       <Panel>
         <template #header>
           <h1 class="h3 mb-0 text-middle">
-            Booking ID: ({{ sale.data.booking_id }})
+            Booking ID: ({{ sale.data.reference_id }})
           </h1>
         </template>
         <div class="row">
@@ -449,7 +342,9 @@ onMounted(async () => {
           <div class="col">
             <p>
               <b>Status:</b>
-              <span class="badge bg-info">{{ sale.data.status }}</span>
+              <span class="badge bg-info ms-1 text-capitalize">
+                {{ sale.data.status }}</span
+              >
             </p>
           </div>
         </div>
@@ -507,7 +402,9 @@ onMounted(async () => {
           </div>
           <div class="row mb-3">
             <div class="col-4">
-              <label class="form-label" for="charges"><b>Charges:</b></label>
+              <label class="form-label" for="charges"
+                ><b>Estimated Cost:</b></label
+              >
               <input
                 type="number"
                 class="form-control"
@@ -535,28 +432,23 @@ onMounted(async () => {
               <HasError :form="form" field="employee_id" />
             </div>
             <div class="col-4">
-                <label class="form-label" for="status"
-                  ><b>Status:</b></label
-                >
-              <select
-                class="form-control"
-                v-model="form.status" id="status"
-              >
+              <label class="form-label" for="status"><b>Status:</b></label>
+              <select class="form-control" v-model="form.status" id="status">
                 <option value="">--Filter by Status--</option>
                 <option value="in progress">In Progress</option>
                 <option value="repaired">Repaired</option>
                 <option value="complete">Complete</option>
                 <option value="can not be repaired">Can't Repaired</option>
-                <option value="customer collected CBR"
-                  >Customer Collected CBR</option
-                >
+                <option value="customer collected CBR">
+                  Customer Collected CBR
+                </option>
                 <option value="customer collected payment pending">
                   Payment Pending
                 </option>
                 <option value="shop property">Shop Property</option>
-                <option value="awaiting customer response"
-                  >Awaiting Response</option
-                >
+                <option value="awaiting customer response">
+                  Awaiting Response
+                </option>
                 <option value="awaiting parts">Awaiting Parts</option>
               </select>
             </div>
@@ -576,9 +468,91 @@ onMounted(async () => {
             <HasError :form="form" field="issue" />
           </div>
         </div>
+      </Panel>
+      <Panel>
+        <template #header>
+          <h1 class="h3 mb-0 text-middle">Products</h1>
+        </template>
+        <div class="row mb-5">
+          <div class="col">
+            <FormAjaxSelect
+              name="product"
+              label="Select Product"
+              slug="products"
+              for-route="sales.create"
+              v-model="selectedProduct"
+              @update:modelValue="handleProductSelect"
+            />
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-bordered">
+            <thead class="bg-primary text-light">
+              <tr>
+                <th>#</th>
+                <th>Product Name</th>
+                <th>Price</th>
+                <th>Qty</th>
+                <!-- <th>Dis%</th> -->
+                <th>Amount</th>
+                <th class="text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(saleDetail, i) in form.booking_details"
+                :key="saleDetail.id"
+              >
+                <td>{{ i + 1 }}</td>
+                <td>{{ saleDetail.product_name }}</td>
+                <td>
+                  {{ saleDetail.price }}
+                </td>
+                <td>
+                  <input
+                    :class="`form-control pos-quantity ${
+                      saleDetail.quantity >
+                      saleDetail.stock + saleDetail.initialQuantity
+                        ? 'invalid'
+                        : ''
+                    }`"
+                    type="number"
+                    min="1"
+                    :max="saleDetail.product.quantity"
+                    v-model="saleDetail.quantity"
+                    :id="`product-${i}-quantity`"
+                  />
+                  <HasError :form="form" :field="saleDetail.quantity" />
+                  <small
+                    >Only {{ saleDetail.product.quantity }} pc(s)
+                    available</small
+                  >
+                  <!-- <small>{{saleDetail.stock  }} +{{saleDetail.initialQuantity}}</small> -->
+                </td>
+                <!-- <td>{{ saleDetail.discount_rate }}</td> -->
+                <td>
+                  {{
+                    saleDetail.price * saleDetail.quantity
+                      ? (saleDetail.price * saleDetail.quantity).toFixed(2)
+                      : 0
+                  }}
+                </td>
+                <td class="text-center">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-danger"
+                    @click="handleRemoveItem($event, saleDetail.product_id)"
+                  >
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <template #footer>
           <div class="text-end">
-            <Button :form="form" class="btn btn-lg btn-primary">Save</Button>
+            <Button :form="form" class="btn btn-lg btn-primary">Update</Button>
           </div>
         </template>
       </Panel>
@@ -587,53 +561,4 @@ onMounted(async () => {
   <div class="text-center" v-else>
     <h2>Loading..</h2>
   </div>
-
-  <VueModal :id="modalID" @onSubmit="addCustomer">
-    <template #title> Add Customer </template>
-    <div class="mb-3">
-      <label class="form-label" for="name">Name:</label>
-      <input
-        v-model="customerForm.name"
-        type="text"
-        class="form-control"
-        id="name"
-      />
-      <HasError :form="customerForm" field="name" />
-    </div>
-    <div class="mb-3">
-      <label class="form-label" for="phone">Phone:</label>
-      <input
-        v-model="customerForm.phone"
-        type="tel"
-        class="form-control"
-        id="phone"
-      />
-      <HasError :form="customerForm" field="phone" />
-    </div>
-
-    <div class="mb-3">
-      <label class="form-label" for="email">Email:</label>
-      <input
-        v-model="customerForm.email"
-        type="email"
-        class="form-control"
-        id="email"
-      />
-      <HasError :form="form" field="email" />
-    </div>
-
-    <div class="mb-3">
-      <label class="form-label" for="trader">Trader:</label>
-      <input
-        v-model="customerForm.trader"
-        type="text"
-        class="form-control"
-        id="trader"
-      />
-      <HasError :form="customerForm" field="trader" />
-    </div>
-    <template #footer>
-      <Button :form="customerForm" class="btn btn-primary">Save</Button>
-    </template>
-  </VueModal>
 </template>

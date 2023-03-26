@@ -5,8 +5,12 @@ import http from "@@/services/HttpService";
 import { useFlash } from "@@/composables/useFlash";
 import { useRouter } from "vue-router";
 import { useCan } from "@@/composables/useCan";
+import { Modal } from "bootstrap";
+import Form from "vform";
 
 // Data
+let modal = null;
+let modalID = "invoiceModal";
 const router = useRouter();
 const { can } = useCan();
 const sales = ref([]);
@@ -20,7 +24,16 @@ let sortOrder = ref("desc");
 let start_date = ref("");
 let end_date = ref("");
 const { flash } = useFlash();
+
 const isLoading = ref(true);
+
+const invoiceForm = ref(
+  new Form({
+    amount: null,
+    reference_id: null,
+    id: null,
+  })
+);
 
 watch(
   () => paginate.value,
@@ -42,6 +55,24 @@ watch(
 );
 
 // Methods
+
+const showInvoiceModal = (booking) => {
+  invoiceForm.value.reset();
+  invoiceForm.value.reference_id = booking.reference_id;
+  invoiceForm.value.id = booking.id;
+  // console.log({ booking });
+  modal.show();
+};
+const generateInvoice = async () => {
+  let routeData = router.resolve({
+    name: "bookings.invoice",
+    params: { id: invoiceForm.value.id },
+  });
+  window.open(routeData.href, "_blank");
+  modal.hide();
+  isLoaded.value = false;
+  invoiceForm.value.reset();
+};
 
 const handleExportClick = async () => {
   const response = await http.get(
@@ -92,13 +123,13 @@ const getBookings = async (page = 1) => {
       "&start_date=" +
       start_date.value +
       "&end_date=" +
-      end_date.value + "&status=" + status.value
+      end_date.value +
+      "&status=" +
+      status.value
   );
   sales.value = response.data;
   isLoading.value = false;
 };
-
-
 
 const handleFilterSales = async () => {
   await getBookings();
@@ -110,16 +141,16 @@ const handleSort = (col) => {
   getBookings();
 };
 
-const displayProfit = (netAmount, cost, shipping_charges) => {
-  if (cost == null) return null;
-  let profit = parseFloat(netAmount) - parseFloat(cost);
-  if (shipping_charges) profit = profit - parseFloat(shipping_charges);
-  return profit.toFixed(2);
+const showInvoicePopup = () => {
+  console.log("Clicked");
 };
-
 // Hooks
 onMounted(() => {
   getBookings();
+
+  modal = new Modal(document.getElementById(modalID), {
+    keyboard: false,
+  });
 });
 </script>
 
@@ -180,10 +211,6 @@ onMounted(() => {
         >
           Add Sale
         </router-link>
-        <!-- <button class="btn btn-lg btn-info" @click="handleExportClick">
-          <i class="fa fa-download"></i>
-          Export to Excel
-        </button> -->
       </div>
     </template>
     <div class="mb-3 row">
@@ -222,25 +249,6 @@ onMounted(() => {
           <option value="awaiting customer response">Awaiting Response</option>
           <option value="awaiting parts">Awaiting Parts</option>
         </select>
-        <!-- <input
-          type="search"
-          placeholder="Search by other fields"
-          v-model.trim.lazy="search"
-          class="form-control"
-          id="search"
-        /> -->
-        <!-- <div class="form-check">
-          <input
-            class="form-check-input"
-            v-model="search_only_id"
-            type="checkbox"
-            value=""
-            id="flexCheckChecked"
-          />
-          <label class="form-check-label" for="flexCheckChecked">
-            Only ID
-          </label>
-        </div> -->
       </div>
     </div>
 
@@ -248,37 +256,44 @@ onMounted(() => {
       <table class="table table-bordered table-hover table-striped">
         <thead class="bg-primary text-bg-dark">
           <tr>
-            <th>#</th>
+            <!-- <th>#</th> -->
             <th>ID</th>
-            <th>Date</th>
-            <th>Customer</th>
-            <th>Device</th>
-            <th>Issue</th>
-            <th>Cost</th>
             <th>Status</th>
+            <th>Item</th>
+            <th>Fault</th>
+            <th>Estimated Cost</th>
+            <th>Customer</th>
+            <th>Date</th>
             <th>Repair By</th>
             <th class="text-center" style="width: 160px">Action</th>
           </tr>
         </thead>
         <tbody>
+          <!-- <td>{{ index + 1 }}</td> -->
           <tr v-for="(sale, index) in sales.data" :key="sale.id">
-            <td>{{ index + 1 }}</td>
-            <td>{{ sale.booking_id }}</td>
-            <td><AppDate :timestamp="sale.date" /></td>
-            <td>{{ sale.account.name }}</td>
+            <td>{{ sale.reference_id }}</td>
+            <td class="text-capitalize">{{ sale.status }}</td>
             <td>{{ sale.device_name }}</td>
             <td>{{ sale.issue }}</td>
             <td>{{ sale.charges }}</td>
-            <td class="text-capitalize">{{ sale.status }}</td>
+            <td>{{ sale.account.name }}</td>
+            <td><AppDate :timestamp="sale.date" /></td>
             <td>{{ sale.employee.name }}</td>
-            <td>
+            <td class="text-center">
               <router-link
-                  
-                  class="btn btn-sm btn-info me-1 mb-1"
-                  :to="{ name: 'bookings.edit', params: { id: sale.id } }"
-                >
-                  <i class="mr-1 fa fa-pencil"></i>
-                </router-link>
+                v-if="sale.status != 'complete' && sale.status != 'repaired'"
+                class="btn btn-sm btn-info me-1 mb-1"
+                :to="{ name: 'bookings.edit', params: { id: sale.id } }"
+              >
+                <i class="mr-1 fa fa-pencil"></i>
+              </router-link>
+              <button
+                v-else
+                @click="showInvoiceModal(sale)"
+                class="btn btn-sm btn-warning me-1 mb-1"
+              >
+                <i class="mr-1 fa fa-print"></i>
+              </button>
             </td>
           </tr>
         </tbody>
@@ -297,4 +312,24 @@ onMounted(() => {
       </div>
     </template>
   </Panel>
+  <VueModal :id="modalID" @onSubmit="generateInvoice">
+    <template #title>
+      Generate Invoice #{{ invoiceForm.reference_id }}</template
+    >
+    <div class="mb-3">
+      <label class="form-label" for="amount">Amount:</label>
+      <input
+        v-model="invoiceForm.amount"
+        type="number"
+        class="form-control"
+        id="amount"
+        required
+      />
+      <HasError :form="invoiceForm" field="amount" />
+    </div>
+
+    <template #footer>
+      <Button :form="invoiceForm" class="btn btn-primary">Generate</Button>
+    </template>
+  </VueModal>
 </template>

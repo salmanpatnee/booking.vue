@@ -104,7 +104,7 @@ onMounted(async () => {
           <h2
             style="font-family: monospace; border: 2px solid; font-weight: bold"
           >
-            {{ sale.booking_id }}
+            {{ sale.reference_id }}
           </h2>
         </div>
 

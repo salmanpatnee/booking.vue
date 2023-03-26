@@ -121,148 +121,6 @@ const addCustomer = () => {
     });
 };
 
-const debounce = (fn, delay) => {
-  let timeout;
-
-  return (...args) => {
-    if (timeout) {
-      clearTimeout(timeout);
-    }
-
-    timeout = setTimeout(() => {
-      fn(...args);
-    }, delay);
-  };
-};
-
-const handleProductSelect = (selectedOption) => {
-  selectedProduct.value = selectedOption;
-
-  const product = selectedOption;
-
-  /* Check whether product already selected */
-  const productExist = form.value.sale_details.findIndex((sD) => {
-    return sD.product_id === product.id;
-  });
-
-  if (productExist !== -1) {
-    alert("This product is already selected");
-    setTimeout(() => {
-      selectedProduct.value = null;
-    }, 300);
-    return;
-  }
-
-  if (product.stock < 1) {
-    flash("Product is out of stock", "error");
-    setTimeout(() => {
-      selectedProduct.value = null;
-    }, 300);
-    return;
-  }
-  const obj = {
-    product_id: product.id,
-    product_name: product.name,
-    original_price: product.default_selling_price,
-    price:
-      product.default_selling_price * ((100 - product[discountRateKey]) / 100),
-    quantity: 1,
-    stock: product.stock,
-    discount_rate: product[discountRateKey],
-    product: product,
-
-    discount_rate_cash: product.discount_rate_cash,
-    discount_rate_card: product.discount_rate_card,
-    discount_rate_shipment: product.discount_rate_shipment,
-  };
-
-  form.value.sale_details.push(obj);
-  setTimeout(() => {
-    selectedProduct.value = null;
-  }, 300);
-};
-
-const handleRemoveItem = ($event, productId) => {
-  const saleDetails = form.value["sale_details"].filter(
-    (pD) => pD.product_id !== productId
-  );
-  form.value["sale_details"] = saleDetails;
-};
-
-const handleBarcodeScan = async (barcode) => {
-  if (barcode.length) {
-    await getSale(barcode);
-    barcodeInput.value = "";
-  }
-};
-
-const handleAddToCart = async (product) => {
-  let productInCart =
-    form.value.sale_details.length &&
-    form.value.sale_details.find((item) => {
-      return item.product_id === product.id;
-    });
-
-  if (productInCart) {
-    if (productInCart.quantity + 1 > product.stock) return false;
-
-    productInCart.quantity++;
-  } else {
-    /*
-    if (product.discount_rate_cash) {
-      let x = (
-        (product.default_selling_price * product.discount_rate_cash) /
-        100
-      ).toFixed(2);
-      product.price = product.default_selling_price - x;
-    } else {
-      product.price = product.default_selling_price;
-    }
-    */
-
-    // console.log({product});
-    // return;
-    // delete product.id;
-
-    const obj = {
-      quantity: 1,
-      original_price: product.default_selling_price,
-      price:
-        product.default_selling_price *
-        ((100 - product[discountRateKey]) / 100),
-      product_name: product.name,
-      product_id: product.id,
-      discount_rate: product[discountRateKey],
-      stock: product.stock,
-      product: product,
-      discount_rate_cash: product.discount_rate_cash,
-      discount_rate_card: product.discount_rate_card,
-      discount_rate_shipment: product.discount_rate_shipment,
-    };
-
-    form.value.sale_details.push(obj);
-  }
-};
-
-const searchProductsWithBarcode = debounce(async (query) => {
-  let url = `/api/products?`;
-  url += `for=sales.create&`;
-  url += `barcode=${query}`;
-
-  try {
-    const response = await axios.get(url);
-    if (response.data.data) {
-      // products.value = response.data.data;
-      // console.log("Now what?", products.value);
-      handleAddToCart(response.data.data);
-    } else {
-      alert("No product found");
-    }
-  } catch (error) {
-    flash(error.response.data.message, "error");
-  }
-}, 350);
-
 const handleSubmit = async () => {
   try {
     const { data: response } = await form.value.post(`/api/bookings`);
@@ -294,108 +152,6 @@ const handleSubmit = async () => {
   }
 };
 
-const update = async () => {
-  form.value
-    .patch(`${baseEndpoint}/${form.value.id}`)
-    .then((response) => {
-      if (response.data.status == "success") {
-        swal
-          .fire({
-            title: "Success!",
-            text: "Do You Want To Print ?",
-            icon: "success",
-            showCancelButton: true,
-            confirmButtonText: "Yes!",
-          })
-          .then((result) => {
-            if (result.isConfirmed) {
-              let routeData = router.resolve({
-                name: "sales.invoice",
-                params: { id: form.value.id },
-              });
-              window.open(routeData.href, "_blank");
-              modal.hide();
-              isLoaded.value = false;
-              form.value.reset();
-              sale.value = {};
-              barcodeInput.value.focus();
-            } else {
-              modal.hide();
-              isLoaded.value = false;
-              sale.value = {};
-              barcodeInput.value.focus();
-            }
-          });
-
-        // toast.value.success(response.data.message);
-        // router.push({
-        // name: "sales.show",
-        // params: { id: response.data.data.id },
-        // });
-      }
-    })
-    .catch((error) => {
-      flash(error.response.data.message, "error");
-    });
-};
-
-const validateQty = (input, stock) => {
-  if (input.value > stock) {
-    input.value = stock;
-  }
-};
-
-const getSale = async (id) => {
-  try {
-    const response = await axios.get(`/api/sales-ordered/${id}`);
-    sale.value.data = response.data.data;
-
-    console.log(sale.value.data.is_deliverable);
-
-    sale.value.isLoading = false;
-    selectedCustomer.value = sale.value.data.account;
-    form.value.account_id = selectedCustomer.value.id;
-    form.value.id = sale.value.data.id;
-    form.value.date = sale.value.data.date;
-    form.value.shipping_charges = sale.value.data.shipping_charges;
-    form.value.discount_amount = sale.value.data.discount_amount;
-    form.value.is_deliverable = sale.value.data.is_deliverable;
-    form.value.shipping_address = sale.value.data.shipping_address;
-
-    const saleDetails = sale.value.data.sale_details;
-
-    saleDetails.forEach((sD) => {
-      sD.product_name = sD.product.name;
-      sD.stock = sD.product.stock;
-      sD.discount_rate_cash = sD.product.discount_rate_cash;
-      sD.discount_rate_card = sD.product.discount_rate_card;
-      sD.discount_rate_shipment = sD.product.discount_rate_shipment;
-      sD.initialQuantity = sD.quantity;
-      if (form.value.is_deliverable) discountRateKey = "discount_rate_shipment";
-
-      sD.price = sD["original_price"] * ((100 - sD[discountRateKey]) / 100);
-    });
-
-    form.value.sale_details = saleDetails;
-    sale.value.isLoading = true;
-    isLoaded.value = true;
-    // productBarcodeInput.value.focus();
-  } catch (error) {
-    // console.log({ error });
-    flash(error.response.data.message, "error");
-    productBarcodeInput.value = "";
-    // productBarcodeInput.value.focus();
-    isLoaded.value = false;
-  }
-};
-
-const handleProductScan = (barcode) => {
-  shouldSubmit = false;
-  if (barcode.length) {
-    searchProductsWithBarcode(barcode);
-    productBarcodeInput.value.value = "";
-  }
-};
 
 const handleSelectedCustomer = () => {
   form.value.account_id = selectedCustomer.value.id;
@@ -409,9 +165,7 @@ const showCustomerModal = () => {
 // Hooks
 onMounted(async () => {
   await getEmployees();
-  if (barcodeInput.value) {
-    barcodeInput.value.focus();
-  }
+  
   modal = new Modal(document.getElementById(modalID), {
     keyboard: false,
   });
@@ -497,7 +251,9 @@ onMounted(async () => {
         </div>
         <div class="row mb-3">
           <div class="col-4">
-            <label class="form-label" for="charges"><b>Charges:</b></label>
+            <label class="form-label" for="charges"
+              ><b>Estimated Cost:</b></label
+            >
             <input
               type="number"
               class="form-control"
