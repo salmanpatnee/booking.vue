@@ -46,8 +46,8 @@ onMounted(async () => {
             </div>
             <div class="col">
               <stat-card
-                title="TOTAL SUPPLIERS"
-                :figure="stats.data.total_suppliers"
+                title="TOTAL EMPLOYEES"
+                :figure="stats.data.total_employees"
                 type="success"
               />
             </div>
@@ -69,18 +69,18 @@ onMounted(async () => {
           <div class="row row-cols-1 row-cols-md-3 g-3">
             <div class="col">
               <stat-card
-                title="TOTAL ORDERS"
+                title="TOTAL BOOKINGS"
                 :figure="stats.data.todays_total_orders"
                 type="info"
               />
             </div>
-            <div class="col">
+            <!-- <div class="col">
               <stat-card
                 title="TOTAL PURCHASES"
                 :figure="parseFloat(stats.data.todays_total_purchase_amount)"
                 type="info"
               />
-            </div>
+            </div> -->
             <div class="col">
               <stat-card
                 title="TOTAL SALES"
@@ -92,7 +92,7 @@ onMounted(async () => {
         </div>
       </div>
     </div>
-    <div class="row">
+    <!-- <div class="row">
       <div class="col d-flex">
         <div class="w-100">
           <div class="row row-cols-1 row-cols-md-3 g-3">
@@ -124,7 +124,7 @@ onMounted(async () => {
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
   <div class="text-center" v-else>
     <app-loader />

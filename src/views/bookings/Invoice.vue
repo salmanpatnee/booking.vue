@@ -40,7 +40,7 @@ const handlePrint = () => {
 };
 
 onMounted(async () => {
-  // await getBooking();
+  await getBooking();
   document.body.classList.add("sale-print");
   isLoaded.value = true;
 });
@@ -65,9 +65,8 @@ onMounted(async () => {
             <img
               @load="handleImageLoad"
               src="/img/pharma-logo-black.png"
-              style="display: none;"
+              style="display: none"
             />
-           
 
             <div class="row">
               <div class="col-12" id="printable">
@@ -77,38 +76,40 @@ onMounted(async () => {
                       <h3>Invoice</h3>
                     </div>
                     <div class="mb-3 text-center">
-                      <h1>MS Bandukda</h1>
-                      <p class="m-0">Karachi</p>
-                      <p class="m-0">Pakistan</p>
-                      <p>+92 322 2184035</p>
+                      <h1>CVS Technologies Limited</h1>
+                      <p class="m-0">Eureka Court</p>
+                      <p class="m-0">India</p>
+                      <p>info@cvstechnologiges.com</p>
                     </div>
 
                     <div class="row mb-4">
-                      <div class="col-md-6">
+                      <div class="col-6 text-start">
                         <div class="text-muted">
-                          Bill to
-                          <strong>
-                            Salman
-                          </strong>
+                          Bill to:
+                          <strong> {{ sale.account.name }} </strong>
                         </div>
                         <p>
-                          Address
+                          Phone:
+                          <strong>{{ sale.account.phone }}</strong>
                           <br />
                           <a href="#"> </a>
                         </p>
                       </div>
-                      <div class="col-md-6 text-md-end">
+                      <div class="col-6 text-end">
                         <div class="text-muted">
-                          Invoice No. <strong>8</strong>
+                          Invoice No. <strong>{{ sale.reference_id }}</strong>
                         </div>
                         <div class="text-muted">
                           Invoice Date.
-                          <strong>5 10 23</strong>
+                          <strong
+                            ><AppDate
+                              :timestamp="moment().format('YYYY-MM-DD')"
+                          /></strong>
                         </div>
-                        <div class="text-muted">
+                        <!-- <div class="text-muted">
                           Due Date.
                           <strong>5 10 23</strong>
-                        </div>
+                        </div> -->
                       </div>
                     </div>
                     <table class="table table-sm">
@@ -121,34 +122,31 @@ onMounted(async () => {
                       </thead>
                       <tbody>
                         <tr>
-                          <td>Repair</td>
-                          <td class="text-end">
-                            600
-                          </td>
-                          <td class="text-end">
-                            600
-                          </td>
+                          <td>{{ sale.issue }}</td>
+                          <td class="text-end">PKR {{ sale.charges }}</td>
+                          <td class="text-end">PKR {{ sale.charges }}</td>
                         </tr>
                         <tr>
                           <th>&nbsp;</th>
                           <th>Subtotal</th>
-                          <th class="text-end">
-                            600
-                          </th>
+                          <th class="text-end">PKR {{ sale.charges }}</th>
                         </tr>
                         <tr>
                           <th>&nbsp;</th>
                           <th>Total</th>
-                          <th class="text-end">
-                            600
-                          </th>
+                          <th class="text-end">PKR {{ sale.charges }}</th>
                         </tr>
                       </tbody>
                     </table>
 
                     <div class="row mt-4">
                       <div class="col">
-                        <h3>Payment details</h3>
+                        <div align="center">
+                          <img :src="sale.qr_code" alt="Qr Code" srcset="" />
+                          <p>{{ sale.reference_id }}</p>
+                        </div>
+
+                        <!-- <h3>Payment details</h3>
                         <div class="text-muted">
                           Bank: <strong>Habib Bank Limited</strong>
                         </div>
@@ -157,7 +155,7 @@ onMounted(async () => {
                         </div>
                         <div class="text-muted">
                           Iban: <strong>PK17 HABB 0024907000093103</strong>
-                        </div>
+                        </div> -->
                       </div>
                     </div>
                   </div>

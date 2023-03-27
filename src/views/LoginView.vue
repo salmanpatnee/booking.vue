@@ -36,12 +36,13 @@ const handleLogin = async () => {
 
 <template>
   <div class="text-center">
-    <img
+    <!-- <img
       src="/src/assets/img/pharmasquare-logo.png"
       class="img-fluid"
       width="250"
-    />
-  </div>
+    /> -->
+    <h1>CVS Technologies Limited
+</h1>  </div>
   <form @submit.prevent="handleLogin">
     <div class="mb-3">
       <label class="form-label">Email</label>

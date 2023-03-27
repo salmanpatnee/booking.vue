@@ -268,7 +268,7 @@ onMounted(async () => {
                   :to="{ name: 'purchases.show', params: { id: purchase.id } }"
                   ><i class="mr-1 fa fa-eye"></i>
                 </router-link>
-
+                <!--
                 <router-link
                   class="btn btn-warning btn-sm me-1 mb-1"
                   target="_blank"
@@ -278,7 +278,7 @@ onMounted(async () => {
                   }"
                   ><i class="mr-1 fa fa-print"></i>
                 </router-link>
-                <!-- <router-link
+                 <router-link
                   v-if="
                     purchase.status !== 'returned' &&
                     purchase.status !== 'final'
