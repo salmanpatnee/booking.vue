@@ -216,6 +216,19 @@ onMounted(() => {
             All Bookings
           </router-link>
         </li>
+        <li
+          class="nav-item"
+          
+        >
+          <router-link
+            class="btn btn-primary btn-lg mx-2"
+            :to="{ name: 'invoices.create' }"
+          >
+            <i class="fa fa-file-o" aria-hidden="true"></i>
+            Generate Invoice
+          </router-link>
+        </li>
+        
 
         <li class="nav-item dropdown">
           <a

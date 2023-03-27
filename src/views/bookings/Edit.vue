@@ -69,7 +69,8 @@ const form = ref(
     date: moment().format("YYYY-MM-DD"),
     device_name: null,
     model_no: null,
-    imei: null,
+    imei: null, 
+    estimated_cost: null,
     charges: null,
     issue: null,
     booking_details: [],
@@ -402,24 +403,24 @@ onMounted(async () => {
           </div>
           <div class="row mb-3">
             <div class="col-4">
-              <label class="form-label" for="charges"
+              <label class="form-label" for="estimated_cost"
                 ><b>Estimated Cost:</b></label
               >
               <input
                 type="number"
                 class="form-control"
-                v-model="form.charges"
+                v-model="form.estimated_cost"
                 placeholder="500"
-                id="charges"
+                id="estimated_cost"
                 required
               />
-              <HasError :form="form" field="charges" />
+              <HasError :form="form" field="estimated_cost" />
             </div>
             <div class="col-4">
-              <label class="form-label" for="charges"
+              <label class="form-label" for="employee_id"
                 ><b>Employee / Technician:</b></label
               >
-              <select class="form-control" v-model="form.employee_id" required>
+              <select id="employee_id" class="form-control" v-model="form.employee_id" required>
                 <option value="">--Select--</option>
                 <option
                   :value="employee.id"
@@ -433,7 +434,7 @@ onMounted(async () => {
             </div>
             <div class="col-4">
               <label class="form-label" for="status"><b>Status:</b></label>
-              <select class="form-control" v-model="form.status" id="status">
+              <select class="form-control" v-model="form.status" id="status" @change="form.charges = null">
                 <option value="">--Filter by Status--</option>
                 <option value="in progress">In Progress</option>
                 <option value="repaired">Repaired</option>
@@ -467,17 +468,28 @@ onMounted(async () => {
 
             <HasError :form="form" field="issue" />
           </div>
+          <div class="col" v-if="form.status === 'complete'">
+            <label class="form-label" for="charges"><b>Charges:</b></label>
+            <input
+                type="number"
+                class="form-control"
+                v-model="form.charges"
+                placeholder="500"
+                id="charges"
+                required
+              />
+          </div>
         </div>
       </Panel>
       <Panel>
         <template #header>
-          <h1 class="h3 mb-0 text-middle">Products</h1>
+          <h1 class="h3 mb-0 text-middle">Inventory</h1>
         </template>
         <div class="row mb-5">
           <div class="col">
             <FormAjaxSelect
               name="product"
-              label="Select Product"
+              label="Select Parts"
               slug="products"
               for-route="sales.create"
               v-model="selectedProduct"
@@ -490,7 +502,7 @@ onMounted(async () => {
             <thead class="bg-primary text-light">
               <tr>
                 <th>#</th>
-                <th>Product Name</th>
+                <th>Name</th>
                 <th>Price</th>
                 <th>Qty</th>
                 <!-- <th>Dis%</th> -->

@@ -82,7 +82,7 @@ const form = ref(
     device_name: null,
     model_no: null,
     imei: null,
-    charges: null,
+    estimated_cost: null,
     issue: null,
     // status: "inprogress",
   })
@@ -251,21 +251,21 @@ onMounted(async () => {
         </div>
         <div class="row mb-3">
           <div class="col-4">
-            <label class="form-label" for="charges"
+            <label class="form-label" for="estimated_cost"
               ><b>Estimated Cost:</b></label
             >
             <input
               type="number"
               class="form-control"
-              v-model="form.charges"
+              v-model="form.estimated_cost"
               placeholder="500"
-              id="charges"
+              id="estimated_cost"
               required
             />
-            <HasError :form="form" field="charges" />
+            <HasError :form="form" field="estimated_cost" />
           </div>
           <div class="col-4">
-            <label class="form-label" for="charges"
+            <label class="form-label" for="estimated_cost"
               ><b>Employee / Technician:</b></label
             >
             <select class="form-control" v-model="form.employee_id" required>

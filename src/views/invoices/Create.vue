@@ -1,30 +1,32 @@
 <script setup>
-import moment from "moment";
-import { onMounted, ref, computed } from "vue";
-import { useRoute } from "vue-router";
-import "vue-select/dist/vue-select.css";
-import axios from "axios";
+import Form from "vform";
+import { useRouter } from "vue-router";
+import { ref } from "vue";
 
-// Data
-const baseEndpoint = "/api/bookings";
-const sale = ref({});
-const route = useRoute();
-let isLoaded = ref(false);
+const router = useRouter();
+const printMode = ref(false);
 let imageLoaded = 0;
 
-// Methods
-const getBooking = async () => {
-  const response = await axios.get(
-    `${baseEndpoint}/${route.params.id}?for=print`
-  );
-  sale.value = response.data.data;
-};
+const form = ref(
+  new Form({
+    client_name: null,
+    description: null,
+    amount: null,
+  })
+);
 
-const handleImageLoad = () => {
-  imageLoaded++;
-  if (imageLoaded == 1) {
-    handlePrint();
-  }
+const generateInvoice = async () => {
+  document.body.classList.add("sale-print");
+  printMode.value = true;
+  //   let routeData = router.resolve({
+  //     name: "bookings.invoice",
+  //     params: {
+  //       name: form.value.client_name,
+  //       description: form.value.description,
+  //       amount: form.value.amount,
+  //     },
+  //   });
+  //   window.open(routeData.href, "_blank");
 };
 
 const handlePrint = () => {
@@ -39,20 +41,82 @@ const handlePrint = () => {
   window.onafterprint = window.close;
 };
 
-onMounted(async () => {
-  // await getBooking();
-  document.body.classList.add("sale-print");
-  isLoaded.value = true;
-});
+const handleImageLoad = () => {
+  imageLoaded++;
+  if (imageLoaded == 1) {
+    handlePrint();
+  }
+};
+
 </script>
 
 <template>
-  <div v-if="isLoaded">
+  <div v-if="!printMode">
+    <form @submit.prevent="generateInvoice">
+      <Panel>
+        <template #header>
+          <h1 class="h3 mb-0 text-middle">Generate Invoice</h1>
+          <router-link
+            class="btn btn-primary"
+            :to="{ name: 'invoices.create' }"
+          >
+            All Sales
+          </router-link>
+        </template>
+        <div class="row">
+          <div class="col-6 mb-4">
+            <label class="form-label" for="client_name">Client Name:</label>
+            <input
+              v-model="form.client_name"
+              type="text"
+              class="form-control form-control-lg"
+              id="client_name"
+              required=""
+              autofocus
+            />
+            <HasError :form="form" field="client_name" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6 mb-4">
+            <label class="form-label" for="description">Description:</label>
+            <textarea
+              v-model="form.description"
+              type="text"
+              class="form-control form-control-lg"
+              id="description"
+              required=""
+            ></textarea>
+            <HasError :form="form" field="description" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-6 mb-4">
+            <label class="form-label" for="amount">Amount Paid:</label>
+            <input
+              v-model="form.amount"
+              type="number"
+              class="form-control form-control-lg"
+              id="amount"
+              required=""
+            />
+            <HasError :form="form" field="amount" />
+          </div>
+        </div>
+        <template #footer>
+          <Button :form="form" class="btn btn-lg btn-primary">
+            Generate
+          </Button>
+        </template>
+      </Panel>
+    </form>
+  </div>
+  <div v-else>
     <div id="printable">
       <div
         class="print-invoice"
         style="
-          /* border: 1px solid #a1a1a1; */
+          border: 1px solid #a1a1a1;
           /* width: 88mm; */
           background: white;
           padding: 10px;
@@ -60,114 +124,7 @@ onMounted(async () => {
           text-align: center;
         "
       >
-        <main class="content">
-          <div class="container-fluid p-0">
-            <img
-              @load="handleImageLoad"
-              src="/img/pharma-logo-black.png"
-              style="display: none;"
-            />
-           
-
-            <div class="row">
-              <div class="col-12" id="printable">
-                <div class="card">
-                  <div class="card-body m-sm-3 m-md-5">
-                    <div class="mb-3 text-center">
-                      <h3>Invoice</h3>
-                    </div>
-                    <div class="mb-3 text-center">
-                      <h1>MS Bandukda</h1>
-                      <p class="m-0">Karachi</p>
-                      <p class="m-0">Pakistan</p>
-                      <p>+92 322 2184035</p>
-                    </div>
-
-                    <div class="row mb-4">
-                      <div class="col-md-6">
-                        <div class="text-muted">
-                          Bill to
-                          <strong>
-                            Salman
-                          </strong>
-                        </div>
-                        <p>
-                          Address
-                          <br />
-                          <a href="#"> </a>
-                        </p>
-                      </div>
-                      <div class="col-md-6 text-md-end">
-                        <div class="text-muted">
-                          Invoice No. <strong>8</strong>
-                        </div>
-                        <div class="text-muted">
-                          Invoice Date.
-                          <strong>5 10 23</strong>
-                        </div>
-                        <div class="text-muted">
-                          Due Date.
-                          <strong>5 10 23</strong>
-                        </div>
-                      </div>
-                    </div>
-                    <table class="table table-sm">
-                      <thead>
-                        <tr>
-                          <th>Description</th>
-                          <th class="text-end">Price</th>
-                          <th class="text-end">Amount</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>Repair</td>
-                          <td class="text-end">
-                            600
-                          </td>
-                          <td class="text-end">
-                            600
-                          </td>
-                        </tr>
-                        <tr>
-                          <th>&nbsp;</th>
-                          <th>Subtotal</th>
-                          <th class="text-end">
-                            600
-                          </th>
-                        </tr>
-                        <tr>
-                          <th>&nbsp;</th>
-                          <th>Total</th>
-                          <th class="text-end">
-                            600
-                          </th>
-                        </tr>
-                      </tbody>
-                    </table>
-
-                    <div class="row mt-4">
-                      <div class="col">
-                        <h3>Payment details</h3>
-                        <div class="text-muted">
-                          Bank: <strong>Habib Bank Limited</strong>
-                        </div>
-                        <div class="text-muted">
-                          Account title: <strong>Muhammad Saifullah</strong>
-                        </div>
-                        <div class="text-muted">
-                          Iban: <strong>PK17 HABB 0024907000093103</strong>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </main>
-
-        <!-- <div align="center">
+        <div align="center">
           <img
             @load="handleImageLoad"
             src="/img/pharma-logo-black.png"
@@ -182,9 +139,9 @@ onMounted(async () => {
           >
             <storng>Bookings</storng>
           </h1>
-         <img src="/img/pharma-logo-black.png" /> 
-        </div> 
-       <div align="left">
+          <!-- <img src="/img/pharma-logo-black.png" /> -->
+        </div>
+        <!-- <div align="left">
           <div class="row">
             <div
               class="col"
@@ -465,19 +422,3 @@ onMounted(async () => {
     </div>
   </div>
 </template>
-
-<style scoped>
-@media print {
-  .sale-print {
-    font-family: monospace !important;
-    color: #000 !important;
-  }
-  .table > tbody > tr > td,
-  table > tbody > tr > th {
-    padding: 0 !important;
-    text-align: center !important;
-    font-family: monospace;
-    color: black !important;
-  }
-}
-</style>

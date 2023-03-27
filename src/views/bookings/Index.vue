@@ -60,18 +60,17 @@ const showInvoiceModal = (booking) => {
   invoiceForm.value.reset();
   invoiceForm.value.reference_id = booking.reference_id;
   invoiceForm.value.id = booking.id;
-  // console.log({ booking });
   modal.show();
 };
-const generateInvoice = async () => {
+const generateInvoice = async (id) => {
   let routeData = router.resolve({
     name: "bookings.invoice",
-    params: { id: invoiceForm.value.id },
+    params: { id },
   });
   window.open(routeData.href, "_blank");
-  modal.hide();
-  isLoaded.value = false;
-  invoiceForm.value.reset();
+  // modal.hide();
+  // isLoaded.value = false;
+  // invoiceForm.value.reset();
 };
 
 const handleExportClick = async () => {
@@ -275,13 +274,13 @@ onMounted(() => {
             <td class="text-capitalize">{{ sale.status }}</td>
             <td>{{ sale.device_name }}</td>
             <td>{{ sale.issue }}</td>
-            <td>{{ sale.charges }}</td>
+            <td>{{ sale.estimated_cost }}</td>
             <td>{{ sale.account.name }}</td>
             <td><AppDate :timestamp="sale.date" /></td>
             <td>{{ sale.employee.name }}</td>
             <td class="text-center">
               <router-link
-                v-if="sale.status != 'complete' && sale.status != 'repaired'"
+                v-if="sale.status != 'complete'"
                 class="btn btn-sm btn-info me-1 mb-1"
                 :to="{ name: 'bookings.edit', params: { id: sale.id } }"
               >
@@ -289,7 +288,7 @@ onMounted(() => {
               </router-link>
               <button
                 v-else
-                @click="showInvoiceModal(sale)"
+                @click="generateInvoice(sale.id)"
                 class="btn btn-sm btn-warning me-1 mb-1"
               >
                 <i class="mr-1 fa fa-print"></i>
