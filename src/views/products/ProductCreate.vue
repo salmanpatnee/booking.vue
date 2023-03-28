@@ -54,6 +54,8 @@ const getProduct = async (id) => {
   form.value.default_selling_price =
     response.data.default_selling_price.toFixed(2);
   form.value.is_active = form.value.is_active ? true : false;
+  selectedCategory.value = response.data.category;
+  
   isLoading.value = false;
 };
 
@@ -126,7 +128,7 @@ onMounted(() => {
         </router-link>
       </template>
       <div v-if="!isLoading">
-        <div class="row">
+        <!-- <div class="row">
           <div class="col mb-4">
             <label class="form-label" for="barcode">Barcode:</label>
             <input
@@ -140,7 +142,7 @@ onMounted(() => {
             />
             <HasError :form="form" field="barcode" />
           </div>
-        </div>
+        </div> -->
         <div class="row">
           <div class="col mb-3">
             <label class="form-label" for="name">Name:</label>

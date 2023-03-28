@@ -9,7 +9,7 @@ const { can } = useCan();
   <nav id="sidebar" class="sidebar js-sidebar">
     <div class="sidebar-content js-simplebar">
       <router-link class="sidebar-brand" to="/dashboard">
-        <span class="align-middle">Booking</span>
+        <span class="align-middle">CVS Technologies</span>
       </router-link>
 
       <ul class="sidebar-nav">
@@ -296,18 +296,18 @@ const { can } = useCan();
             data-bs-parent="#sidebar"
             style=""
           >
-            <!-- <li class="sidebar-item">
+            <li class="sidebar-item">
               <router-link class="sidebar-link" :to="{ name: 'sales.index' }">
                 <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
                 <span class="align-middle">Sales</span>
               </router-link>
-            </li> -->
-            <li class="sidebar-item">
+            </li>
+            <!-- <li class="sidebar-item">
               <router-link class="sidebar-link" :to="{ name: 'pos.create' }">
                 <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
                 <span class="align-middle">POS</span>
               </router-link>
-            </li>
+            </li> -->
           </ul>
         </li>
 
@@ -424,7 +424,7 @@ const { can } = useCan();
             </ul>
           </li> -->
 
-        <li class="sidebar-item">
+        <!-- <li class="sidebar-item">
           <a
             data-bs-target="#reports"
             data-bs-toggle="collapse"
@@ -440,7 +440,7 @@ const { can } = useCan();
             data-bs-parent="#sidebar"
             style=""
           >
-            <!-- <li class="sidebar-item">
+            <li class="sidebar-item">
               <router-link
                 class="sidebar-link"
                 :to="{ name: 'reports.registers.index' }"
@@ -448,7 +448,7 @@ const { can } = useCan();
                 <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
                 <span class="align-middle">Cash Registers</span>
               </router-link>
-            </li> -->
+            </li> 
             <li class="sidebar-item">
               <router-link
                 class="sidebar-link"
@@ -468,7 +468,7 @@ const { can } = useCan();
               </router-link>
             </li>
           </ul>
-        </li>
+        </li> -->
 
         <!-- <li class="sidebar-item">
           <a

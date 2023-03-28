@@ -51,7 +51,7 @@ app.component("AppTime", AppTime);
 app.component("AppLoader", AppLoader);
 
 const options = {
-  color: "#A0C92A",
+  color: "#2A75D8",
   failedColor: "#874b4b",
   thickness: "3px",
 };

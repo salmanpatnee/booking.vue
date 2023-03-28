@@ -116,25 +116,28 @@ onMounted(async () => {
                       <thead>
                         <tr>
                           <th>Description</th>
-                          <th class="text-end">Price</th>
-                          <th class="text-end">Amount</th>
+                          <th>Price</th>
+                          <th>Amount</th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr>
                           <td>{{ sale.issue }}</td>
-                          <td class="text-end">PKR {{ sale.charges }}</td>
-                          <td class="text-end">PKR {{ sale.charges }}</td>
+                          <td >PKR {{ sale.charges }}</td>
+                          <td >PKR {{ sale.charges }}</td>
+                        </tr>
+                        <tr>
+                          <td colspan="3"></td>
                         </tr>
                         <tr>
                           <th>&nbsp;</th>
-                          <th>Subtotal</th>
-                          <th class="text-end">PKR {{ sale.charges }}</th>
+                          <th >Subtotal</th>
+                          <th >PKR {{ sale.charges }}</th>
                         </tr>
                         <tr>
                           <th>&nbsp;</th>
-                          <th>Total</th>
-                          <th class="text-end">PKR {{ sale.charges }}</th>
+                          <th >Total</th>
+                          <th >PKR {{ sale.charges }}</th>
                         </tr>
                       </tbody>
                     </table>

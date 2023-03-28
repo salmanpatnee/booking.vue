@@ -57,7 +57,7 @@ import BookingsInvoice from "@@/views/bookings/Invoice.vue";
 
 import InvoiceCreate from "@@/views/invoices/Create.vue";
 
-// import SaleIndex from "@@/views/sales/Index.vue";
+import SaleIndex from "@@/views/sales/Index.vue";
 // import TodaySaleIndex from "@@/views/sales/TodaySaleIndex.vue";
 // import SaleShow from "@@/views/sales/Show.vue";
 // import SaleCreate from "@@/views/sales/Create.vue";
@@ -367,12 +367,11 @@ const router = createRouter({
           component: InvoiceCreate,
         },
 
-        // {
-        //   path: "/sales",
-        //   name: "sales.index",
-        //   component: SaleIndex,
-        //   // meta: { authorize: ["sale-view"] },
-        // },
+        {
+          path: "/sales",
+          name: "sales.index",
+          component: SaleIndex,
+        },
         // {
         //   path: "/todays-sales",
         //   name: "todays.sales.index",

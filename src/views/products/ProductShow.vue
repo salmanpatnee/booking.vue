@@ -103,7 +103,6 @@ onMounted(async () => {
               v-for="entry in product.product_inventory_entries"
               :key="entry.id"
             >
-              <td>{{ entry.location.name }}</td>
               <td>{{ entry.purchased_price.toFixed(2) }}</td>
               <td>{{ entry.available_quantity }}</td>
               <td>
@@ -112,9 +111,7 @@ onMounted(async () => {
                 }}
               </td>
               <td>{{ entry.sold_quantity }}</td>
-              <td>{{ entry.transferred_quantity }}</td>
-              <td>{{ entry.adjusted_quantity }}</td>
-              <td>{{ entry.expiry_date }}</td>
+             
             </tr>
           </tbody>
         </table>
@@ -131,7 +128,7 @@ onMounted(async () => {
             <tr>
               <th>Date</th>
               <th>Invoice No</th>
-              <th>Supplier</th>
+              <!-- <th>Supplier</th> -->
               <th>Qty</th>
               <th>Rate</th>
               <th>Total</th>
@@ -157,7 +154,7 @@ onMounted(async () => {
                   {{ purchase_detail.purchase.id }}
                 </router-link>
               </td>
-              <td>{{ purchase_detail.purchase.account.name }}</td>
+              <!-- <td>{{ purchase_detail.purchase.account.name }}</td> -->
               <td>{{ purchase_detail.quantity }}</td>
               <td>{{ purchase_detail.price.toFixed(2) }}</td>
               <td>{{ purchase_detail.amount }}</td>

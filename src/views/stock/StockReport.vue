@@ -54,18 +54,18 @@ onMounted(async () => {
           <tr>
             <th>#</th>
             <th>Product</th>
-            <th>Location</th>
+            <!-- <th>Location</th> -->
             <th>Type</th>
             <th>Purchases Price</th>
             <th>In Qty</th>
             <th>Out Qty</th>
-            <th>Transferred Qty</th>
+            <!-- <th>Transferred Qty</th>
             <th>Adjusted Qty</th>
-            <th>Returned Qty</th>
+            <th>Returned Qty</th> -->
             <th>Stock</th>
             <th>Purchased Amount</th>
             <th>Sold Amount</th>
-            <th>Expiry Date</th>
+            <!-- <th>Expiry Date</th> -->
             <!-- <th style="width: 130px">Action</th> -->
           </tr>
         </thead>
@@ -76,7 +76,7 @@ onMounted(async () => {
           >
             <td>{{ index + 1 }}</td>
             <td>{{ inventory.product.name }}</td>
-            <td>{{ inventory.location.name }}</td>
+            <!-- <td>{{ inventory.location.name }}</td> -->
             <td>
               {{
                 inventory.reference_type ===
@@ -88,18 +88,18 @@ onMounted(async () => {
             <td>{{ parseFloat(inventory.purchased_price).toFixed(2) }}</td>
             <td>{{ inventory.initial_quantity }}</td>
             <td>{{ inventory.sold_quantity }}</td>
-            <td>{{ inventory.transferred_quantity }}</td>
+            <!-- <td>{{ inventory.transferred_quantity }}</td>
             <td>{{ inventory.adjusted_quantity }}</td>
             <td>
               {{
                 inventory.purchase_returned_quantity ||
                 inventory.returned_quantity
               }}
-            </td>
+            </td> -->
             <td>{{ inventory.available_quantity }}</td>
             <td>{{ inventory.purchased_amount }}</td>
             <td>{{ inventory.sold_amount }}</td>
-            <td><AppDate :timestamp="inventory.expiry_date" /></td>
+            <!-- <td><AppDate :timestamp="inventory.expiry_date" /></td> -->
           </tr>
         </tbody>
       </table>

@@ -13,7 +13,7 @@ const sales = ref([]);
 const paginate = ref(25);
 const search = ref("");
 const id = ref("");
-const baseEndpoint = "/api/sales";
+const baseEndpoint = "/api/bookings";
 let orderBy = ref("created_at");
 let sortOrder = ref("desc");
 let start_date = ref("");
@@ -24,59 +24,59 @@ const isLoading = ref(true);
 watch(
   () => paginate.value,
   (paginate, prevCount) => {
-    getSales();
+    getBookings();
   }
 );
 watch(
   () => search.value,
   (search, prevCount) => {
-    getSales();
+    getBookings();
   }
 );
 watch(
   () => id.value,
   (id, prevCount) => {
-    getSales();
+    getBookings();
   }
 );
 
 // Methods
 
-const handleExportClick = async () => {
-  const response = await http.get(
-    baseEndpoint +
-      "/export?search=" +
-      search.value +
-      "&id=" +
-      id.value +
-      "&start_date=" +
-      start_date.value +
-      "&end_date=" +
-      end_date.value,
-    {
-      // If you forget this, your download will be corrupt.
-      responseType: "blob",
-    }
-  );
-  //Let's create a link in the document that we'll
-  // programmatically 'click'.
-  const link = document.createElement("a");
+// const handleExportClick = async () => {
+//   const response = await http.get(
+//     baseEndpoint +
+//       "/export?search=" +
+//       search.value +
+//       "&id=" +
+//       id.value +
+//       "&start_date=" +
+//       start_date.value +
+//       "&end_date=" +
+//       end_date.value,
+//     {
+//       // If you forget this, your download will be corrupt.
+//       responseType: "blob",
+//     }
+//   );
+//   //Let's create a link in the document that we'll
+//   // programmatically 'click'.
+//   const link = document.createElement("a");
 
-  // Tell the browser to associate the response data to
-  // the URL of the link we created above.
-  link.href = window.URL.createObjectURL(new Blob([response.data]));
+//   // Tell the browser to associate the response data to
+//   // the URL of the link we created above.
+//   link.href = window.URL.createObjectURL(new Blob([response.data]));
 
-  // Tell the browser to download, not render, the file.
-  link.setAttribute("download", "sales.xlsx");
+//   // Tell the browser to download, not render, the file.
+//   link.setAttribute("download", "sales.xlsx");
 
-  // Place the link in the DOM.
-  document.body.appendChild(link);
+//   // Place the link in the DOM.
+//   document.body.appendChild(link);
 
-  // Make the magic happen!
-  link.click();
-};
+//   // Make the magic happen!
+//   link.click();
+// };
 
-const getSales = async (page = 1) => {
+const getBookings = async (page = 1) => {
   isLoading.value = true;
   const response = await axios.get(
     baseEndpoint +
@@ -88,27 +88,23 @@ const getSales = async (page = 1) => {
       search.value +
       "&id=" +
       id.value +
-      "&sortOrder=" +
-      sortOrder.value +
-      "&orderBy=" +
-      orderBy.value +
       "&start_date=" +
       start_date.value +
       "&end_date=" +
-      end_date.value
+      end_date.value + "&for=sales"
   );
-  sales.value = response.data.data;
+  sales.value = response.data;
   isLoading.value = false;
 };
 
 const handleFilterSales = async () => {
-  await getSales();
+  await getBookings();
 };
 
 const handleSort = (col) => {
   orderBy.value = col;
   sortOrder.value = sortOrder.value == "desc" ? "asc" : "desc";
-  getSales();
+  getBookings();
 };
 
 const displayProfit = (netAmount, cost, shipping_charges) => {
@@ -120,7 +116,7 @@ const displayProfit = (netAmount, cost, shipping_charges) => {
 
 // Hooks
 onMounted(() => {
-  getSales();
+  getBookings();
 });
 </script>
 
@@ -174,17 +170,10 @@ onMounted(() => {
     <template #header>
       <h1 class="h3 mb-0 text-middle">Sales</h1>
       <div>
-        <router-link
-          v-if="can('sale-add')"
-          class="btn btn-lg btn-primary me-4"
-          :to="{ name: 'pos.create' }"
-        >
-          Add Sale
-        </router-link>
-        <button class="btn btn-lg btn-info" @click="handleExportClick">
+        <!-- <button class="btn btn-lg btn-info" @click="handleExportClick">
           <i class="fa fa-download"></i>
           Export to Excel
-        </button>
+        </button> -->
       </div>
     </template>
     <div class="mb-3 row">
@@ -239,42 +228,33 @@ onMounted(() => {
             <th>Date</th>
             <th>Invoice No</th>
             <th>Customer</th>
-            <th>Status</th>
             <th>Cost</th>
-            <th>Total</th>
+            <th>Charges</th>
             <th>Profit</th>
-            <th class="text-center" style="width: 160px;">Action</th>
+            <!-- <th class="text-center" style="width: 160px;">Action</th> -->
           </tr>
         </thead>
         <tbody>
           <tr v-for="(sale, index) in sales.data" :key="sale.id">
             <td>{{ index + 1 }}</td>
             <td>
-              <AppDate :timestamp="sale.date" /><br />
-              <AppTime :timestamp="sale.created_at" />
+              <AppDate :timestamp="sale.delivered_date" /><br />
             </td>
             <td>
-              <router-link
-                :to="{ name: 'sales.show', params: { id: sale.id } }"
+              {{ sale.reference_id }}
+              <!-- <router-link
+                :to="{ name: 'bookings.show', params: { id: sale.id } }"
               >
                 {{ sale.id }}
-              </router-link>
+              </router-link> -->
             </td>
-            <td>{{ sale.account.name }}</td>
+           <td>{{ sale.account.name }}</td>
             <td>
-              <span
-                class="text-capitalize badge"
-                :class="{
-                  'bg-info': sale.status == 'ordered',
-                  'bg-warning': sale.status == 'draft',
-                  'bg-success':
-                    sale.status == 'final' || sale.status == 'completed',
-                  'bg-danger': sale.status == 'returned',
-                }"
-                >{{ sale.status }}</span
-              >
+              {{ sale.purchase_amount }}
             </td>
-            <td>{{ sale.purchase_amount.toFixed(2) }}</td>
+            <td>{{ sale.charges }}</td>
+            <td>{{ sale.charges - sale.purchase_amount }}</td>
+            <!-- <td>{{ sale.purchase_amount.toFixed(2) }}</td>
             <td>{{ sale.net_amount }}</td>
             <td>
               {{
@@ -284,9 +264,9 @@ onMounted(() => {
                   sale.shipping_charges
                 )
               }}
-            </td>
+            </td> -->
 
-            <td>
+            <!-- <td>
               <div class="text-center">
                 <router-link
                   v-if="can('sale-view')"
@@ -302,7 +282,7 @@ onMounted(() => {
                   target="_blank"
                 >
                   <i class="mr-1 fa fa-print"></i>
-                </router-link>
+                </router-link>  -->
                 <!--
                    <router-link
                   v-if="
@@ -319,7 +299,7 @@ onMounted(() => {
                   <i class="fa fa-refresh" aria-hidden="true"></i>
                 </router-link>
                 -->
-                <router-link
+                <!-- <router-link
                   class="btn btn-sm btn-info me-1 mb-1"
                   :to="{
                     name: 'sales.return.create',
@@ -343,7 +323,7 @@ onMounted(() => {
                   <i class="fa fa-exchange" aria-hidden="true"></i>
                 </router-link>
               </div>
-            </td>
+            </td> -->
           </tr>
         </tbody>
       </table>
@@ -352,7 +332,7 @@ onMounted(() => {
       <h3>Loading...</h3>
     </div>
     <template #footer v-if="!isLoading">
-      <Pagination :data="sales" @pagination-change-page="getSales" />
+      <Pagination :data="sales" @pagination-change-page="getBookings" />
       <div class="text-center">
         <small>
           Showing {{ sales.from }} to {{ sales.to }} of

@@ -210,7 +210,24 @@ onMounted(() => {
             All Bookings
           </router-link>
         </li>
-
+        <li class="nav-item">
+          <router-link
+            class="btn btn-primary btn-lg mx-2"
+            :to="{ name: 'products.create' }"
+          >
+          <i class="fa fa-plus-circle" aria-hidden="true"></i>
+            Add Product
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link
+            class="btn btn-primary btn-lg mx-2"
+            :to="{ name: 'purchases.create' }"
+          >
+          <i class="fa fa-plus-circle" aria-hidden="true"></i>
+            Add Purchase
+          </router-link>
+        </li>
         <li class="nav-item dropdown">
           <a
             class="nav-icon dropdown-toggle d-inline-block d-sm-none"

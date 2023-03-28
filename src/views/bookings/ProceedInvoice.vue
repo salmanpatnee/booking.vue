@@ -78,15 +78,15 @@ onMounted(async () => {
             src="/img/pharma-logo-black.png"
             style="display: none"
           />
-          <!-- <h1
+          <h1
             style="
               font-family: monospace;
               font-weight: 900;
               text-transform: uppercase;
             "
           >
-            <storng>Booking</storng>
-          </h1> -->
+            <storng>CVS Technologies</storng>
+          </h1>
           <!-- <img src="/img/pharma-logo-black.png" /> -->
         </div>
         <div align="center">
