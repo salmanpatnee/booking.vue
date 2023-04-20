@@ -26,9 +26,10 @@ const form = ref(
   new Form({
     id: "",
     name: "",
-    email: "",
+    trade_name: "",
     phone: "",
-    trader: "",
+    email: "",
+    address: "",
     balance: 0.0,
     account_type: "customer",
   })
@@ -225,9 +226,10 @@ onMounted(() => {
             <tr>
               <th>#</th>
               <th>Name</th>
-              <th>Email</th>
+              <th>Trade Name</th>
               <th>Phone</th>
-              <th>Trader</th>
+              <th>Email</th>
+              <th>Address</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -235,9 +237,10 @@ onMounted(() => {
             <tr v-for="(customer, index) in customers.data" :key="customer.id">
               <td>{{ index + 1 }}</td>
               <td>{{ customer.name }}</td>
-              <td>{{ customer.email }}</td>
+              <td>{{ customer.trade_name }}</td>
               <td>{{ customer.phone }}</td>
-              <td>{{ customer.trader }}</td>
+              <td>{{ customer.email }}</td>
+              <td>{{ customer.address }}</td>
               <td>
                 <div>
                   <!-- <router-link
@@ -297,15 +300,16 @@ onMounted(() => {
       <HasError :form="form" field="name" />
     </div>
     <div class="mb-3">
-      <label class="form-label" for="email">Email:</label>
+      <label class="form-label" for="trade_name">Trade Name:</label>
       <input
-        v-model="form.email"
-        type="email"
+        v-model="form.trade_name"
+        type="text"
         class="form-control"
-        id="email"
+        id="trade_name"
       />
-      <HasError :form="form" field="email" />
+      <HasError :form="form" field="trade_name" />
     </div>
+   
     <div class="mb-3">
       <label class="form-label" for="phone">Phone:</label>
       <input
@@ -318,14 +322,24 @@ onMounted(() => {
       <HasError :form="form" field="phone" />
     </div>
     <div class="mb-3">
-      <label class="form-label" for="company">Trader:</label>
+      <label class="form-label" for="email">Email:</label>
       <input
-        v-model="form.trader"
-        type="text"
+        v-model="form.email"
+        type="email"
         class="form-control"
-        id="trader"
+        id="email"
       />
-      <HasError :form="form" field="company" />
+      <HasError :form="form" field="email" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="address">Address:</label>
+      <textarea
+        v-model="form.address"
+        type="address"
+        class="form-control"
+        id="address"
+      ></textarea>
+      <HasError :form="form" field="address" />
     </div>
     <template #footer>
       <Button :form="form" class="btn btn-primary">Save</Button>

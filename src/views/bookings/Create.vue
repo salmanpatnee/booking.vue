@@ -95,9 +95,10 @@ const customerForm = ref(
   new Form({
     id: "",
     name: "",
-    email: "",
+    trade_name: "",
     phone: "",
-    trader: "",
+    email: "",
+    address: "",
     balance: 0.0,
     account_type: "customer",
     for: "pos",
@@ -152,7 +153,6 @@ const handleSubmit = async () => {
   }
 };
 
-
 const handleSelectedCustomer = () => {
   form.value.account_id = selectedCustomer.value.id;
 };
@@ -165,7 +165,7 @@ const showCustomerModal = () => {
 // Hooks
 onMounted(async () => {
   await getEmployees();
-  
+
   modal = new Modal(document.getElementById(modalID), {
     keyboard: false,
   });
@@ -313,20 +313,32 @@ onMounted(async () => {
         type="text"
         class="form-control"
         id="name"
+        required
       />
       <HasError :form="customerForm" field="name" />
     </div>
+    <div class="mb-3">
+      <label class="form-label" for="trade_name">Trade Name:</label>
+      <input
+        v-model="customerForm.trade_name"
+        type="text"
+        class="form-control"
+        id="trade_name"
+      />
+      <HasError :form="customerForm" field="trade_name" />
+    </div>
+
     <div class="mb-3">
       <label class="form-label" for="phone">Phone:</label>
       <input
         v-model="customerForm.phone"
         type="tel"
+        required
         class="form-control"
         id="phone"
       />
       <HasError :form="customerForm" field="phone" />
     </div>
-
     <div class="mb-3">
       <label class="form-label" for="email">Email:</label>
       <input
@@ -335,18 +347,17 @@ onMounted(async () => {
         class="form-control"
         id="email"
       />
-      <HasError :form="form" field="email" />
+      <HasError :form="customerForm" field="email" />
     </div>
-
     <div class="mb-3">
-      <label class="form-label" for="trader">Trader:</label>
-      <input
-        v-model="customerForm.trader"
-        type="text"
+      <label class="form-label" for="address">Address:</label>
+      <textarea
+        v-model="customerForm.address"
+        type="address"
         class="form-control"
-        id="trader"
-      />
-      <HasError :form="customerForm" field="trader" />
+        id="address"
+      ></textarea>
+      <HasError :form="customerForm" field="address" />
     </div>
     <template #footer>
       <Button :form="customerForm" class="btn btn-primary">Save</Button>

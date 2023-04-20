@@ -7,7 +7,7 @@
         <div class="col-12 text-center">
           <p class="mb-0">
             <a class="text-muted" href="#" target="_blank"
-              ><strong>&copy; 2023 CVS Tecnologies Limited.</strong></a
+              ><strong>&copy; 2023 iCrack.</strong></a
             >
           </p>
         </div>

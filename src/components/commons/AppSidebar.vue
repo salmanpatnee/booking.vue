@@ -9,7 +9,7 @@ const { can } = useCan();
   <nav id="sidebar" class="sidebar js-sidebar">
     <div class="sidebar-content js-simplebar">
       <router-link class="sidebar-brand" to="/dashboard">
-        <span class="align-middle">CVS Technologies</span>
+        <span class="align-middle">iCrack</span>
       </router-link>
 
       <ul class="sidebar-nav">

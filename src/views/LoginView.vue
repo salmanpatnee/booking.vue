@@ -41,7 +41,7 @@ const handleLogin = async () => {
       class="img-fluid"
       width="250"
     /> -->
-    <h1>CVS Technologies Limited
+    <h1>iCrack
 </h1>  </div>
   <form @submit.prevent="handleLogin">
     <div class="mb-3">
