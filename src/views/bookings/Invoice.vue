@@ -76,10 +76,10 @@ onMounted(async () => {
                       <h3>Invoice</h3>
                     </div>
                     <div class="mb-3 text-center">
-                      <h1>CVS Technologies Limited</h1>
-                      <p class="m-0">Eureka Court</p>
+                      <h1>iCrack</h1>
+                      <!-- <p class="m-0">Eureka Court</p>
                       <p class="m-0">India</p>
-                      <p>info@cvstechnologiges.com</p>
+                      <p>info@cvstechnologiges.com</p> -->
                     </div>
 
                     <div class="row mb-4">

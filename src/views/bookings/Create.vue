@@ -83,9 +83,10 @@ const form = ref(
     imei: null,
     device_type: "",
     device_make: "",
-    model_no: null,
+    device_model: null,
     issue_type: "",
-    estimated_cost: null,
+    estimated_cost: null, 
+    estimated_delivery_date: null,
     serial_no: null,
     issue: null,
     customer_comments: null,
@@ -184,7 +185,7 @@ onMounted(async () => {
       <template #header>
         <h1 class="h3 mb-0 text-middle">Add Booking</h1>
       </template>
-      <div class="d-flex g-0 align-items-end mb-5 col-8">
+      <div class="d-flex g-0 align-items-end  col-8">
         <div class="col">
           <FormAjaxSelect
             ref="customerInput"
@@ -195,6 +196,7 @@ onMounted(async () => {
             @update:modelValue="handleSelectedCustomer"
             @add-new-customer="showCustomerModal"
           />
+          
         </div>
         <div class="col-auto">
           <button
@@ -205,8 +207,10 @@ onMounted(async () => {
             <i class="fa fa-plus"></i>
           </button>
         </div>
+        
       </div>
-      <div class="mt-3">
+      <HasError :form="form" field="account_id" />
+      <div class="mt-5">
         <h3>Issue Description</h3>
         <div class="row mt-4">
           <div class="col">
@@ -234,7 +238,6 @@ onMounted(async () => {
                 v-model="form.imei"
                 id="imei"
                 placeholder="789654123963"
-                required
                 maxlength="15"
               />
               <HasError :form="form" field="imei" />
@@ -304,18 +307,18 @@ onMounted(async () => {
             <HasError :form="form" field="device_make" />
           </div>
           <div class="col-4">
-            <label class="form-label" for="model_no"
+            <label class="form-label" for="device_model"
               ><b>Device Model:</b></label
             >
             <input
               type="text"
               class="form-control"
-              v-model="form.model_no"
-              id="model_no"
+              v-model="form.device_model"
+              id="device_model"
               placeholder="A32"
               required
             />
-            <HasError :form="form" field="model_no" />
+            <HasError :form="form" field="device_model" />
           </div>
           <div class="col-4">
             <label class="form-label" for="issue_type"
@@ -328,7 +331,7 @@ onMounted(async () => {
               required
             >
               <option value="">Select Fault Type</option>
-              <option value="ScreDn damage">Screen Damage</option>
+              <option value="Screen Damage">Screen Damage</option>
               <option value="Battery Problems">Battery Problems</option>
               <option value="Water Damage">Water Damage</option>
               <option value="Software Issues">Software Issues</option>
@@ -376,6 +379,16 @@ onMounted(async () => {
 
           <HasError :form="form" field="issue" />
         </div>
+        <div class="col-4">
+          <label class="form-label" for="estimated_delivery_date"><b>Estimated Delivery Date:</b></label>
+          <input
+            type="date"
+            class="form-control"
+            v-model="form.estimated_delivery_date"
+            id="estimated_delivery_date"
+            required
+          />
+        </div>
       </div>
       <div class="row mb-3">
         <div class="col-4">
@@ -414,7 +427,7 @@ onMounted(async () => {
             type="number"
             class="form-control"
             v-model="form.serial_no"
-            placeholder=""
+            placeholder="Optional"
             id="serial_no"
           />
           <HasError :form="form" field="serial_no" />
@@ -429,7 +442,7 @@ onMounted(async () => {
             v-model="form.customer_comments"
             id="customer_comments"
             class="form-control w-100"
-            placeholder=""
+            placeholder="Optional"
           ></textarea>
 
           <HasError :form="form" field="customer_comments" />
@@ -440,7 +453,7 @@ onMounted(async () => {
             v-model="form.notes"
             id="notes"
             class="form-control w-100"
-            placeholder=""
+            placeholder="Optional"
           ></textarea>
 
           <HasError :form="form" field="notes" />

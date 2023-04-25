@@ -66,13 +66,18 @@ const form = ref(
     id: "",
     account_id: "",
     employee_id: "",
-    date: moment().format("YYYY-MM-DD"),
     device_name: null,
-    model_no: null,
-    imei: null, 
+    imei: null,
+    device_type: "",
+    device_make: "",
+    device_model: null,
+    issue_type: "",
     estimated_cost: null,
-    charges: null,
+    estimated_delivery_date: null,
+    serial_no: null,
     issue: null,
+    customer_comments: null,
+    notes: null,
     booking_details: [],
     // status: "inprogress",
   })
@@ -331,6 +336,9 @@ onMounted(async () => {
         <template #header>
           <h1 class="h3 mb-0 text-middle">
             Booking ID: ({{ sale.data.reference_id }})
+            <span class="badge bg-info ms-1 text-capitalize">
+              {{ sale.data.status }}</span
+            >
           </h1>
         </template>
         <div class="row">
@@ -342,10 +350,8 @@ onMounted(async () => {
           </div>
           <div class="col">
             <p>
-              <b>Status:</b>
-              <span class="badge bg-info ms-1 text-capitalize">
-                {{ sale.data.status }}</span
-              >
+              <b>Estimated Delivery Date:</b>
+              <AppDate :timestamp="sale.data.estimated_delivery_date" />
             </p>
           </div>
         </div>
@@ -356,7 +362,7 @@ onMounted(async () => {
             <div class="col">
               <div class="mb-3">
                 <label class="form-label" for="device_name"
-                  ><b>Device Name:</b></label
+                  ><b>Item Details:</b></label
                 >
                 <input
                   type="text"
@@ -371,23 +377,7 @@ onMounted(async () => {
             </div>
             <div class="col">
               <div class="mb-3">
-                <label class="form-label" for="model_no"
-                  ><b>Model No:</b></label
-                >
-                <input
-                  type="text"
-                  class="form-control"
-                  v-model="form.model_no"
-                  id="model_no"
-                  placeholder="A32"
-                  required
-                />
-                <HasError :form="form" field="model_no" />
-              </div>
-            </div>
-            <div class="col">
-              <div class="mb-3">
-                <label class="form-label" for="imei"><b>IMEI:</b></label>
+                <label class="form-label" for="imei"><b>IMEI No:</b></label>
                 <input
                   type="text"
                   class="form-control"
@@ -400,64 +390,135 @@ onMounted(async () => {
                 <HasError :form="form" field="imei" />
               </div>
             </div>
+            <div class="col">
+              <div class="mb-3">
+                <label class="form-label" for="device_type"
+                  ><b>Device Type:</b></label
+                >
+                <select
+                  class="form-select"
+                  v-model="form.device_type"
+                  id="device_type"
+                  required
+                >
+                  <option value="">Select Device Type</option>
+                  <option value="Smartphones">Smartphones</option>
+                  <option value="Tablets">Tablets</option>
+                  <option value="Laptops">Laptops</option>
+                  <option value="Smartwatches">Smartwatches</option>
+                  <option value="Gaming Consoles">Gaming Consoles</option>
+                  <option value="Audio Devices">Audio Devices</option>
+                  <option value="Digital Cameras">Digital Cameras</option>
+                  <option value="Drones">Drones</option>
+                  <option value="VR Headsets">VR Headsets</option>
+                  <option value="Other">Other</option>
+                </select>
+                <HasError :form="form" field="device_type" />
+              </div>
+            </div>
           </div>
           <div class="row mb-3">
             <div class="col-4">
-              <label class="form-label" for="estimated_cost"
-                ><b>Estimated Cost:</b></label
+              <label class="form-label" for="device_make"
+                ><b>Device Make:</b></label
+              >
+              <select
+                class="form-select"
+                v-model="form.device_make"
+                id="device_make"
+                required
+              >
+                <option value="">Select Device Make</option>
+                <option value="Apple">Apple</option>
+                <option value="Samsung">Samsung</option>
+                <option value="Huawei">Huawei</option>
+                <option value="Xiaomi">Xiaomi</option>
+                <option value="Oppo">Oppo</option>
+                <option value="Vivo">Vivo</option>
+                <option value="Sony">Sony</option>
+                <option value="LG">LG</option>
+                <option value="HTC">HTC</option>
+                <option value="Motorola">Motorola</option>
+                <option value="Nokia">Nokia</option>
+                <option value="Blackberry">Blackberry</option>
+                <option value="Lenovo">Lenovo</option>
+                <option value="Asus">Asus</option>
+                <option value="Dell">Dell</option>
+                <option value="HP">HP</option>
+                <option value="Acer">Acer</option>
+                <option value="Toshiba">Toshiba</option>
+                <option value="Panasonic">Panasonic</option>
+                <option value="Fujitsu">Fujitsu</option>
+                <option value="Other">Other</option>
+              </select>
+              <HasError :form="form" field="device_make" />
+            </div>
+            <div class="col-4">
+              <label class="form-label" for="device_model"
+                ><b>Device Model:</b></label
               >
               <input
-                type="number"
+                type="text"
                 class="form-control"
-                v-model="form.estimated_cost"
-                placeholder="500"
-                id="estimated_cost"
+                v-model="form.device_model"
+                id="device_model"
+                placeholder="A32"
                 required
               />
-              <HasError :form="form" field="estimated_cost" />
+              <HasError :form="form" field="device_model" />
             </div>
             <div class="col-4">
-              <label class="form-label" for="employee_id"
-                ><b>Employee / Technician:</b></label
+              <label class="form-label" for="issue_type"
+                ><b>Fault Type:</b></label
               >
-              <select id="employee_id" class="form-control" v-model="form.employee_id" required>
-                <option value="">--Select--</option>
-                <option
-                  :value="employee.id"
-                  v-for="employee in employees.data"
-                  :key="employee.id"
+              <select
+                class="form-select"
+                v-model="form.issue_type"
+                id="issue_type"
+                required
+              >
+                <option value="">Select Fault Type</option>
+                <option value="Screen Damage">Screen Damage</option>
+                <option value="Battery Problems">Battery Problems</option>
+                <option value="Water Damage">Water Damage</option>
+                <option value="Software Issues">Software Issues</option>
+                <option value="Hardware Issues">Hardware Issues</option>
+                <option value="Data Recovery">Data Recovery</option>
+                <option value="Speaker and Microphone Issues"
+                  >Speaker and Microphone Issues</option
                 >
-                  {{ employee.name }}
-                </option>
+                <option value="Signal and Connectivity Issues"
+                  >Signal and Connectivity Issues</option
+                >
+                <option value="Touchscreen Problems"
+                  >Touchscreen Problems</option
+                >
+                <option value="Charging Issues">Charging Issues</option>
+                <option value="Malware and Virus Removal"
+                  >Malware and Virus Removal</option
+                >
+                <option value="Overheating Issues">Overheating Issues</option>
+                <option value="Device not Turning on"
+                  >Device not Turning on</option
+                >
+                <option value="Device Freezing or Crashing"
+                  >Device Freezing or Crashing</option
+                >
+                <option value="SIM Card Issues">SIM Card Issues</option>
+                <option value="GPS Issues">GPS Issues</option>
+                <option value="Camera Issues">Camera Issues</option>
+                <option value="Audio Jack Issues">Audio Jack Issues</option>
+                <option value="Physical Damage">Physical Damage</option>
+                <option value="Other">Other</option>
               </select>
-              <HasError :form="form" field="employee_id" />
-            </div>
-            <div class="col-4">
-              <label class="form-label" for="status"><b>Status:</b></label>
-              <select class="form-control" v-model="form.status" id="status" @change="form.charges = null">
-                <option value="">--Filter by Status--</option>
-                <option value="in progress">In Progress</option>
-                <option value="repaired">Repaired</option>
-                <option value="complete">Complete</option>
-                <option value="can not be repaired">Can't Repaired</option>
-                <option value="customer collected CBR">
-                  Customer Collected CBR
-                </option>
-                <option value="customer collected payment pending">
-                  Payment Pending
-                </option>
-                <option value="shop property">Shop Property</option>
-                <option value="awaiting customer response">
-                  Awaiting Response
-                </option>
-                <option value="awaiting parts">Awaiting Parts</option>
-              </select>
+              <HasError :form="form" field="issue_type" />
             </div>
           </div>
         </div>
-        <div class="row">
+
+        <div class="row mb-3">
           <div class="col-8">
-            <label class="form-label" for="imei"><b>Issue:</b></label>
+            <label class="form-label" for="imei"><b>Item Fault:</b></label>
             <textarea
               v-model="form.issue"
               id="issue"
@@ -468,16 +529,121 @@ onMounted(async () => {
 
             <HasError :form="form" field="issue" />
           </div>
-          <div class="col" v-if="form.status === 'complete'">
+          <div class="col">
+            <label class="form-label" for="serial_no"><b>Serial No:</b></label>
+            <input
+              type="number"
+              class="form-control"
+              v-model="form.serial_no"
+              placeholder="Optional"
+              id="serial_no"
+            />
+            <HasError :form="form" field="serial_no" />
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-4">
+            <label class="form-label" for="status"><b>Status:</b></label>
+            <select
+              class="form-select"
+              v-model="form.status"
+              id="status"
+              @change="form.charges = null"
+            >
+              <option value="">--Filter by Status--</option>
+              <option value="in progress">In Progress</option>
+              <option value="repaired">Repaired</option>
+              <option value="complete">Complete</option>
+              <option value="can not be repaired">Can't Repaired</option>
+              <option value="customer collected CBR">
+                Customer Collected CBR
+              </option>
+              <option value="customer collected payment pending">
+                Payment Pending
+              </option>
+              <option value="shop property">Shop Property</option>
+              <option value="awaiting customer response">
+                Awaiting Response
+              </option>
+              <option value="awaiting parts">Awaiting Parts</option>
+            </select>
+          </div>
+          <div class="col-4">
+            <label class="form-label" for="estimated_cost"
+              ><b>Estimated Cost:</b></label
+            >
+            <input
+              type="number"
+              class="form-control"
+              v-model="form.estimated_cost"
+              placeholder="500"
+              id="estimated_cost"
+              required
+            />
+            <HasError :form="form" field="estimated_cost" />
+          </div>
+          <div class="col-4">
+            <label class="form-label" for="employee_id"
+              ><b>Employee / Technician:</b></label
+            >
+            <select class="form-control" v-model="form.employee_id" required>
+              <option value="">--Select--</option>
+              <option
+                :value="employee.id"
+                v-for="employee in employees.data"
+                :key="employee.id"
+              >
+                {{ employee.name }}
+              </option>
+            </select>
+            <HasError :form="form" field="employee_id" />
+          </div>
+          
+        </div>
+
+        <div class="row mb-3">
+          
+          <div class="col-4" v-if="form.status === 'complete'">
             <label class="form-label" for="charges"><b>Charges:</b></label>
             <input
-                type="number"
-                class="form-control"
-                v-model="form.charges"
-                placeholder="500"
-                id="charges"
-                required
-              />
+              type="number"
+              class="form-control"
+              v-model="form.charges"
+              placeholder="500"
+              id="charges"
+              required
+            />
+          </div>
+          <div class="col-4">
+            
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-6">
+            <label class="form-label" for="customer_comments"
+              ><b>Customer Notes:</b></label
+            >
+            <textarea
+              v-model="form.customer_comments"
+              id="customer_comments"
+              class="form-control w-100"
+              placeholder="Optional"
+            ></textarea>
+
+            <HasError :form="form" field="customer_comments" />
+          </div>
+          <div class="col-6">
+            <label class="form-label" for="notes"><b>Notes:</b></label>
+            <textarea
+              v-model="form.notes"
+              id="notes"
+              class="form-control w-100"
+              placeholder="Optional"
+            ></textarea>
+
+            <HasError :form="form" field="notes" />
           </div>
         </div>
       </Panel>
@@ -516,7 +682,7 @@ onMounted(async () => {
                 :key="saleDetail.id"
               >
                 <td>{{ i + 1 }}</td>
-                <td>{{ saleDetail.product_name }}</td>
+                <td>{{ saleDetail.product.name }}</td>
                 <td>
                   {{ saleDetail.price }}
                 </td>
@@ -536,7 +702,7 @@ onMounted(async () => {
                   />
                   <HasError :form="form" :field="saleDetail.quantity" />
                   <small
-                    >Only {{ saleDetail.product.quantity }} pc(s)
+                    >Only {{ saleDetail.product.quantity || saleDetail.product.stock }} pc(s)
                     available</small
                   >
                   <!-- <small>{{saleDetail.stock  }} +{{saleDetail.initialQuantity}}</small> -->

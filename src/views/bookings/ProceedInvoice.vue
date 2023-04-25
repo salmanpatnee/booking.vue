@@ -73,10 +73,15 @@ onMounted(async () => {
         "
       >
         <div align="center">
-          <img
+          <!-- <img
             @load="handleImageLoad"
             src="/img/pharma-logo-black.png"
-            style="display: none"
+            style="display: none;"
+          /> -->
+          <img
+            
+            src="/img/pharma-logo-black.png"
+            style="display: none;"
           />
           <h1
             style="
@@ -85,12 +90,12 @@ onMounted(async () => {
               text-transform: uppercase;
             "
           >
-            <storng>CVS Technologies</storng>
+            <storng>iCrack</storng>
           </h1>
           <!-- <img src="/img/pharma-logo-black.png" /> -->
         </div>
         <div align="center">
-          <h1
+          <!-- <h1
             style="
               font-family: monospace;
               margin-top: 0.8em;
@@ -98,19 +103,65 @@ onMounted(async () => {
               padding-bottom: 0.2em;
               border-top: 2px solid;
             "
-          >
-            <storng>Booking ID</storng>
+          > -->
+          <h1 style="margin-top: 50px;">
+            <!-- <storng>Booking ID</storng> -->
           </h1>
-          <h2
+          <div class="row mb-3">
+            <div class="col text-start">
+              <p style="margin-bottom:5px;">Booking Reference: {{sale.reference_id}}</p>
+              <p style="margin-bottom:5px;">Date: <AppDate :timestamp="sale.date"/></p>
+              <p style="margin-bottom:5px;">Customer: {{ sale.account.name }}</p>
+              <p style="margin-bottom:5px;">Trade: {{ sale.account.trade_name }}</p>
+              <p style="margin-bottom:5px;">Phone: {{ sale.account.phone }}</p>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col text-start">
+              <strong>Issue Description</strong>
+              <hr/>
+              <p>Item: {{sale.device_name}}</p>
+              <p>Fault: {{ sale.issue }}</p>
+              <p>Serial No: {{ sale.serial_no }}</p>
+              <p>IMEI: {{ sale.imei }}</p>
+              <p>Delivery Date: <b><AppDate :timestamp="sale.estimated_delivery_date"/></b></p>
+              <p>Status: {{sale.status}}</p>
+              <p>Comments: {{sale.customer_comments}}</p>
+            </div>
+          </div>
+          <div class="row mb-4">
+            <div class="col text-start">
+              <hr/>
+              <p>Total Estimated Cost: {{sale.estimated_cost}}</p>
+            </div>
+          </div>
+          <div class="row mb-2">
+            <div class="col text-center">
+              <strong>Terms &amp; Conditions</strong>
+              <hr/>
+              <p class="text-start">Any repair items not collected within 30 days will be disposed off or sold to recover repairs cost. iCrack Technologies Limited is not liaiable for reimbursing the cost of item.</p>
+              <p class="text-start">All items needs to be checked by customer before leaving iCrack Technologies premises or personnel.</p>
+              <p class="text-start">True condition of the items booked in for repair diagnosis needs to be fully clarified by the customer upon which the quote will be provided. Any fault or condition identified during diagnosis might change the quotation.</p>
+              <p class="text-start">Hardware repairs have 90 days warranty. Water/Liquid damage repairs have 15  days warranty. Batteries come with 30 days waranty. Warranty excludes faults relating to physicals or accidental damage or if the device is open  whilst in your possession. If the nature of the repair falls outside the terms of your warranty or guarantee, then you may incur a charge for the repair.</p>
+               <p class="text-start">Our warranty does not cover repairs on Wifi faults on the iPhone 4 and 4s</p>
+               <p class="text-start">If you take your device to a third party after it has been repaired by iCrack Technologies this will void the warranty on your device. This includes both repaired and purchased devices.</p>
+               <p class="text-start">All software related repairs will not be covered by our warranty.</p>
+               <p class="text-start">The warranty only covers the original repair. For example, if you pay for a screen repair and the screen becomes faulty, you will be covered with a 6-Month warranty. If any additional faults occur that are not related to the original repair this will not be covered under warranty and will need to be paid for.</p>
+            </div>
+          </div>
+          <!-- <h2
             style="font-family: monospace; border: 2px solid; font-weight: bold"
           >
             {{ sale.reference_id }}
-          </h2>
+          </h2> -->
         </div>
 
         <hr />
         <div align="center">
           <img :src="sale.qr_code" alt="Qr Code" srcset="" />
+        </div>
+        <div align="center">
+          <small>{{ sale.reference_id }}</small>
         </div>
         <!-- <div align="center" style="margin-top: 20px">
           <hr />
