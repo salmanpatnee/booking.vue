@@ -227,7 +227,7 @@ onMounted(() => {
         <!-- <label class="d-inline-block me-2 fw-bold" for="search"> Search </label> -->
         <input
           type="search"
-          placeholder="Search by ID"
+          placeholder="Search"
           v-model.trim.lazy="id"
           class="form-control"
           id="id"

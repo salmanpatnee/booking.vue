@@ -73,16 +73,16 @@ onMounted(async () => {
         "
       >
         <div align="center">
-          <!-- <img
+          <img
             @load="handleImageLoad"
             src="/img/pharma-logo-black.png"
             style="display: none;"
-          /> -->
-          <img
+          />
+          <!-- <img
             
             src="/img/pharma-logo-black.png"
             style="display: none;"
-          />
+          /> -->
           <h1
             style="
               font-family: monospace;
@@ -147,6 +147,14 @@ onMounted(async () => {
                <p class="text-start">If you take your device to a third party after it has been repaired by iCrack Technologies this will void the warranty on your device. This includes both repaired and purchased devices.</p>
                <p class="text-start">All software related repairs will not be covered by our warranty.</p>
                <p class="text-start">The warranty only covers the original repair. For example, if you pay for a screen repair and the screen becomes faulty, you will be covered with a 6-Month warranty. If any additional faults occur that are not related to the original repair this will not be covered under warranty and will need to be paid for.</p>
+                <p class="text-start">If the device is damaged it shall not be covered until warranty.</p>
+                <p class="text-start">All warranty claims have to be reported within the warranty period and returned to our premises within two weeks from this date.</p>
+                <p class="text-start">If the device you returned has been reset we will need the iCloud / Google account information to be able to test the device, without this account information we will not provide a warranty.</p>
+                <p class="text-start">Warranty on all accessories sold by iCrack Technologies for 30 days.</p>
+                <p class="text-start">We will not be responsible for loss of sim card / memory card during repair, it is your responsibility to take them out before sending device or leaving our premises.</p>
+                <p class="text-start">Liquid damage repairs can take up to 7-14 days.</p>
+                <p class="text-start">Any motherboard related repairs can take up to 7-14 days.</p>
+                <p class="text-start">Any software related repairs can take up to 7-14 days.</p>
             </div>
           </div>
           <!-- <h2

@@ -62,19 +62,19 @@ onMounted(async () => {
       >
         <main class="content">
           <div class="container-fluid p-0">
-            <img
+            <!-- <img
               @load="handleImageLoad"
               src="/img/pharma-logo-black.png"
               style="display: none"
-            />
+            /> -->
 
             <div class="row">
               <div class="col-12" id="printable">
                 <div class="card">
                   <div class="card-body m-sm-3 m-md-5">
-                    <div class="mb-3 text-center">
+                    <!-- <div class="mb-3 text-center">
                       <h3>Invoice</h3>
-                    </div>
+                    </div> -->
                     <div class="mb-3 text-center">
                       <h1>iCrack</h1>
                       <!-- <p class="m-0">Eureka Court</p>
@@ -88,22 +88,27 @@ onMounted(async () => {
                           Bill to:
                           <strong> {{ sale.account.name }} </strong>
                         </div>
-                        <p>
+                        <div class="text-muted">
                           Phone:
-                          <strong>{{ sale.account.phone }}</strong>
-                          <br />
-                          <a href="#"> </a>
-                        </p>
+                          <strong> {{ sale.account.phone}} </strong>
+                        </div>
+                        <div class="text-muted">
+                          Trade Name:
+                          <strong> {{ sale.account.trade_name}} </strong>
+                        </div>
+
+        
+           
                       </div>
                       <div class="col-6 text-end">
                         <div class="text-muted">
-                          Invoice No. <strong>{{ sale.reference_id }}</strong>
+                          Booking Reference: <strong>{{ sale.reference_id }}</strong>
                         </div>
                         <div class="text-muted">
-                          Invoice Date.
+                          Date:
                           <strong
                             ><AppDate
-                              :timestamp="moment().format('YYYY-MM-DD')"
+                              :timestamp="sale.delivered_date"
                           /></strong>
                         </div>
                         <!-- <div class="text-muted">
@@ -123,21 +128,21 @@ onMounted(async () => {
                       <tbody>
                         <tr>
                           <td>{{ sale.issue }}</td>
-                          <td >PKR {{ sale.charges }}</td>
-                          <td >PKR {{ sale.charges }}</td>
+                          <td > {{ sale.charges }}</td>
+                          <td > {{ sale.charges }}</td>
                         </tr>
-                        <tr>
+                        <!-- <tr>
                           <td colspan="3"></td>
-                        </tr>
+                        </tr> -->
                         <tr>
                           <th>&nbsp;</th>
                           <th >Subtotal</th>
-                          <th >PKR {{ sale.charges }}</th>
+                          <th > {{ sale.charges }}</th>
                         </tr>
                         <tr>
                           <th>&nbsp;</th>
                           <th >Total</th>
-                          <th >PKR {{ sale.charges }}</th>
+                          <th > {{ sale.charges }}</th>
                         </tr>
                       </tbody>
                     </table>
