@@ -87,11 +87,12 @@ onMounted(async () => {
             style="
               font-family: monospace;
               font-weight: 900;
-              text-transform: uppercase;
             "
           >
             <storng>iCrack</storng>
           </h1>
+          <p>84 Gracechurch Shopping Centre, The Parade, Birmingham, Sutton Coldfield B72 1PH, United Kingdom</p>
+          <p>+44 7821 904842</p>
           <!-- <img src="/img/pharma-logo-black.png" /> -->
         </div>
         <div align="center">
@@ -139,22 +140,21 @@ onMounted(async () => {
             <div class="col text-center">
               <strong>Terms &amp; Conditions</strong>
               <hr/>
-              <p class="text-start">Any repair items not collected within 30 days will be disposed off or sold to recover repairs cost. iCrack Technologies Limited is not liaiable for reimbursing the cost of item.</p>
+              <p class="text-start">Any repair items not collected within 30 days will be disposed off or sold to recove repairs cost. iCrack Technologies Limited  is not liaiable for reimbursing the cost of item.</p>
               <p class="text-start">All items needs to be checked by customer before leaving iCrack Technologies premises or personnel.</p>
-              <p class="text-start">True condition of the items booked in for repair diagnosis needs to be fully clarified by the customer upon which the quote will be provided. Any fault or condition identified during diagnosis might change the quotation.</p>
-              <p class="text-start">Hardware repairs have 90 days warranty. Water/Liquid damage repairs have 15  days warranty. Batteries come with 30 days waranty. Warranty excludes faults relating to physicals or accidental damage or if the device is open  whilst in your possession. If the nature of the repair falls outside the terms of your warranty or guarantee, then you may incur a charge for the repair.</p>
-               <p class="text-start">Our warranty does not cover repairs on Wifi faults on the iPhone 4 and 4s</p>
-               <p class="text-start">If you take your device to a third party after it has been repaired by iCrack Technologies this will void the warranty on your device. This includes both repaired and purchased devices.</p>
+              <p class="text-start">True Condition of the items booked in for repair diagnosis needs to be fully clarified by the customer upon which the quote will be provided. Any fault or condition identified during diagnosis might change the quotation. </p>
+              <p class="text-start">Hardware repairs have 90 days warranty. Water/Liquid damage repairs have 15 days warranty. Batteries come with 30 days warranty. Warranty excludes faults relating to physical or accidental damage or if the device is opened whilst in your possession. If the nature of the repair falls outside the terms of your warranty or guarantee, then you may incur a charge for the repair.</p>
+               <p class="text-start">If you take your device to a third party after it has been repaired by iCrack Technologies this will void the warranty on your device. This includes both repaired and purchashed devices.</p>
                <p class="text-start">All software related repairs will not be covered by our warranty.</p>
                <p class="text-start">The warranty only covers the original repair. For example, if you pay for a screen repair and the screen becomes faulty, you will be covered with a 6-Month warranty. If any additional faults occur that are not related to the original repair this will not be covered under warranty and will need to be paid for.</p>
-                <p class="text-start">If the device is damaged it shall not be covered until warranty.</p>
+                <p class="text-start">If the device is damaged it shall not be covered under warranty.</p>
                 <p class="text-start">All warranty claims have to be reported within the warranty period and returned to our premises within two weeks from this date.</p>
-                <p class="text-start">If the device you returned has been reset we will need the iCloud / Google account information to be able to test the device, without this account information we will not provide a warranty.</p>
-                <p class="text-start">Warranty on all accessories sold by iCrack Technologies for 30 days.</p>
-                <p class="text-start">We will not be responsible for loss of sim card / memory card during repair, it is your responsibility to take them out before sending device or leaving our premises.</p>
-                <p class="text-start">Liquid damage repairs can take up to 7-14 days.</p>
-                <p class="text-start">Any motherboard related repairs can take up to 7-14 days.</p>
-                <p class="text-start">Any software related repairs can take up to 7-14 days.</p>
+                <p class="text-start">If the device you returned has been reset we will need the iCloud/Google account information we will not provide a warranty.</p>
+                <p class="text-start">Warranty on all accessories sole by iCrack Technologies for 30 Days.</p>
+                <p class="text-start">We will not be reponsible for Loss of Sim Card/ Memory Card During Repairs, it is your responsibility to take them out before sending device or leaving our premises.</p>
+                <p class="text-start">Liquid Damage repairs can take up to 7 - 14 days.</p>
+                <p class="text-start">Any Motherboard related repairs can take up to 7 - 14 days.</p>
+                <p class="text-start">Any software related repairs can take up to 7 - 14 days.</p>
             </div>
           </div>
           <!-- <h2

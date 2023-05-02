@@ -77,9 +77,10 @@ onMounted(async () => {
                     </div> -->
                     <div class="mb-3 text-center">
                       <h1>iCrack</h1>
-                      <!-- <p class="m-0">Eureka Court</p>
-                      <p class="m-0">India</p>
-                      <p>info@cvstechnologiges.com</p> -->
+                      <p>84 Gracechurch Shopping Centre, <br>The Parade, Birmingham, <br>Sutton Coldfield B72 1PH, <br>United Kingdom</p>
+          <p>+44 7821 904842</p>
+
+      
                     </div>
 
                     <div class="row mb-4">
