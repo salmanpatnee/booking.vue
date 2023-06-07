@@ -9,7 +9,7 @@ import purchaseService from "@@/services/PurchaseService";
 // import PurchasedProductsTable from './PurchasedProductsTable.vue';
 
 // Data
-const baseEndpoint = "/api/bookings";
+const baseEndpoint = "/api/booking-list";
 const sale = ref({});
 const route = useRoute();
 let isLoaded = ref(false);
@@ -50,6 +50,9 @@ const totalDiscountDisplay = computed(() => {
 const dueAmountDisplay = computed(() => {
   return purchase.value.net_amount - purchase.value.paid_amount;
 });
+const totalEstimatedCostDisplay = computed(()=>{
+  return 1500;
+});
 // Hooks
 onMounted(async () => {
   await getBooking();
@@ -73,104 +76,182 @@ onMounted(async () => {
         "
       >
         <div align="center">
-          <img
-            @load="handleImageLoad"
-            src="/img/pharma-logo-black.png"
-            style="display: none;"
-          />
           <!-- <img
-            
+            @load="handleImageLoad"
             src="/img/pharma-logo-black.png"
             style="display: none;"
           /> -->
           <h1
-            style="
-              font-family: monospace;
-              font-weight: 900;
-            "
+            style="font-family: monospace; font-weight: 900; font-size: 22px;"
           >
             <storng>iCrack</storng>
           </h1>
-          <p>84 Gracechurch Shopping Centre, The Parade, Birmingham, Sutton Coldfield B72 1PH, United Kingdom</p>
-          <p>+44 7821 904842</p>
+          <p style="font-size: 10px; margin-bottom: 5px;">
+            84 Gracechurch Shopping Centre, The Parade, Birmingham, Sutton
+            Coldfield B72 1PH, United Kingdom
+          </p>
+          <p style="font-size: 10px; margin-bottom: 5px;">07883 731494</p>
+          <p>Attention: This is not a sale invoice.</p>
           <!-- <img src="/img/pharma-logo-black.png" /> -->
         </div>
         <div align="center">
-          <!-- <h1
-            style="
-              font-family: monospace;
-              margin-top: 0.8em;
-              border-bottom: 2px solid;
-              padding-bottom: 0.2em;
-              border-top: 2px solid;
-            "
-          > -->
-          <h1 style="margin-top: 50px;">
-            <!-- <storng>Booking ID</storng> -->
-          </h1>
-          <div class="row mb-3">
+          <hr class="mt-2 mb-2" />
+          <div class="row mb-0">
             <div class="col text-start">
-              <p style="margin-bottom:5px;">Booking Reference: {{sale.reference_id}}</p>
-              <p style="margin-bottom:5px;">Date: <AppDate :timestamp="sale.date"/></p>
-              <p style="margin-bottom:5px;">Customer: {{ sale.account.name }}</p>
-              <p style="margin-bottom:5px;">Trade: {{ sale.account.trade_name }}</p>
-              <p style="margin-bottom:5px;">Phone: {{ sale.account.phone }}</p>
+              <p style="margin-bottom: 5px; font-size: 12px;">
+                <b>Booking Reference:</b> {{ sale.reference_id }}
+              </p>
+              <p style="margin-bottom: 5px; font-size: 12px;">
+                <b>Date:</b> <AppDate :timestamp="sale.date" />
+              </p>
+              <p style="margin-bottom: 5px; font-size: 12px;">
+                <b>Customer:</b> {{ sale.account.name }}
+              </p>
+              <p style="margin-bottom: 5px; font-size: 12px;">
+                <b>Trade:</b> {{ sale.account.trade_name }}
+              </p>
+              <p style="margin-bottom: 5px; font-size: 12px;">
+                <b>Phone:</b> {{ sale.account.phone }}
+              </p>
+              <p style="margin-bottom: 0px; font-size: 12px;">
+                <b>Items:</b>
+              </p>
             </div>
           </div>
+
+          <!-- ITEMS -->
+          <div class="row mb-2" v-for="(booking_list_detail, index) in sale.booking_list_details" :key="booking_list_detail.id">
+            <div class="col text-start">
+              <hr class="mt-0 mb-0" />
+              <p style="font-size: 12px; margin-bottom: 0px; text-align:right;">
+                <b>Barcode:</b> {{ sale.reference_id }}
+              </p>
+              <p style="font-size: 12px; margin-bottom: 0px;">
+                <b>Item</b>: {{ booking_list_detail.device_name }}
+              </p>
+              <p style="font-size: 12px; margin-bottom: 0px;">
+                <b>Fault</b>: {{ booking_list_detail.issue }}
+              </p>
+              <p style="font-size: 12px; margin-bottom: 0px;">
+                <b>Serial No:</b> {{ booking_list_detail.serial_no }}
+              </p>
+              <p style="font-size: 12px; margin-bottom: 0px;">
+                <b>IMEI:</b> {{ booking_list_detail.imei }}
+              </p>
+              <p style="font-size: 12px; margin-bottom: 0px;">
+                <b>Delivery Date:</b>
+                <AppDate :timestamp="booking_list_detail.estimated_delivery_date" />
+              </p>
+              <p style="font-size: 12px; margin-bottom: 0px;">
+                <b>Estimated Cost:</b> {{ booking_list_detail.estimated_cost }}
+                
+              </p>
+              <p style="font-size: 12px; margin-bottom: 0px;">
+                <b>Status:</b> {{ booking_list_detail.status }}
+              </p>
+              <p style="font-size: 12px; margin-bottom: 0px;">
+                <b>Comments:</b> {{ booking_list_detail.customer_comments }}
+              </p>
+            </div>
+          </div>
+           <!-- ITEMS END-->
           <div class="row mb-2">
             <div class="col text-start">
-              <strong>Issue Description</strong>
-              <hr/>
-              <p>Item: {{sale.device_name}}</p>
-              <p>Fault: {{ sale.issue }}</p>
-              <p>Serial No: {{ sale.serial_no }}</p>
-              <p>IMEI: {{ sale.imei }}</p>
-              <p>Delivery Date: <b><AppDate :timestamp="sale.estimated_delivery_date"/></b></p>
-              <p>Status: {{sale.status}}</p>
-              <p>Comments: {{sale.customer_comments}}</p>
-            </div>
-          </div>
-          <div class="row mb-4">
-            <div class="col text-start">
-              <hr/>
-              <p>Total Estimated Cost: {{sale.estimated_cost}}</p>
+              <hr class="mb-2 mt-2" />
+              <p class="mb-0">
+                Total Items: {{ sale.booking_items_count }}
+              </p>
+              <p class="mb-0">
+                Total Estimated Cost: {{ totalEstimatedCostDisplay }}
+              </p>
             </div>
           </div>
           <div class="row mb-2">
             <div class="col text-center">
               <strong>Terms &amp; Conditions</strong>
-              <hr/>
-              <p class="text-start">Any repair items not collected within 30 days will be disposed off or sold to recove repairs cost. iCrack Technologies Limited  is not liaiable for reimbursing the cost of item.</p>
-              <p class="text-start">All items needs to be checked by customer before leaving iCrack Technologies premises or personnel.</p>
-              <p class="text-start">True Condition of the items booked in for repair diagnosis needs to be fully clarified by the customer upon which the quote will be provided. Any fault or condition identified during diagnosis might change the quotation. </p>
-              <p class="text-start">Hardware repairs have 90 days warranty. Water/Liquid damage repairs have 15 days warranty. Batteries come with 30 days warranty. Warranty excludes faults relating to physical or accidental damage or if the device is opened whilst in your possession. If the nature of the repair falls outside the terms of your warranty or guarantee, then you may incur a charge for the repair.</p>
-               <p class="text-start">If you take your device to a third party after it has been repaired by iCrack Technologies this will void the warranty on your device. This includes both repaired and purchashed devices.</p>
-               <p class="text-start">All software related repairs will not be covered by our warranty.</p>
-               <p class="text-start">The warranty only covers the original repair. For example, if you pay for a screen repair and the screen becomes faulty, you will be covered with a 6-Month warranty. If any additional faults occur that are not related to the original repair this will not be covered under warranty and will need to be paid for.</p>
-                <p class="text-start">If the device is damaged it shall not be covered under warranty.</p>
-                <p class="text-start">All warranty claims have to be reported within the warranty period and returned to our premises within two weeks from this date.</p>
-                <p class="text-start">If the device you returned has been reset we will need the iCloud/Google account information we will not provide a warranty.</p>
-                <p class="text-start">Warranty on all accessories sole by iCrack Technologies for 30 Days.</p>
-                <p class="text-start">We will not be reponsible for Loss of Sim Card/ Memory Card During Repairs, it is your responsibility to take them out before sending device or leaving our premises.</p>
-                <p class="text-start">Liquid Damage repairs can take up to 7 - 14 days.</p>
-                <p class="text-start">Any Motherboard related repairs can take up to 7 - 14 days.</p>
-                <p class="text-start">Any software related repairs can take up to 7 - 14 days.</p>
+              <hr class="mb-2 mt-2" />
+              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+                Any repair items not collected within 30 days will be disposed
+                off or sold to recove repairs cost. iCrack Technologies Limited
+                is not liaiable for reimbursing the cost of item.
+              </p>
+              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+                All items needs to be checked by customer before leaving iCrack
+                Technologies premises or personnel.
+              </p>
+              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+                True Condition of the items booked in for repair diagnosis needs
+                to be fully clarified by the customer upon which the quote will
+                be provided. Any fault or condition identified during diagnosis
+                might change the quotation.
+              </p>
+              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+                Hardware repairs have 90 days warranty. Water/Liquid damage
+                repairs have 15 days warranty. Batteries come with 30 days
+                warranty. Warranty excludes faults relating to physical or
+                accidental damage or if the device is opened whilst in your
+                possession. If the nature of the repair falls outside the terms
+                of your warranty or guarantee, then you may incur a charge for
+                the repair.
+              </p>
+              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+                If you take your device to a third party after it has been
+                repaired by iCrack Technologies this will void the warranty on
+                your device. This includes both repaired and purchashed devices.
+              </p>
+              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+                All software related repairs will not be covered by our
+                warranty.
+              </p>
+              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+                The warranty only covers the original repair. For example, if
+                you pay for a screen repair and the screen becomes faulty, you
+                will be covered with a 6-Month warranty. If any additional
+                faults occur that are not related to the original repair this
+                will not be covered under warranty and will need to be paid for.
+              </p>
+              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+                If the device is damaged it shall not be covered under warranty.
+              </p>
+              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+                All warranty claims have to be reported within the warranty
+                period and returned to our premises within two weeks from this
+                date.
+              </p>
+              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+                If the device you returned has been reset we will need the
+                iCloud/Google account information we will not provide a
+                warranty.
+              </p>
+              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+                Warranty on all accessories sole by iCrack Technologies for 30
+                Days.
+              </p>
+              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+                We will not be reponsible for Loss of Sim Card/ Memory Card
+                During Repairs, it is your responsibility to take them out
+                before sending device or leaving our premises.
+              </p>
+              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+                Liquid Damage repairs can take up to 7 - 14 days.
+              </p>
+              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+                Any Motherboard related repairs can take up to 7 - 14 days.
+              </p>
+              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+                Any software related repairs can take up to 7 - 14 days.
+              </p>
             </div>
           </div>
-          <!-- <h2
-            style="font-family: monospace; border: 2px solid; font-weight: bold"
-          >
-            {{ sale.reference_id }}
-          </h2> -->
         </div>
 
-        <hr />
+        <!-- <hr id="main-header" class="mb-2 mt-2" />
         <div align="center">
-          <img :src="sale.qr_code" alt="Qr Code" srcset="" />
+          <img :src="sale.qr_code" alt="Qr Code" srcset="" width="50"/>
         </div>
         <div align="center">
           <small>{{ sale.reference_id }}</small>
-        </div>
+        </div> -->
         <!-- <div align="center" style="margin-top: 20px">
           <hr />
 

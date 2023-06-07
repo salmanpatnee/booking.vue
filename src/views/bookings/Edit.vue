@@ -40,6 +40,14 @@ let shouldSubmit = true;
 //   return authStore.user.cash_registers.length;
 // });
 
+const handlePrintInvoice = (id) => {
+  let routeData = router.resolve({
+    name: "bookings.proceed.invoice",
+    params: { id },
+  });
+  window.open(routeData.href, "_blank");
+};
+
 const getEmployees = async (page = 1) => {
   employees.value.isLoading = true;
   const { data: response } = await axios.get(`/api/employees`);
@@ -53,7 +61,10 @@ const getBooking = async () => {
   const { data: response } = await http.get(`/api/bookings/${id}`);
   sale.value.data = response.data;
   form.value.fill(response.data);
-  form.value.employee_id = response.data.employee.id;
+
+  form.value.employee_id = response.data.employee
+    ? response.data.employee.id
+    : "";
   form.value.status = response.data.status;
   form.value.booking_details = response.data.booking_details;
   //   console.log({ response });
@@ -340,19 +351,48 @@ onMounted(async () => {
               {{ sale.data.status }}</span
             >
           </h1>
+          <div>
+            <p class="mb-0">
+              <b>Date Receive:</b> <AppDate :timestamp="sale.data.date" />
+            </p>
+          </div>
+          <div>
+            <p class="mb-0">
+              <b>Estimated Delivery Date: </b>
+              <AppDate :timestamp="sale.data.estimated_delivery_date" />
+            </p>
+          </div>
         </template>
         <div class="row">
           <div class="col">
-            <p><b>Customer:</b> {{ sale.data.account.name }}</p>
+            <p><b>Customer Name:</b> {{ sale.data.account.name }}</p>
+
+            <p><b>Email:</b> {{ sale.data.account.email }}</p>
+
+            <!-- <pre>{{sale.data.account}}</pre> -->
           </div>
           <div class="col">
-            <p><b>Date Receive:</b> <AppDate :timestamp="sale.data.date" /></p>
+            <p><b>Trade Name:</b> {{ sale.data.account.trade_name }}</p>
+            <p><b>Address:</b> {{ sale.data.account.address }}</p>
           </div>
           <div class="col">
-            <p>
-              <b>Estimated Delivery Date:</b>
-              <AppDate :timestamp="sale.data.estimated_delivery_date" />
-            </p>
+            <div class="d-flex flex-wrap justify-content-between">
+
+              <p><b>Phone:</b> {{ sale.data.account.phone }}</p>
+              <div>
+                <button
+                  type="button"
+                  @click.prevent="handlePrintInvoice(sale.data.id)"
+                  class="btn btn-warning btn-sm"
+                >
+                  <i class="fa fa-print"></i>
+                </button>
+              </div>
+            </div>
+            <div class="text-center mt-4">
+              <img :src="sale.data.qr_code" alt="Qr Code" srcset="" width="60"/>
+              <small class="d-block">{{ sale.data.reference_id }}</small>
+            </div>
           </div>
         </div>
 
@@ -370,7 +410,7 @@ onMounted(async () => {
                   v-model="form.device_name"
                   id="device_name"
                   placeholder="Samsung"
-                  required
+                  
                 />
                 <HasError :form="form" field="device_name" />
               </div>
@@ -384,7 +424,7 @@ onMounted(async () => {
                   v-model="form.imei"
                   id="imei"
                   placeholder="789654123963"
-                  required
+                  
                   maxlength="15"
                 />
                 <HasError :form="form" field="imei" />
@@ -399,7 +439,7 @@ onMounted(async () => {
                   class="form-select"
                   v-model="form.device_type"
                   id="device_type"
-                  required
+                  
                 >
                   <option value="">Select Device Type</option>
                   <option value="Smartphones">Smartphones</option>
@@ -426,7 +466,7 @@ onMounted(async () => {
                 class="form-select"
                 v-model="form.device_make"
                 id="device_make"
-                required
+                
               >
                 <option value="">Select Device Make</option>
                 <option value="Apple">Apple</option>
@@ -463,7 +503,7 @@ onMounted(async () => {
                 v-model="form.device_model"
                 id="device_model"
                 placeholder="A32"
-                required
+                
               />
               <HasError :form="form" field="device_model" />
             </div>
@@ -475,7 +515,7 @@ onMounted(async () => {
                 class="form-select"
                 v-model="form.issue_type"
                 id="issue_type"
-                required
+                
               >
                 <option value="">Select Fault Type</option>
                 <option value="Screen Damage">Screen Damage</option>
@@ -524,7 +564,7 @@ onMounted(async () => {
               id="issue"
               class="form-control w-100"
               placeholder="Display panel"
-              required
+              
             ></textarea>
 
             <HasError :form="form" field="issue" />
@@ -579,7 +619,7 @@ onMounted(async () => {
               v-model="form.estimated_cost"
               placeholder="500"
               id="estimated_cost"
-              required
+              
             />
             <HasError :form="form" field="estimated_cost" />
           </div>
@@ -587,7 +627,7 @@ onMounted(async () => {
             <label class="form-label" for="employee_id"
               ><b>Employee / Technician:</b></label
             >
-            <select class="form-control" v-model="form.employee_id" required>
+            <select class="form-control" v-model="form.employee_id" >
               <option value="">--Select--</option>
               <option
                 :value="employee.id"
@@ -599,11 +639,9 @@ onMounted(async () => {
             </select>
             <HasError :form="form" field="employee_id" />
           </div>
-          
         </div>
 
         <div class="row mb-3">
-          
           <div class="col-4" v-if="form.status === 'complete'">
             <label class="form-label" for="charges"><b>Charges:</b></label>
             <input
@@ -612,12 +650,10 @@ onMounted(async () => {
               v-model="form.charges"
               placeholder="500"
               id="charges"
-              required
+              
             />
           </div>
-          <div class="col-4">
-            
-          </div>
+          <div class="col-4"></div>
         </div>
 
         <div class="row mb-3">
@@ -702,8 +738,11 @@ onMounted(async () => {
                   />
                   <HasError :form="form" :field="saleDetail.quantity" />
                   <small
-                    >Only {{ saleDetail.product.quantity || saleDetail.product.stock }} pc(s)
-                    available</small
+                    >Only
+                    {{
+                      saleDetail.product.quantity || saleDetail.product.stock
+                    }}
+                    pc(s) available</small
                   >
                   <!-- <small>{{saleDetail.stock  }} +{{saleDetail.initialQuantity}}</small> -->
                 </td>

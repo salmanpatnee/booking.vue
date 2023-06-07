@@ -62,11 +62,11 @@ onMounted(async () => {
       >
         <main class="content">
           <div class="container-fluid p-0">
-            <!-- <img
+            <img
               @load="handleImageLoad"
-              src="/img/pharma-logo-black.png"
-              style="display: none"
-            /> -->
+              src="/img/logo.jpg"
+              style="display: none;"
+            />
 
             <div class="row">
               <div class="col-12" id="printable">
@@ -77,10 +77,12 @@ onMounted(async () => {
                     </div> -->
                     <div class="mb-3 text-center">
                       <h1>iCrack</h1>
-                      <p>84 Gracechurch Shopping Centre, <br>The Parade, Birmingham, <br>Sutton Coldfield B72 1PH, <br>United Kingdom</p>
-          <p>+44 7821 904842</p>
-
-      
+                      <p>
+                        84 Gracechurch Shopping Centre, <br />The Parade,
+                        Birmingham, <br />Sutton Coldfield B72 1PH, <br />United
+                        Kingdom
+                      </p>
+                      <p>07883 731494</p>
                     </div>
 
                     <div class="row mb-4">
@@ -91,25 +93,22 @@ onMounted(async () => {
                         </div>
                         <div class="text-muted">
                           Phone:
-                          <strong> {{ sale.account.phone}} </strong>
+                          <strong> {{ sale.account.phone }} </strong>
                         </div>
                         <div class="text-muted">
                           Trade Name:
-                          <strong> {{ sale.account.trade_name}} </strong>
+                          <strong> {{ sale.account.trade_name }} </strong>
                         </div>
-
-        
-           
                       </div>
                       <div class="col-6 text-end">
                         <div class="text-muted">
-                          Booking Reference: <strong>{{ sale.reference_id }}</strong>
+                          Booking Reference:
+                          <strong>{{ sale.reference_id }}</strong>
                         </div>
                         <div class="text-muted">
                           Date:
                           <strong
-                            ><AppDate
-                              :timestamp="sale.delivered_date"
+                            ><AppDate :timestamp="sale.delivered_date"
                           /></strong>
                         </div>
                         <!-- <div class="text-muted">
@@ -129,21 +128,21 @@ onMounted(async () => {
                       <tbody>
                         <tr>
                           <td>{{ sale.issue }}</td>
-                          <td > {{ sale.charges }}</td>
-                          <td > {{ sale.charges }}</td>
+                          <td>{{ sale.charges }}</td>
+                          <td>{{ sale.charges }}</td>
                         </tr>
                         <!-- <tr>
                           <td colspan="3"></td>
                         </tr> -->
                         <tr>
                           <th>&nbsp;</th>
-                          <th >Subtotal</th>
-                          <th > {{ sale.charges }}</th>
+                          <th>Subtotal</th>
+                          <th>{{ sale.charges }}</th>
                         </tr>
                         <tr>
                           <th>&nbsp;</th>
-                          <th >Total</th>
-                          <th > {{ sale.charges }}</th>
+                          <th>Total</th>
+                          <th>{{ sale.charges }}</th>
                         </tr>
                       </tbody>
                     </table>

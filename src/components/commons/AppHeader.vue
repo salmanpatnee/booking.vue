@@ -204,7 +204,7 @@ onMounted(() => {
         <li class="nav-item">
           <router-link
             class="btn btn-primary btn-lg mx-2"
-            :to="{ name: 'bookings.index' }"
+            :to="{ name: 'booking.items.index' }"
           >
             <i class="fa fa-calendar-minus-o" aria-hidden="true"></i>
             All Bookings

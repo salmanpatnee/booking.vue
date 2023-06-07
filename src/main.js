@@ -34,6 +34,14 @@ import {
 
 const app = createApp(App);
 
+app.config.globalProperties.$filters = {
+  currencyPound(value) {
+    // return '£' + value
+    let val = (value/1).toFixed(2).replace('.', ',')
+        return '£' + val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+  }
+}
+
 app.component(Button.name, Button);
 app.component(HasError.name, HasError);
 app.component(AlertError.name, AlertError);
@@ -51,7 +59,7 @@ app.component("AppTime", AppTime);
 app.component("AppLoader", AppLoader);
 
 const options = {
-  color: "#2A75D8",
+  color: "#ed008c",
   failedColor: "#874b4b",
   thickness: "3px",
 };

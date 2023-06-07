@@ -50,9 +50,11 @@ import StockReport from "@@/views/stock/StockReport.vue";
 // import StockManagement from "@@/views/stock/StockManagement.vue";
 
 import BookingIndex from "@@/views/bookings/Index.vue";
+import BookingItemIndex from "@@/views/bookings/ItemIndex.vue";
 import BookingCreate from "@@/views/bookings/Create.vue";
 import BookingEdit from "@@/views/bookings/Edit.vue";
 import BookingsProceedInvoice from "@@/views/bookings/ProceedInvoice.vue";
+import BookingsBarcodePrint from "@@/views/bookings/BarcodePrint.vue";
 import BookingsInvoice from "@@/views/bookings/Invoice.vue";
 
 import InvoiceCreate from "@@/views/invoices/Create.vue";
@@ -340,6 +342,11 @@ const router = createRouter({
           component: BookingIndex,
         },
         {
+          path: "/booking/items",
+          name: "booking.items.index",
+          component: BookingItemIndex,
+        },
+        {
           path: "/bookings/create",
           name: "bookings.create",
           component: BookingCreate,
@@ -353,6 +360,12 @@ const router = createRouter({
           path: "/bookings/:id/proceed/invoice",
           name: "bookings.proceed.invoice",
           component: BookingsProceedInvoice,
+          // meta: { authorize: ["pos-manage"] },
+        },
+        {
+          path: "/bookings/:id/barcode",
+          name: "bookings.barcode.print",
+          component: BookingsBarcodePrint,
           // meta: { authorize: ["pos-manage"] },
         },
         {
