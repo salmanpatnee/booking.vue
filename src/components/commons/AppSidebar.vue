@@ -107,7 +107,7 @@ const { can } = useCan();
               </router-link>
             </li>
 
-            <li class="sidebar-item">
+            <!-- <li class="sidebar-item">
               <router-link
                 class="sidebar-link"
                 :to="{ name: 'bookings.index' }"
@@ -115,7 +115,7 @@ const { can } = useCan();
                 <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
                 <span class="align-middle">Manage Bookings</span>
               </router-link>
-            </li>
+            </li> -->
             <li class="sidebar-item">
               <router-link
                 class="sidebar-link"

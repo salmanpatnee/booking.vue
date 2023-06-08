@@ -163,6 +163,9 @@ const showInvoicePopup = () => {
 };
 // Hooks
 onMounted(() => {
+
+  document.getElementById("sidebar").classList.add("collapsed");
+  
   getBookingItems();
 
   modal = new Modal(document.getElementById(modalID), {

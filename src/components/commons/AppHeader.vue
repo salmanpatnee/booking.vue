@@ -207,10 +207,10 @@ onMounted(() => {
             :to="{ name: 'booking.items.index' }"
           >
             <i class="fa fa-calendar-minus-o" aria-hidden="true"></i>
-            All Bookings
+            All Bookings Items
           </router-link>
         </li>
-        <li class="nav-item">
+        <!-- <li class="nav-item">
           <router-link
             class="btn btn-primary btn-lg mx-2"
             :to="{ name: 'products.create' }"
@@ -218,7 +218,7 @@ onMounted(() => {
           <i class="fa fa-plus-circle" aria-hidden="true"></i>
             Add Product
           </router-link>
-        </li>
+        </li> 
         <li class="nav-item">
           <router-link
             class="btn btn-primary btn-lg mx-2"
@@ -228,6 +228,7 @@ onMounted(() => {
             Add Purchase
           </router-link>
         </li>
+        -->
         <li class="nav-item dropdown">
           <a
             class="nav-icon dropdown-toggle d-inline-block d-sm-none"

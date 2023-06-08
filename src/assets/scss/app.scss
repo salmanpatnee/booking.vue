@@ -159,3 +159,10 @@ ul.pagination li {
     font-size: .875em;
     color: #dc3545;
 }
+
+@media (min-width: 992px) {
+
+    .content {
+        padding: 1rem 1rem 1.5rem;
+    }
+}

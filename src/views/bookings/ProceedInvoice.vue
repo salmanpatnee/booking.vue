@@ -41,18 +41,13 @@ const handlePrint = () => {
   // document.body.innerHTML = originalContents;
   window.onafterprint = window.close;
 };
-const totalDiscountDisplay = computed(() => {
-  const { discount_amount } = sale.value;
-  return discount_amount === "0.00"
-    ? "0.00"
-    : parseFloat(discount_amount).toFixed(2);
+
+const totalEstimatedCostDisplay = computed(() => {
+  return sale.value.booking_list_details.reduce((accumulator, object) => {
+    return accumulator + parseFloat(object.estimated_cost);
+  }, 0);
 });
-const dueAmountDisplay = computed(() => {
-  return purchase.value.net_amount - purchase.value.paid_amount;
-});
-const totalEstimatedCostDisplay = computed(()=>{
-  return 1500;
-});
+
 // Hooks
 onMounted(async () => {
   await getBooking();
@@ -76,11 +71,11 @@ onMounted(async () => {
         "
       >
         <div align="center">
-          <!-- <img
+          <img
             @load="handleImageLoad"
             src="/img/pharma-logo-black.png"
             style="display: none;"
-          /> -->
+          />
           <h1
             style="font-family: monospace; font-weight: 900; font-size: 22px;"
           >
@@ -120,10 +115,16 @@ onMounted(async () => {
           </div>
 
           <!-- ITEMS -->
-          <div class="row mb-2" v-for="(booking_list_detail, index) in sale.booking_list_details" :key="booking_list_detail.id">
+          <div
+            class="row mb-2"
+            v-for="(booking_list_detail, index) in sale.booking_list_details"
+            :key="booking_list_detail.id"
+          >
             <div class="col text-start">
-              <hr class="mt-0 mb-0" />
-              <p style="font-size: 12px; margin-bottom: 0px; text-align:right;">
+              <hr class="mt-0 mb-1" />
+              <p
+                style="font-size: 12px; margin-bottom: 0px;"
+              >
                 <b>Barcode:</b> {{ sale.reference_id }}
               </p>
               <p style="font-size: 12px; margin-bottom: 0px;">
@@ -140,11 +141,12 @@ onMounted(async () => {
               </p>
               <p style="font-size: 12px; margin-bottom: 0px;">
                 <b>Delivery Date:</b>
-                <AppDate :timestamp="booking_list_detail.estimated_delivery_date" />
+                <AppDate
+                  :timestamp="booking_list_detail.estimated_delivery_date"
+                />
               </p>
               <p style="font-size: 12px; margin-bottom: 0px;">
                 <b>Estimated Cost:</b> {{ booking_list_detail.estimated_cost }}
-                
               </p>
               <p style="font-size: 12px; margin-bottom: 0px;">
                 <b>Status:</b> {{ booking_list_detail.status }}
@@ -154,15 +156,13 @@ onMounted(async () => {
               </p>
             </div>
           </div>
-           <!-- ITEMS END-->
+          <!-- ITEMS END-->
           <div class="row mb-2">
             <div class="col text-start">
               <hr class="mb-2 mt-2" />
-              <p class="mb-0">
-                Total Items: {{ sale.booking_items_count }}
-              </p>
-              <p class="mb-0">
-                Total Estimated Cost: {{ totalEstimatedCostDisplay }}
+              <p style="font-size: 12px; margin-bottom: 0px;" class="mb-0"><b>Total Items:</b> {{ sale.booking_items_count }}</p>
+              <p style="font-size: 12px; margin-bottom: 0px;" class="mb-0">
+                <b>Total Estimated Cost:</b> {{ totalEstimatedCostDisplay }}
               </p>
             </div>
           </div>
