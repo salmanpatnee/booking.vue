@@ -13,10 +13,10 @@ let modal = null;
 let modalID = "invoiceModal";
 const router = useRouter();
 const bookingItems = ref([]);
-const paginate = ref(25);
+const paginate = ref(50);
 const search = ref("");
 const id = ref("");
-const device_name = ref("")
+const device_name = ref("");
 const status = ref("");
 const fault = ref("");
 const baseEndpoint = "/api/booking-items";
@@ -34,6 +34,28 @@ const invoiceForm = ref(
     reference_id: null,
     id: null,
   })
+);
+
+const params = ref({
+  reference_id: "",
+  status: "",
+  device_name: "",
+  issue: "",
+  customer: "",
+  trader: "",
+  employee: "",
+  phone: "",
+  email: "", 
+  sort_field: "created_at", 
+  sort_direction: "desc", 
+});
+
+watch(
+  () => params,
+  (newValue, oldValue) => {
+    getBookingItems();
+  },
+  { deep: true }
 );
 
 watch(
@@ -66,7 +88,6 @@ watch(
     getBookingItems();
   }
 );
-
 
 // Methods
 
@@ -123,26 +144,37 @@ const handleExportClick = async () => {
 
 const getBookingItems = async (page = 1) => {
   isLoading.value = true;
+  // const response = await axios.get(
+  //   baseEndpoint +
+  //     "?page=" +
+  //     page +
+  //     "&paginate=" +
+  //     paginate.value +
+  //     "&search=" +
+  //     search.value +
+  //     "&id=" +
+  //     id.value +
+  //     "&device_name=" +
+  //     device_name.value +
+  //     "&fault=" +
+  //     fault.value +
+  //     "&start_date=" +
+  //     start_date.value +
+  //     "&end_date=" +
+  //     end_date.value +
+  //     "&status=" +
+  //     status.value
+  // );
+
   const response = await axios.get(
-    baseEndpoint +
-      "?page=" +
-      page +
-      "&paginate=" +
-      paginate.value +
-      "&search=" +
-      search.value +
-      "&id=" +
-      id.value +
-      "&device_name=" +
-      device_name.value +
-      "&fault=" +
-      fault.value +
-      "&start_date=" +
-      start_date.value +
-      "&end_date=" +
-      end_date.value +
-      "&status=" +
-      status.value
+    baseEndpoint, {
+      params: {
+        page, 
+        paginate: paginate.value, 
+        search: search.value.length >= 4 ? search.value : '', 
+        ...params.value
+      }
+    }
   );
   bookingItems.value = response.data;
   isLoading.value = false;
@@ -163,9 +195,8 @@ const showInvoicePopup = () => {
 };
 // Hooks
 onMounted(() => {
-
   document.getElementById("sidebar").classList.add("collapsed");
-  
+
   getBookingItems();
 
   modal = new Modal(document.getElementById(modalID), {
@@ -245,7 +276,7 @@ onMounted(() => {
           id="id"
         />
       </div>
-      <div class="col">
+      <!-- <div class="col">
         <select
           class="form-control"
           v-model="status"
@@ -264,10 +295,10 @@ onMounted(() => {
           <option value="awaiting customer response">Awaiting Response</option>
           <option value="awaiting parts">Awaiting Parts</option>
         </select>
-      </div>
+      </div> -->
     </div>
     <!-- <pre>{{ bookingItems }}</pre> -->
-    <div class="table-responsive" v-if="!isLoading">
+    <div class="table-responsive">
       <table class="table table-bordered table-hover table-striped">
         <thead class="bg-primary text-bg-dark">
           <tr>
@@ -275,7 +306,7 @@ onMounted(() => {
             <th>Status</th>
             <th>Item</th>
             <th>Fault</th>
-            <th>Estimated Cost</th>
+            <th>Cost</th>
             <th>Customer</th>
             <th>Date</th>
             <th>Trade</th>
@@ -293,16 +324,17 @@ onMounted(() => {
                 class="form-control"
                 type="search"
                 name="search_id"
-                id="search_id" v-model.trim.lazy="id"
+                id="search_id"
+                v-model="params.reference_id"
               />
             </td>
             <td>
               <select
                 class="form-select"
                 style="width: 100px;"
-                v-model="status"
-                @change="getBookingItems()"
+                v-model="params.status"
               >
+                <!-- @change="getBookingItems()" -->
                 <option value="">Status</option>
                 <option value="in progress">In Progress</option>
                 <option value="repaired">Repaired</option>
@@ -322,71 +354,75 @@ onMounted(() => {
               </select>
             </td>
             <td>
-              <input style="width: 80px;" type="search" name="search_device_name" id="search_device_name" v-model.trim.lazy="device_name"/>
+              <input
+                style="width: 80px;"
+                type="search"
+                name="search_device_name"
+                id="search_device_name"
+                v-model="params.device_name"
+              />
             </td>
             <td>
-              <input style="width: 80px;" type="search" v-model.trim.lazy="fault"/>
-              <!-- <select
-                class="form-select"
-                style="width: 100px;"
-                v-model="fault"
-                @change="getBookingItems()"
-              >
-                <option value="">Fault</option>
-                <option value="Screen Damage">Screen Damage</option>
-                  <option value="Battery Problems">Battery Problems</option>
-                  <option value="Water Damage">Water Damage</option>
-                  <option value="Software Issues">Software Issues</option>
-                  <option value="Hardware Issues">Hardware Issues</option>
-                  <option value="Data Recovery">Data Recovery</option>
-                  <option value="Speaker and Microphone Issues"
-                    >Speaker and Microphone Issues</option
-                  >
-                  <option value="Signal and Connectivity Issues"
-                    >Signal and Connectivity Issues</option
-                  >
-                  <option value="Touchscreen Problems"
-                    >Touchscreen Problems</option
-                  >
-                  <option value="Charging Issues">Charging Issues</option>
-                  <option value="Malware and Virus Removal"
-                    >Malware and Virus Removal</option
-                  >
-                  <option value="Overheating Issues">Overheating Issues</option>
-                  <option value="Device not Turning on"
-                    >Device not Turning on</option
-                  >
-                  <option value="Device Freezing or Crashing"
-                    >Device Freezing or Crashing</option
-                  >
-                  <option value="SIM Card Issues">SIM Card Issues</option>
-                  <option value="GPS Issues">GPS Issues</option>
-                  <option value="Camera Issues">Camera Issues</option>
-                  <option value="Audio Jack Issues">Audio Jack Issues</option>
-                  <option value="Physical Damage">Physical Damage</option>
-                  <option value="Other">Other</option>
-              </select> -->
+              <input
+                style="width: 80px;"
+                type="search"
+                v-model="params.issue"
+              />
             </td>
             <td></td>
             <td>
-              <input style="width: 80px;" type="search" name="search_account_name" id="search_account_name" />
+              <input
+                style="width: 80px;"
+                v-model="params.customer"
+                type="search"
+                name="search_account_name"
+                id="search_account_name"
+              />
             </td>
             <td></td>
             <td>
-              <input style="width: 80px;" type="search" name="search_trade" id="search_trade" />
+              <input
+                style="width: 80px;"
+                type="search"
+                v-model="params.trader"
+                name="search_trade"
+                id="search_trade"
+              />
             </td>
             <td>
-              <input style="width: 80px;" type="search" name="employee_name" id="employee_name" />
+              <input
+                style="width: 80px;"
+                type="search"
+                v-model="params.employee"
+                name="employee_name"
+                id="employee_name"
+              />
             </td>
             <td>
-              <input style="width: 80px;" type="search" name="search_account_phone" id="search_account_phone" />
+              <input
+                style="width: 80px;"
+                type="search"
+                v-model="params.phone"
+                name="search_account_phone"
+                id="search_account_phone"
+              />
             </td>
             <td>
-              <input style="width: 80px;" type="search" name="search_account_email" id="search_account_email" />
+              <input
+                style="width: 80px;"
+                type="search"
+                v-model="params.email"
+                name="search_account_email"
+                id="search_account_email"
+              />
             </td>
             <td></td>
           </tr>
-          <tr v-for="(item, index) in bookingItems.data" :key="item.id">
+          <tr
+            v-for="(item, index) in bookingItems.data"
+            :key="item.id"
+            v-if="!isLoading"
+          >
             <td>{{ item.reference_id }}</td>
             <td class="text-capitalize">{{ item.status }}</td>
             <td>{{ item.device_name }}</td>
@@ -400,9 +436,34 @@ onMounted(() => {
             <td>{{ item.account.email }}</td>
             <td></td>
           </tr>
+          <tr v-else>
+            <td colspan="12"><p class="text-center">Wait Data is Loading...</p></td>
+          </tr>
         </tbody>
+        <tfoot v-if="!isLoading">
+          <tr>
+            <td colspan="9">
+              <span class="fw-bold">{{ bookingItems.meta.total }}</span>
+              Booking(s) Loaded. Total Estimated Repair Cost:
+              <span class="fw-bold">{{
+                $filters.currencyPound(bookingItems.meta.totalEstimatedCost)
+              }}</span>
+            </td>
+          </tr>
+        </tfoot>
       </table>
     </div>
+
+    <template #footer v-if="!isLoading">
+      <Pagination :data="bookingItems" @pagination-change-page="getBookingItems" />
+      <div class="text-center">
+        <small>
+          Showing {{ bookingItems.meta.from }} to {{ bookingItems.meta.to }} of
+          {{ bookingItems.meta.total }}
+        </small>
+      </div>
+    </template>
+    
     <!--
      <div class="table-responsive" v-if="!isLoading">
       <table class="table table-bordered table-hover table-striped">
