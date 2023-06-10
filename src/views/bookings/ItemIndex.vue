@@ -45,9 +45,9 @@ const params = ref({
   trader: "",
   employee: "",
   phone: "",
-  email: "", 
-  sort_field: "created_at", 
-  sort_direction: "desc", 
+  email: "",
+  sort_field: "created_at",
+  sort_direction: "desc",
 });
 
 watch(
@@ -166,16 +166,16 @@ const getBookingItems = async (page = 1) => {
   //     status.value
   // );
 
-  const response = await axios.get(
-    baseEndpoint, {
-      params: {
-        page, 
-        paginate: paginate.value, 
-        search: search.value.length >= 4 ? search.value : '', 
-        ...params.value
-      }
-    }
-  );
+  const response = await axios.get(baseEndpoint, {
+    params: {
+      page,
+      paginate: paginate.value,
+      search: search.value.length >= 4 ? search.value : "", 
+      start_date: start_date.value, 
+      end_date: end_date.value,
+      ...params.value,
+    },
+  });
   bookingItems.value = response.data;
   isLoading.value = false;
 };
@@ -184,6 +184,11 @@ const handleFilterbookingItems = async () => {
   await getBookingItems();
 };
 
+const clearDateFields = async () => {
+  start_date.value = '';
+  end_date.value = '';
+  await getBookingItems();
+}
 const handleSort = (col) => {
   orderBy.value = col;
   sortOrder.value = sortOrder.value == "desc" ? "asc" : "desc";
@@ -218,7 +223,7 @@ onMounted(() => {
               type="date"
               id="start_date"
               v-model="start_date"
-              class="form-control"
+              class="form-control form-control-sm"
               placeholder="Start Date"
             />
           </div>
@@ -234,19 +239,27 @@ onMounted(() => {
               type="date"
               id="end_date"
               v-model="end_date"
-              class="form-control"
+              class="form-control form-control-sm"
               placeholder="End Date"
             />
           </div>
         </div>
       </div>
       <div class="col">
+       
         <button
           type="button"
           @click="handleFilterbookingItems"
           class="btn btn-primary"
         >
           Filter
+        </button>
+        <button
+          type="button"
+          @click="clearDateFields"
+          class="btn ms-2 btn-outline-secondary"
+        >
+          Clear
         </button>
       </div>
     </div>
@@ -258,7 +271,7 @@ onMounted(() => {
     <div class="mb-3 row">
       <div class="align-items-center col d-flex">
         <label class="d-inline-block me-2 fw-bold"> Show </label>
-        <select v-model="paginate" class="form-select w-auto">
+        <select v-model="paginate" class="form-select form-select-sm w-auto">
           <option :value="10">10</option>
           <option :value="25">25</option>
           <option :value="50">50</option>
@@ -272,13 +285,13 @@ onMounted(() => {
           type="search"
           placeholder="Search"
           v-model.trim.lazy="id"
-          class="form-control"
+          class="form-control form-control-sm"
           id="id"
         />
       </div>
       <!-- <div class="col">
         <select
-          class="form-control"
+          class="form-control form-control-sm"
           v-model="status"
           @change="getBookingItems()"
         >
@@ -299,7 +312,9 @@ onMounted(() => {
     </div>
     <!-- <pre>{{ bookingItems }}</pre> -->
     <div class="table-responsive">
-      <table class="table table-bordered table-hover table-striped">
+      <table
+        class="table table-bordered table-hover table-striped table-booking table-sm"
+      >
         <thead class="bg-primary text-bg-dark">
           <tr>
             <th>ID</th>
@@ -321,7 +336,7 @@ onMounted(() => {
             <td>
               <input
                 style="width: 100px;"
-                class="form-control"
+                class="form-control form-control-sm"
                 type="search"
                 name="search_id"
                 id="search_id"
@@ -330,7 +345,7 @@ onMounted(() => {
             </td>
             <td>
               <select
-                class="form-select"
+                class="form-select form-select-sm"
                 style="width: 100px;"
                 v-model="params.status"
               >
@@ -355,7 +370,8 @@ onMounted(() => {
             </td>
             <td>
               <input
-                style="width: 80px;"
+                style="width: 100px;"
+                class="form-control form-control-sm"
                 type="search"
                 name="search_device_name"
                 id="search_device_name"
@@ -364,7 +380,8 @@ onMounted(() => {
             </td>
             <td>
               <input
-                style="width: 80px;"
+                style="width: 100px;"
+                class="form-control form-control-sm"
                 type="search"
                 v-model="params.issue"
               />
@@ -372,17 +389,21 @@ onMounted(() => {
             <td></td>
             <td>
               <input
-                style="width: 80px;"
+                style="width: 120px;"
+                class="form-control form-control-sm"
                 v-model="params.customer"
                 type="search"
                 name="search_account_name"
                 id="search_account_name"
               />
             </td>
-            <td></td>
+            <td>
+              <span style="width: 85px; display: inline-block;"></span>
+            </td>
             <td>
               <input
-                style="width: 80px;"
+                style="width: 100px;"
+                class="form-control form-control-sm"
                 type="search"
                 v-model="params.trader"
                 name="search_trade"
@@ -391,7 +412,8 @@ onMounted(() => {
             </td>
             <td>
               <input
-                style="width: 80px;"
+                style="width: 120px;"
+                class="form-control form-control-sm"
                 type="search"
                 v-model="params.employee"
                 name="employee_name"
@@ -400,7 +422,8 @@ onMounted(() => {
             </td>
             <td>
               <input
-                style="width: 80px;"
+                style="width: 100px;"
+                class="form-control form-control-sm"
                 type="search"
                 v-model="params.phone"
                 name="search_account_phone"
@@ -409,7 +432,7 @@ onMounted(() => {
             </td>
             <td>
               <input
-                style="width: 80px;"
+                class="form-control form-control-sm w-100"
                 type="search"
                 v-model="params.email"
                 name="search_account_email"
@@ -437,7 +460,9 @@ onMounted(() => {
             <td></td>
           </tr>
           <tr v-else>
-            <td colspan="12"><p class="text-center">Wait Data is Loading...</p></td>
+            <td colspan="12">
+              <p class="text-center">Wait Data is Loading...</p>
+            </td>
           </tr>
         </tbody>
         <tfoot v-if="!isLoading">
@@ -455,7 +480,10 @@ onMounted(() => {
     </div>
 
     <template #footer v-if="!isLoading">
-      <Pagination :data="bookingItems" @pagination-change-page="getBookingItems" />
+      <Pagination
+        :data="bookingItems"
+        @pagination-change-page="getBookingItems"
+      />
       <div class="text-center">
         <small>
           Showing {{ bookingItems.meta.from }} to {{ bookingItems.meta.to }} of
@@ -463,7 +491,7 @@ onMounted(() => {
         </small>
       </div>
     </template>
-    
+
     <!--
      <div class="table-responsive" v-if="!isLoading">
       <table class="table table-bordered table-hover table-striped">
@@ -539,7 +567,7 @@ onMounted(() => {
       <input
         v-model="invoiceForm.amount"
         type="number"
-        class="form-control"
+        class="form-control form-control-sm"
         id="amount"
         required
       />

@@ -160,6 +160,16 @@ ul.pagination li {
     color: #dc3545;
 }
 
+
+.table.table-booking > :not(caption) > * > * {
+    // padding: 0.45rem 0.55rem;
+}
+.table.table-booking > tbody > tr > td, 
+.table.table-booking > thead > tr > th {
+    vertical-align: middle;
+    font-size: 12px;
+}
+
 @media (min-width: 992px) {
 
     .content {
