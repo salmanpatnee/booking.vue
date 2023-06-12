@@ -42,13 +42,15 @@ const params = ref({
   device_name: "",
   issue: "",
   customer: "",
-  trader: "",
+  trade_name: "",
   employee: "",
   phone: "",
   email: "",
   sort_field: "created_at",
   sort_direction: "desc",
 });
+
+const selectedRowId = ref("");
 
 watch(
   () => params,
@@ -144,6 +146,7 @@ const handleExportClick = async () => {
 
 const getBookingItems = async (page = 1) => {
   isLoading.value = true;
+  selectedRowId.value = "";
   // const response = await axios.get(
   //   baseEndpoint +
   //     "?page=" +
@@ -170,8 +173,8 @@ const getBookingItems = async (page = 1) => {
     params: {
       page,
       paginate: paginate.value,
-      search: search.value.length >= 4 ? search.value : "", 
-      start_date: start_date.value, 
+      search: search.value.length >= 4 ? search.value : "",
+      start_date: start_date.value,
       end_date: end_date.value,
       ...params.value,
     },
@@ -185,10 +188,10 @@ const handleFilterbookingItems = async () => {
 };
 
 const clearDateFields = async () => {
-  start_date.value = '';
-  end_date.value = '';
+  start_date.value = "";
+  end_date.value = "";
   await getBookingItems();
-}
+};
 const handleSort = (col) => {
   orderBy.value = col;
   sortOrder.value = sortOrder.value == "desc" ? "asc" : "desc";
@@ -198,6 +201,10 @@ const handleSort = (col) => {
 const showInvoicePopup = () => {
   console.log("Clicked");
 };
+const handleShow = () => {
+  router.push({ name: "bookings.edit", params: { id: selectedRowId.value } });
+}
+
 // Hooks
 onMounted(() => {
   document.getElementById("sidebar").classList.add("collapsed");
@@ -246,7 +253,6 @@ onMounted(() => {
         </div>
       </div>
       <div class="col">
-       
         <button
           type="button"
           @click="handleFilterbookingItems"
@@ -271,21 +277,25 @@ onMounted(() => {
     <div class="mb-3 row">
       <div class="align-items-center col d-flex">
         <label class="d-inline-block me-2 fw-bold"> Show </label>
-        <select v-model="paginate" class="form-select form-select-sm w-auto">
+        <select v-model="paginate" class="form-select form-select w-auto">
           <option :value="10">10</option>
           <option :value="25">25</option>
           <option :value="50">50</option>
           <option :value="100">100</option>
         </select>
       </div>
-      <div class="col"></div>
+      <div class="col">
+        <button class="btn btn-outline-primary  me-2" :disabled="!selectedRowId" @click="handleShow">View Details</button>  
+        <button class="btn btn-outline-primary   me-2" @click.prevent="getBookingItems">Refresh</button>
+        <button class="btn btn-outline-primary  me-2" :disabled="!selectedRowId">Send SMS</button>  
+      </div>
       <div class="align-items-center col-auto d-flex">
         <!-- <label class="d-inline-block me-2 fw-bold" for="search"> Search </label> -->
         <input
           type="search"
           placeholder="Search"
           v-model.trim.lazy="id"
-          class="form-control form-control-sm"
+          class="form-control"
           id="id"
         />
       </div>
@@ -313,7 +323,7 @@ onMounted(() => {
     <!-- <pre>{{ bookingItems }}</pre> -->
     <div class="table-responsive">
       <table
-        class="table table-bordered table-hover table-striped table-booking table-sm"
+        class="table table-bordered table-booking table-sm"
       >
         <thead class="bg-primary text-bg-dark">
           <tr>
@@ -322,13 +332,12 @@ onMounted(() => {
             <th>Item</th>
             <th>Fault</th>
             <th>Cost</th>
-            <th>Customer</th>
             <th>Date</th>
+            <th>Customer</th>
             <th>Trade</th>
-            <th>Repair By</th>
             <th>Phone</th>
             <th>Email</th>
-            <th class="text-center">Action</th>
+            <th>Repair By</th>
           </tr>
         </thead>
         <tbody>
@@ -387,6 +396,7 @@ onMounted(() => {
               />
             </td>
             <td></td>
+            <td><span style="width: 85px; display: inline-block;"></span></td>
             <td>
               <input
                 style="width: 120px;"
@@ -397,29 +407,18 @@ onMounted(() => {
                 id="search_account_name"
               />
             </td>
-            <td>
-              <span style="width: 85px; display: inline-block;"></span>
-            </td>
+
             <td>
               <input
                 style="width: 100px;"
                 class="form-control form-control-sm"
                 type="search"
-                v-model="params.trader"
+                v-model="params.trade_name"
                 name="search_trade"
                 id="search_trade"
               />
             </td>
-            <td>
-              <input
-                style="width: 120px;"
-                class="form-control form-control-sm"
-                type="search"
-                v-model="params.employee"
-                name="employee_name"
-                id="employee_name"
-              />
-            </td>
+
             <td>
               <input
                 style="width: 100px;"
@@ -439,10 +438,20 @@ onMounted(() => {
                 id="search_account_email"
               />
             </td>
-            <td></td>
+            <td>
+              <input
+                style="width: 120px;"
+                class="form-control form-control-sm"
+                type="search"
+                v-model="params.employee"
+                name="employee_name"
+                id="employee_name"
+              />
+            </td>
           </tr>
           <tr
             v-for="(item, index) in bookingItems.data"
+            @click="selectedRowId = item.id" :class="selectedRowId == item.id ? 'bg-primary bg-opacity-10 text-danger' : ''"
             :key="item.id"
             v-if="!isLoading"
           >
@@ -451,13 +460,13 @@ onMounted(() => {
             <td>{{ item.device_name }}</td>
             <td>{{ item.issue }}</td>
             <td>{{ item.estimated_cost }}</td>
-            <td>{{ item.account.name }}</td>
             <td><AppDate :timestamp="item.date" /></td>
+            <td>{{ item.account.name }}</td>
+
             <td>{{ item.account.trade_name }}</td>
-            <td>{{ item.employee && item.employee.name }}</td>
             <td>{{ item.account.phone }}</td>
             <td>{{ item.account.email }}</td>
-            <td></td>
+            <td>{{ item.employee && item.employee.name }}</td>
           </tr>
           <tr v-else>
             <td colspan="12">
@@ -467,7 +476,7 @@ onMounted(() => {
         </tbody>
         <tfoot v-if="!isLoading">
           <tr>
-            <td colspan="9">
+            <td colspan="11" class="text-center py-3">
               <span class="fw-bold">{{ bookingItems.meta.total }}</span>
               Booking(s) Loaded. Total Estimated Repair Cost:
               <span class="fw-bold">{{

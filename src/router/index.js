@@ -352,7 +352,7 @@ const router = createRouter({
           component: BookingCreate,
         },
         {
-          path: "/bookings/edit/:id",
+          path: "/items/edit/:id",
           name: "bookings.edit",
           component: BookingEdit,
         },
