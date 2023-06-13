@@ -461,7 +461,7 @@ onMounted(() => {
             <td>{{ item.issue }}</td>
             <td>{{ item.estimated_cost }}</td>
             <td><AppDate :timestamp="item.date" /></td>
-            <td>{{ item.account.name }}</td>
+            <td>{{ item.account && item.account.name }}</td>
 
             <td>{{ item.account.trade_name }}</td>
             <td>{{ item.account.phone }}</td>

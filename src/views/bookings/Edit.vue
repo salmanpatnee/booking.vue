@@ -1,78 +1,29 @@
 <script setup>
-import http from "@@/services/HttpService";
-import { useAuthStore } from "@@/stores/authStore";
 import { onMounted, ref, inject, watch, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
 import Form from "vform";
-import { useToast } from "vue-toastification";
 import moment from "moment";
-import "vue-select/dist/vue-select.css";
-import FormAjaxSelect from "@@/components/commons/FormAjaxSelect.vue";
-import { Modal } from "bootstrap";
 import { useFlash } from "@@/composables/useFlash";
-import { v4 as uuidv4 } from "uuid";
 
 // Data
-const authStore = useAuthStore();
-
+const baseEndpoint = "/api/booking-items";
 const isLoaded = ref(false);
 const { flash } = useFlash();
-const sale = ref({
+const route = useRoute();
+const router = useRouter();
+
+const bookingItems = ref({
   data: null,
   isLoading: true,
 });
 
-const route = useRoute();
-const router = useRouter();
-const toast = ref(useToast());
-const customers = ref({
-  isLoading: false,
-  data: [],
-});
 const employees = ref({
   isLoading: false,
   data: [],
 });
-const products = ref([]);
-const baseEndpoint = "/api/booking-items";
+
 const swal = inject("$swal");
-const barcodeInput = ref(null);
-const productBarcodeInput = ref(null);
-
-let discountRateKey = "discount_rate_cash";
-let modal = null;
-let modalID = "customersModal";
-let shouldSubmit = true;
-const bankAccounts = ref([]);
-
-// const isRegisterOpen = computed(() => {
-//   return authStore.user.cash_registers.length;
-// });
-
-const getEmployees = async (page = 1) => {
-  // const params = `?page=${page}&paginate=${paginate.value}&search=${search.value}`;
-  const params = `?for=sales.create`;
-  employees.value.loading = true;
-  const { data: response } = await axios.get(`/api/employees`);
-  employees.value.data = response.data;
-  employees.value.loading = false;
-};
-
-const handleShipment = () => {
-  if (form.value.is_deliverable) {
-    discountRateKey = "discount_rate_shipment";
-  } else {
-    discountRateKey = "discount_rate_cash";
-  }
-
-  form.value.sale_details.forEach((sD) => {
-    console.log(sD[discountRateKey]);
-    sD.discount_rate = sD[discountRateKey];
-    console.log(sD[discountRateKey] / 100);
-    sD.price = sD["original_price"] * ((100 - sD[discountRateKey]) / 100);
-  });
-};
 
 const form = ref(
   new Form({
@@ -83,9 +34,14 @@ const form = ref(
   })
 );
 
-
 // Methods
 
+const getEmployees = async (page = 1) => {
+  employees.value.loading = true;
+  const { data: response } = await axios.get(`/api/employees`);
+  employees.value.data = response.data;
+  employees.value.loading = false;
+};
 
 const handleSubmit = async () => {
   try {
@@ -118,12 +74,21 @@ const handleSubmit = async () => {
   }
 };
 
-
 const getItems = async () => {
+  bookingItems.value.isLoading = true;
   const response = await axios.get(`${baseEndpoint}/${route.params.id}`);
-  form.value = response.data.data;
-  
-}
+  bookingItems.value.data = response.data.data;
+
+  form.value.id = bookingItems.value.data.id;
+  form.value.account = bookingItems.value.data.account;
+  form.value.account_id = bookingItems.value.data.account.id;
+  form.value.date = bookingItems.value.data.date;
+  form.value.booking_list_details =
+    bookingItems.value.data.booking_list_details;
+  form.value.reference_id = bookingItems.value.data.reference_id;
+
+  bookingItems.value.isLoading = false;
+};
 
 // Hooks
 onMounted(async () => {
@@ -133,52 +98,63 @@ onMounted(async () => {
 </script>
 
 <template>
-  <form @submit.prevent="handleSubmit">
-    <Panel>
-      <template #header>
-        <h1 class="h3 mb-0 text-middle">Edit Booking Item</h1>
-      </template>
+  <!-- <pre>{{bookingItems.data}}</pre> -->
 
-      <div class="mt-5">
-        <div class="d-flex justify-content-between mt-4 mb-4">
-          <h3>Booking Details</h3>
-          <div class="text-end">
-            <button
-              v-if="!form.booking_list_details.length"
-              type="button"
-              @click="handleAddBookingItem()"
-              class="btn btn-primary"
-            >
-              <i class="fa fa-plus"></i>
-            </button>
+  <form @submit.prevent="handleSubmit">
+    <div v-if="!bookingItems.isLoading">
+      <Panel>
+        <template #header>
+          <h1 class="h3 mb-0 text-middle">
+            Booking Details ( Reference No:
+            {{ bookingItems.data.reference_id }})
+          </h1>
+        </template>
+
+        <div class="row">
+          <div class="col">
+            <div class="mb-3">
+              <label class="form-label" for="date">Customer Name:</label>
+              <p>
+                <b>{{ bookingItems.data.account.name }}</b>
+              </p>
+            </div>
+          </div>
+          <div class="col">
+            <div class="mb-3">
+              <label class="form-label" for="date">Date:</label>
+              <p>
+                <b><AppDate :timestamp="bookingItems.data.date" /></b>
+              </p>
+            </div>
+          </div>
+          <div class="col">
+            <div class="mb-3">
+              <label class="form-label" for="date">Total Booking Items:</label>
+              <p>
+                <b>{{ bookingItems.data.booking_items_count }}</b>
+              </p>
+            </div>
           </div>
         </div>
-        <hr />
+      </Panel>
+      <Panel>
+        <template #header>
+          <h1 class="h3 mb-0 text-middle">
+            Booking Items
+          </h1>
+        </template>
+
         <div class="mb-5">
-          <!-- <pre>
-            {{ form }}
-          </pre> -->
-          <h4 class="text-center" v-if="!form.booking_list_details.length">
-            You do not have any items
-          </h4>
           <div
-            v-for="(item, index) in form.booking_list_details"
+            v-for="(item, index) in bookingItems.data.booking_list_details"
             :key="item.id"
           >
-            <!-- <pre>{{ item }}</pre> -->
             <div
               class="mb-3 d-flex justify-content-between align-content-center"
             >
               <h4 class="badge bg-primary text-white fs-4">
                 Booking Item <b>#{{ index + 1 }}</b>
               </h4>
-              <button
-                @click="handleDeleteBookingItem(item)"
-                type="button"
-                class="btn btn-danger"
-              >
-                <i class="fa fa-trash"></i>
-              </button>
             </div>
             <div class="row mt-4">
               <div class="col">
@@ -425,32 +401,24 @@ onMounted(async () => {
                 <HasError :form="form" field="notes" />
               </div>
             </div>
-
-            <div class="d-flex justify-content-end mt-5"></div>
-            <hr class="mt-5 mb-4" />
+            <hr class="my-5" />
           </div>
-          <div class="text-end" v-if="form.booking_list_details.length">
-            <button
-              @click="handleAddBookingItem(index)"
-              type="button"
-              class="btn btn-primary me-2"
+        </div>
+
+        <template #footer>
+          <div class="text-end">
+            <Button
+              :form="form"
+              :disabled="!bookingItems.data.booking_list_details.length"
+              class="btn btn-lg btn-primary"
+              >Update</Button
             >
-              <i class="fa fa-plus"></i>
-            </button>
           </div>
-        </div>
-      </div>
-
-      <template #footer>
-        <div class="text-end">
-          <Button
-            :form="form"
-            :disabled="!form.booking_list_details.length"
-            class="btn btn-lg btn-primary"
-            >Save</Button
-          >
-        </div>
-      </template>
-    </Panel>
+        </template>
+      </Panel>
+    </div>
+    <div class="text-center" v-else>
+      <AppLoader />
+    </div>
   </form>
 </template>
