@@ -10,7 +10,7 @@ import Form from "vform";
 
 // Data
 let modal = null;
-let modalID = "invoiceModal";
+let modalID = "messageModal";
 const router = useRouter();
 const bookingItems = ref([]);
 const paginate = ref(50);
@@ -28,11 +28,9 @@ const { flash } = useFlash();
 
 const isLoading = ref(true);
 
-const invoiceForm = ref(
+const messageForm = ref(
   new Form({
-    amount: null,
-    reference_id: null,
-    id: null,
+    message: null,
   })
 );
 
@@ -51,6 +49,7 @@ const params = ref({
 });
 
 const selectedRowId = ref("");
+const selectedItem = ref({});
 
 watch(
   () => params,
@@ -94,9 +93,9 @@ watch(
 // Methods
 
 const showInvoiceModal = (booking) => {
-  invoiceForm.value.reset();
-  invoiceForm.value.reference_id = booking.reference_id;
-  invoiceForm.value.id = booking.id;
+  messageForm.value.reset();
+  messageForm.value.reference_id = booking.reference_id;
+  messageForm.value.id = booking.id;
   modal.show();
 };
 const generateInvoice = async (id) => {
@@ -107,7 +106,7 @@ const generateInvoice = async (id) => {
   window.open(routeData.href, "_blank");
   // modal.hide();
   // isLoaded.value = false;
-  // invoiceForm.value.reset();
+  // messageForm.value.reset();
 };
 
 const handleExportClick = async () => {
@@ -147,27 +146,7 @@ const handleExportClick = async () => {
 const getBookingItems = async (page = 1) => {
   isLoading.value = true;
   selectedRowId.value = "";
-  // const response = await axios.get(
-  //   baseEndpoint +
-  //     "?page=" +
-  //     page +
-  //     "&paginate=" +
-  //     paginate.value +
-  //     "&search=" +
-  //     search.value +
-  //     "&id=" +
-  //     id.value +
-  //     "&device_name=" +
-  //     device_name.value +
-  //     "&fault=" +
-  //     fault.value +
-  //     "&start_date=" +
-  //     start_date.value +
-  //     "&end_date=" +
-  //     end_date.value +
-  //     "&status=" +
-  //     status.value
-  // );
+  selectedItem.value = {};
 
   const response = await axios.get(baseEndpoint, {
     params: {
@@ -192,17 +171,66 @@ const clearDateFields = async () => {
   end_date.value = "";
   await getBookingItems();
 };
-const handleSort = (col) => {
-  orderBy.value = col;
-  sortOrder.value = sortOrder.value == "desc" ? "asc" : "desc";
-  getBookingItems();
-};
 
-const showInvoicePopup = () => {
-  console.log("Clicked");
-};
 const handleShow = () => {
   router.push({ name: "bookings.edit", params: { id: selectedRowId.value } });
+};
+
+const selectRow = (item, id) => {
+  if(selectedRowId.value == id){
+    selectedRowId.value = "";
+  } else {
+    selectedRowId.value = id;
+    selectedItem.value = item;
+  }
+};
+
+const printBarcode = () => {
+  const routeData = router.resolve({
+    name: "bookings.barcode.print",
+    params: { id: selectedRowId.value },
+  });
+  window.open(routeData.href, "_blank");
+};
+
+const showMessageModal = () => {
+
+  messageForm.value.message = `Hello ${selectedItem.value.account.name}, your device (Ref: ${selectedItem.value.reference_id}) is repaired.\n\nhttps://g.page/r/Cd5T4cka7ogJEBM/review`;
+  modal.show();
+};
+
+const sendMessage = async () => {
+  
+  try {
+    const { data: response } = await messageForm.value.post(`/api/booking-items/send-message`);
+
+    return response;
+    if (response.status == "success") {
+      form.value.reset();
+      selectedCustomer.value = "";
+
+      swal
+        .fire({
+          title: "Success!",
+          text: "Do You Want To Print ?",
+          icon: "success",
+          showCancelButton: true,
+          confirmButtonText: "Yes!",
+        })
+        .then(async (result) => {
+          if (result.isConfirmed) {
+            let routeData = router.resolve({
+              name: "bookings.proceed.invoice",
+              params: { id: response.data.id },
+            });
+            window.open(routeData.href, "_blank");
+          }
+        });
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
 }
 
 // Hooks
@@ -275,7 +303,7 @@ onMounted(() => {
       <h1 class="h3 mb-0 text-middle">Booking Items</h1>
     </template>
     <div class="mb-3 row">
-      <div class="align-items-center col d-flex">
+      <div class="align-items-center col-2 d-flex">
         <label class="d-inline-block me-2 fw-bold"> Show </label>
         <select v-model="paginate" class="form-select form-select w-auto">
           <option :value="10">10</option>
@@ -284,13 +312,36 @@ onMounted(() => {
           <option :value="100">100</option>
         </select>
       </div>
-      <div class="col">
-        <button class="btn btn-outline-primary  me-2" :disabled="!selectedRowId" @click="handleShow">View Details</button>  
-        <button class="btn btn-outline-primary   me-2" @click.prevent="getBookingItems">Refresh</button>
-        <button class="btn btn-outline-primary  me-2" :disabled="!selectedRowId">Send SMS</button>  
+      <div class="col text-center">
+        <button
+          class="btn me-2"
+          :class="!selectedRowId ? 'btn-outline-primary' : 'btn-primary'"
+          :disabled="!selectedRowId"
+          @click="handleShow"
+        >
+          View Details
+        </button>
+        <button class="btn btn-primary me-2" @click.prevent="getBookingItems">
+          Refresh
+        </button>
+        <button
+          @click="showMessageModal"
+          class="btn me-2"
+          :disabled="!selectedRowId"
+          :class="!selectedRowId ? 'btn-outline-primary' : 'btn-primary'"
+        >
+          Send SMS
+        </button>
+        <button
+          @click="printBarcode"
+          class="btn me-2"
+          :disabled="!selectedRowId"
+          :class="!selectedRowId ? 'btn-outline-primary' : 'btn-primary'"
+        >
+          Print Barcode
+        </button>
       </div>
-      <div class="align-items-center col-auto d-flex">
-        <!-- <label class="d-inline-block me-2 fw-bold" for="search"> Search </label> -->
+      <div class="align-items-center col-3 d-flex">
         <input
           type="search"
           placeholder="Search"
@@ -299,32 +350,10 @@ onMounted(() => {
           id="id"
         />
       </div>
-      <!-- <div class="col">
-        <select
-          class="form-control form-control-sm"
-          v-model="status"
-          @change="getBookingItems()"
-        >
-          <option value="">--Filter by Status--</option>
-          <option value="in progress">In Progress</option>
-          <option value="repaired">Repaired</option>
-          <option value="complete">Complete</option>
-          <option value="can not be repaired">Can't Repaired</option>
-          <option value="customer collected CBR">Customer Collected CBR</option>
-          <option value="customer collected payment pending">
-            Payment Pending
-          </option>
-          <option value="shop property">Shop Property</option>
-          <option value="awaiting customer response">Awaiting Response</option>
-          <option value="awaiting parts">Awaiting Parts</option>
-        </select>
-      </div> -->
     </div>
     <!-- <pre>{{ bookingItems }}</pre> -->
     <div class="table-responsive">
-      <table
-        class="table table-bordered table-booking table-sm"
-      >
+      <table class="table table-bordered table-booking table-sm">
         <thead class="bg-primary text-bg-dark">
           <tr>
             <th>ID</th>
@@ -451,7 +480,12 @@ onMounted(() => {
           </tr>
           <tr
             v-for="(item, index) in bookingItems.data"
-            @click="selectedRowId = item.id" :class="selectedRowId == item.id ? 'bg-primary bg-opacity-10 text-danger' : ''"
+            @click="selectRow(item, item.id)"
+            :class="
+              selectedRowId == item.id
+                ? 'bg-primary bg-opacity-10 text-danger'
+                : ''
+            "
             :key="item.id"
             v-if="!isLoading"
           >
@@ -469,8 +503,8 @@ onMounted(() => {
             <td>{{ item.employee && item.employee.name }}</td>
           </tr>
           <tr v-else>
-            <td colspan="12">
-              <p class="text-center">Wait Data is Loading...</p>
+            <td colspan="12" class="text-center">
+              <AppLoader />
             </td>
           </tr>
         </tbody>
@@ -567,24 +601,21 @@ onMounted(() => {
     </template>
     -->
   </Panel>
-  <VueModal :id="modalID" @onSubmit="generateInvoice">
+
+  <VueModal :id="modalID" @onSubmit="sendMessage">
     <template #title>
-      Generate Invoice #{{ invoiceForm.reference_id }}</template
-    >
-    <div class="mb-3">
-      <label class="form-label" for="amount">Amount:</label>
-      <input
-        v-model="invoiceForm.amount"
-        type="number"
-        class="form-control form-control-sm"
-        id="amount"
-        required
-      />
-      <HasError :form="invoiceForm" field="amount" />
+      Send SMS
+    </template>
+
+    <div class="row">
+      <div class="col">
+        <label class="form-label" for="mesage"><b>Message:</b></label>
+        <textarea class="form-control" id="mesage" v-model="messageForm.message" cols="10" rows="5"></textarea>
+      </div>
     </div>
 
     <template #footer>
-      <Button :form="invoiceForm" class="btn btn-primary">Generate</Button>
+      <Button :form="messageForm" class="btn btn-primary">Send</Button>
     </template>
   </VueModal>
 </template>

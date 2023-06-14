@@ -1,26 +1,21 @@
 <script setup>
-import moment from "moment";
 import { onMounted, ref, computed } from "vue";
 import { useRoute } from "vue-router";
-import "vue-select/dist/vue-select.css";
 import axios from "axios";
 
-import purchaseService from "@@/services/PurchaseService";
-// import PurchasedProductsTable from './PurchasedProductsTable.vue';
-
 // Data
-const baseEndpoint = "/api/bookings";
-const sale = ref({});
+const baseEndpoint = "/api/booking-items";
+const item = ref({});
 const route = useRoute();
 let isLoaded = ref(false);
 let imageLoaded = 0;
 
 // Methods
-const getBooking = async () => {
+const getBookingItem = async () => {
   const response = await axios.get(
     `${baseEndpoint}/${route.params.id}?for=print`
   );
-  sale.value = response.data.data;
+  item.value = response.data.data;
 };
 
 const handleImageLoad = () => {
@@ -41,18 +36,10 @@ const handlePrint = () => {
   // document.body.innerHTML = originalContents;
   window.onafterprint = window.close;
 };
-const totalDiscountDisplay = computed(() => {
-  const { discount_amount } = sale.value;
-  return discount_amount === "0.00"
-    ? "0.00"
-    : parseFloat(discount_amount).toFixed(2);
-});
-const dueAmountDisplay = computed(() => {
-  return purchase.value.net_amount - purchase.value.paid_amount;
-});
+
 // Hooks
 onMounted(async () => {
-  await getBooking();
+  await getBookingItem();
   document.body.classList.add("sale-print");
   isLoaded.value = true;
 });
@@ -78,23 +65,24 @@ onMounted(async () => {
             src="/img/pharma-logo-black.png"
             style="display: none;"
           />
-          <!-- <img
-            
-            src="/img/pharma-logo-black.png"
-            style="display: none;"
-          /> -->
           <h1
             style="font-family: monospace; font-weight: 900; font-size: 22px;"
           >
             <storng>iCrack</storng>
           </h1>
         </div>
-
-        <div align="center" style="margin-top:1em;">
-          <img :src="sale.qr_code" alt="Qr Code" srcset="" width="70" />
+    
+        <div align="center">
+          <p style="margin-bottom:5px; margin-top: 0;"><b>Issue:</b> {{ item.issue }}</p>
         </div>
         <div align="center">
-          <small>{{ sale.reference_id }}</small>
+          <p style="margin-bottom:5px; margin-top: 0; text-transform: capitalize;"><b>Status:</b> {{ item.status }}</p>
+        </div>
+        <div align="center">
+          <p style="margin-bottom:5px; margin-top: 0;"><b>Date:</b> <AppDate :timestamp="item.date"/></p>
+        </div>
+        <div align="center">
+          <small style="margin-bottom:5px; margin-top: 0;"><b>Barcode:</b> {{item.reference_id}}</small>
         </div>
       </div>
     </div>

@@ -45,8 +45,12 @@ const getEmployees = async (page = 1) => {
 
 const handleSubmit = async () => {
   try {
-    const { data: response } = await form.value.post(`/api/booking-list`);
+    const { data: response } = await form.value.patch(
+      `/api/booking-list/${form.value.id}`
+    );
 
+    console.log(response);
+    return;
     if (response.status == "success") {
       form.value.reset();
       selectedCustomer.value = "";
@@ -90,6 +94,10 @@ const getItems = async () => {
   bookingItems.value.isLoading = false;
 };
 
+const printBarcode = id => {
+  const routeData = router.resolve({name: 'bookings.barcode.print', params: { id}});
+  window.open(routeData.href, '_blank');
+}
 // Hooks
 onMounted(async () => {
   await getEmployees();
@@ -155,6 +163,21 @@ onMounted(async () => {
               <h4 class="badge bg-primary text-white fs-4">
                 Booking Item <b>#{{ index + 1 }}</b>
               </h4>
+              <div>
+
+                <button
+                  @click="printBarcode(item.id)"
+                  class="btn btn-sm me-2 btn-outline-primary"
+                >
+                  Print Barcode
+                </button>
+                <button
+                  @click="printBarcode(item.id)"
+                  class="btn btn-sm me-2 btn-outline-primary"
+                >
+                  Send SMS
+                </button>
+              </div>
             </div>
             <div class="row mt-4">
               <div class="col">
@@ -407,12 +430,7 @@ onMounted(async () => {
 
         <template #footer>
           <div class="text-end">
-            <Button
-              :form="form"
-              :disabled="!bookingItems.data.booking_list_details.length"
-              class="btn btn-lg btn-primary"
-              >Update</Button
-            >
+            <Button :form="form" class="btn btn-lg btn-primary">Update</Button>
           </div>
         </template>
       </Panel>
