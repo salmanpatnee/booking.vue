@@ -4,11 +4,13 @@ import { useRoute, useRouter } from "vue-router";
 import axios from "axios";
 import Form from "vform";
 import moment from "moment";
+import { Modal } from "bootstrap";
 import { useFlash } from "@@/composables/useFlash";
 
 // Data
+let modal = null;
+let modalID = "messageModal";
 const baseEndpoint = "/api/booking-items";
-const isLoaded = ref(false);
 const { flash } = useFlash();
 const route = useRoute();
 const router = useRouter();
@@ -34,48 +36,19 @@ const form = ref(
   })
 );
 
-// Methods
+const messageForm = ref(
+  new Form({
+    message: null,
+    phone: null,
+  })
+);
 
+// Methods
 const getEmployees = async (page = 1) => {
   employees.value.loading = true;
   const { data: response } = await axios.get(`/api/employees`);
   employees.value.data = response.data;
   employees.value.loading = false;
-};
-
-const handleSubmit = async () => {
-  try {
-    const { data: response } = await form.value.patch(
-      `/api/booking-list/${form.value.id}`
-    );
-
-    console.log(response);
-    return;
-    if (response.status == "success") {
-      form.value.reset();
-      selectedCustomer.value = "";
-
-      swal
-        .fire({
-          title: "Success!",
-          text: "Do You Want To Print ?",
-          icon: "success",
-          showCancelButton: true,
-          confirmButtonText: "Yes!",
-        })
-        .then(async (result) => {
-          if (result.isConfirmed) {
-            let routeData = router.resolve({
-              name: "bookings.proceed.invoice",
-              params: { id: response.data.id },
-            });
-            window.open(routeData.href, "_blank");
-          }
-        });
-    }
-  } catch (error) {
-    console.log(error);
-  }
 };
 
 const getItems = async () => {
@@ -94,20 +67,65 @@ const getItems = async () => {
   bookingItems.value.isLoading = false;
 };
 
-const printBarcode = id => {
-  const routeData = router.resolve({name: 'bookings.barcode.print', params: { id}});
-  window.open(routeData.href, '_blank');
-}
+const handleSubmit = async () => {
+  try {
+    const { data: response } = await form.value.patch(
+      `/api/booking-list/${form.value.id}`
+    );
+
+    if (response.status == "success") {
+      form.value.reset();
+      flash(response.message);
+      router.push({ name: "booking.items.index"});
+    }
+  } catch (error) {
+    flash(response.message, 'error');
+    console.log(error);
+  }
+};
+
+const printBarcode = (id) => {
+  const routeData = router.resolve({
+    name: "bookings.barcode.print",
+    params: { id },
+  });
+  window.open(routeData.href, "_blank");
+};
+
+const showMessageModal = (selectedItem) => {
+  messageForm.value.message = `Hello ${selectedItem.account.name}, your device (Ref: ${selectedItem.reference_id}) is repaired.\n\nhttps://g.page/r/Cd5T4cka7ogJEBM/review`;
+  messageForm.value.phone = selectedItem.account.phone;
+  modal.show();
+};
+
+const sendMessage = async () => {
+  try {
+    const { data: response } = await messageForm.value.post(
+      `/api/booking-items/send-message`
+    );
+
+    if (response.status == "success") {
+      modal.hide();
+      messageForm.value.reset();
+      flash(response.message);
+    }
+  } catch (error) {
+    flash(response.message, "error");
+  }
+};
+
 // Hooks
 onMounted(async () => {
   await getEmployees();
   await getItems();
+
+  modal = new Modal(document.getElementById(modalID), {
+    keyboard: false,
+  });
 });
 </script>
 
 <template>
-  <!-- <pre>{{bookingItems.data}}</pre> -->
-
   <form @submit.prevent="handleSubmit">
     <div v-if="!bookingItems.isLoading">
       <Panel>
@@ -164,15 +182,14 @@ onMounted(async () => {
                 Booking Item <b>#{{ index + 1 }}</b>
               </h4>
               <div>
-
-                <button
+                <button type="button"
                   @click="printBarcode(item.id)"
                   class="btn btn-sm me-2 btn-outline-primary"
                 >
                   Print Barcode
                 </button>
-                <button
-                  @click="printBarcode(item.id)"
+                <button type="button"
+                  @click="showMessageModal(item)"
                   class="btn btn-sm me-2 btn-outline-primary"
                 >
                   Send SMS
@@ -439,4 +456,27 @@ onMounted(async () => {
       <AppLoader />
     </div>
   </form>
+
+  <VueModal :id="modalID" @onSubmit="sendMessage">
+    <template #title>
+      Send SMS
+    </template>
+
+    <div class="row">
+      <div class="col">
+        <label class="form-label" for="mesage"><b>Message:</b></label>
+        <textarea
+          class="form-control"
+          id="mesage"
+          v-model="messageForm.message"
+          cols="10"
+          rows="5"
+        ></textarea>
+      </div>
+    </div>
+
+    <template #footer>
+      <Button :form="messageForm" class="btn btn-primary">Send</Button>
+    </template>
+  </VueModal>
 </template>

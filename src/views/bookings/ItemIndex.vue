@@ -4,7 +4,6 @@ import axios from "axios";
 import http from "@@/services/HttpService";
 import { useFlash } from "@@/composables/useFlash";
 import { useRouter } from "vue-router";
-import { useCan } from "@@/composables/useCan";
 import { Modal } from "bootstrap";
 import Form from "vform";
 
@@ -17,11 +16,8 @@ const paginate = ref(50);
 const search = ref("");
 const id = ref("");
 const device_name = ref("");
-const status = ref("");
 const fault = ref("");
 const baseEndpoint = "/api/booking-items";
-let orderBy = ref("created_at");
-let sortOrder = ref("desc");
 let start_date = ref("");
 let end_date = ref("");
 const { flash } = useFlash();
@@ -31,6 +27,7 @@ const isLoading = ref(true);
 const messageForm = ref(
   new Form({
     message: null,
+    phone: null,
   })
 );
 
@@ -91,23 +88,6 @@ watch(
 );
 
 // Methods
-
-const showInvoiceModal = (booking) => {
-  messageForm.value.reset();
-  messageForm.value.reference_id = booking.reference_id;
-  messageForm.value.id = booking.id;
-  modal.show();
-};
-const generateInvoice = async (id) => {
-  let routeData = router.resolve({
-    name: "bookings.invoice",
-    params: { id },
-  });
-  window.open(routeData.href, "_blank");
-  // modal.hide();
-  // isLoaded.value = false;
-  // messageForm.value.reset();
-};
 
 const handleExportClick = async () => {
   const response = await http.get(
@@ -177,7 +157,7 @@ const handleShow = () => {
 };
 
 const selectRow = (item, id) => {
-  if(selectedRowId.value == id){
+  if (selectedRowId.value == id) {
     selectedRowId.value = "";
   } else {
     selectedRowId.value = id;
@@ -193,45 +173,37 @@ const printBarcode = () => {
   window.open(routeData.href, "_blank");
 };
 
-const showMessageModal = () => {
+const printInvoice = () => {
+  const routeData = router.resolve({
+    name: "bookings.proceed.invoice",
+    params: { id: selectedItem.value.booking_list_id },
+  });
+  window.open(routeData.href, "_blank");
+};
 
+const showMessageModal = () => {
   messageForm.value.message = `Hello ${selectedItem.value.account.name}, your device (Ref: ${selectedItem.value.reference_id}) is repaired.\n\nhttps://g.page/r/Cd5T4cka7ogJEBM/review`;
+  messageForm.value.phone = selectedItem.value.account.phone;
   modal.show();
 };
 
 const sendMessage = async () => {
-  
   try {
-    const { data: response } = await messageForm.value.post(`/api/booking-items/send-message`);
+    const { data: response } = await messageForm.value.post(
+      `/api/booking-items/send-message`
+    );
 
-    return response;
     if (response.status == "success") {
-      form.value.reset();
-      selectedCustomer.value = "";
-
-      swal
-        .fire({
-          title: "Success!",
-          text: "Do You Want To Print ?",
-          icon: "success",
-          showCancelButton: true,
-          confirmButtonText: "Yes!",
-        })
-        .then(async (result) => {
-          if (result.isConfirmed) {
-            let routeData = router.resolve({
-              name: "bookings.proceed.invoice",
-              params: { id: response.data.id },
-            });
-            window.open(routeData.href, "_blank");
-          }
-        });
+      modal.hide();
+      messageForm.value.reset();
+      selectedRowId.value = "";
+      selectedItem.value = "";
+      flash(response.message);
     }
   } catch (error) {
-    console.log(error);
+    flash(response.message, "error");
   }
-
-}
+};
 
 // Hooks
 onMounted(() => {
@@ -339,6 +311,14 @@ onMounted(() => {
           :class="!selectedRowId ? 'btn-outline-primary' : 'btn-primary'"
         >
           Print Barcode
+        </button>
+        <button
+          @click="printInvoice"
+          class="btn me-2"
+          :disabled="!selectedRowId"
+          :class="!selectedRowId ? 'btn-outline-primary' : 'btn-primary'"
+        >
+          Print Invoice
         </button>
       </div>
       <div class="align-items-center col-3 d-flex">
@@ -610,7 +590,13 @@ onMounted(() => {
     <div class="row">
       <div class="col">
         <label class="form-label" for="mesage"><b>Message:</b></label>
-        <textarea class="form-control" id="mesage" v-model="messageForm.message" cols="10" rows="5"></textarea>
+        <textarea
+          class="form-control"
+          id="mesage"
+          v-model="messageForm.message"
+          cols="10"
+          rows="5"
+        ></textarea>
       </div>
     </div>
 
