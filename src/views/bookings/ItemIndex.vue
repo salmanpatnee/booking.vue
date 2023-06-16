@@ -89,44 +89,11 @@ watch(
 
 // Methods
 
-const handleExportClick = async () => {
-  const response = await http.get(
-    baseEndpoint +
-      "/export?search=" +
-      search.value +
-      "&id=" +
-      id.value +
-      "&start_date=" +
-      start_date.value +
-      "&end_date=" +
-      end_date.value,
-    {
-      // If you forget this, your download will be corrupt.
-      responseType: "blob",
-    }
-  );
-  //Let's create a link in the document that we'll
-  // programmatically 'click'.
-  const link = document.createElement("a");
-
-  // Tell the browser to associate the response data to
-  // the URL of the link we created above.
-  link.href = window.URL.createObjectURL(new Blob([response.data]));
-
-  // Tell the browser to download, not render, the file.
-  link.setAttribute("download", "bookingItems.xlsx");
-
-  // Place the link in the DOM.
-  document.body.appendChild(link);
-
-  // Make the magic happen!
-  link.click();
-};
-
 const getBookingItems = async (page = 1) => {
   isLoading.value = true;
   selectedRowId.value = "";
   selectedItem.value = {};
+  
 
   const response = await axios.get(baseEndpoint, {
     params: {
@@ -151,6 +118,12 @@ const clearDateFields = async () => {
   end_date.value = "";
   await getBookingItems();
 };
+
+const refreshData = async () => {
+  start_date.value = "";
+  end_date.value = "";
+  await getBookingItems();
+}
 
 const handleShow = () => {
   router.push({ name: "bookings.edit", params: { id: selectedRowId.value } });
@@ -284,7 +257,7 @@ onMounted(() => {
           <option :value="100">100</option>
         </select>
       </div>
-      <div class="col text-center">
+      <div class="col text-end">
         <button
           class="btn me-2"
           :class="!selectedRowId ? 'btn-outline-primary' : 'btn-primary'"
@@ -293,9 +266,7 @@ onMounted(() => {
         >
           View Details
         </button>
-        <button class="btn btn-primary me-2" @click.prevent="getBookingItems">
-          Refresh
-        </button>
+        
         <button
           @click="showMessageModal"
           class="btn me-2"
@@ -318,10 +289,14 @@ onMounted(() => {
           :disabled="!selectedRowId"
           :class="!selectedRowId ? 'btn-outline-primary' : 'btn-primary'"
         >
-          Print Invoice
+          Print Booking Invoice
         </button>
+        <button class="btn btn-primary me-2" @click.prevent="refreshData">
+          Refresh
+        </button>
+
       </div>
-      <div class="align-items-center col-3 d-flex">
+      <!-- <div class="align-items-center col-3 d-flex">
         <input
           type="search"
           placeholder="Search"
@@ -329,7 +304,7 @@ onMounted(() => {
           class="form-control"
           id="id"
         />
-      </div>
+      </div> -->
     </div>
     <!-- <pre>{{ bookingItems }}</pre> -->
     <div class="table-responsive">

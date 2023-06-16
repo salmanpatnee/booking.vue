@@ -1,5 +1,4 @@
 <script setup>
-import http from "@@/services/HttpService";
 import { useAuthStore } from "@@/stores/authStore";
 import { onMounted, ref, inject, watch, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
@@ -14,64 +13,26 @@ import { useFlash } from "@@/composables/useFlash";
 import { v4 as uuidv4 } from "uuid";
 
 // Data
-const authStore = useAuthStore();
-
-const isLoaded = ref(false);
+const baseEndpoint = "/api/sales";
 const { flash } = useFlash();
-const sale = ref({
-  data: null,
-  isLoading: true,
-});
-
-const route = useRoute();
 const router = useRouter();
 const toast = ref(useToast());
-const customers = ref({
-  isLoading: false,
-  data: [],
-});
+
 const employees = ref({
   isLoading: false,
   data: [],
 });
-const products = ref([]);
-const baseEndpoint = "/api/sales";
-const swal = inject("$swal");
-const barcodeInput = ref(null);
-const productBarcodeInput = ref(null);
 
-let discountRateKey = "discount_rate_cash";
+const swal = inject("$swal");
 let modal = null;
 let modalID = "customersModal";
-let shouldSubmit = true;
-const bankAccounts = ref([]);
 
-// const isRegisterOpen = computed(() => {
-//   return authStore.user.cash_registers.length;
-// });
 
 const getEmployees = async (page = 1) => {
-  // const params = `?page=${page}&paginate=${paginate.value}&search=${search.value}`;
-  const params = `?for=sales.create`;
   employees.value.loading = true;
   const { data: response } = await axios.get(`/api/employees`);
   employees.value.data = response.data;
   employees.value.loading = false;
-};
-
-const handleShipment = () => {
-  if (form.value.is_deliverable) {
-    discountRateKey = "discount_rate_shipment";
-  } else {
-    discountRateKey = "discount_rate_cash";
-  }
-
-  form.value.sale_details.forEach((sD) => {
-    console.log(sD[discountRateKey]);
-    sD.discount_rate = sD[discountRateKey];
-    console.log(sD[discountRateKey] / 100);
-    sD.price = sD["original_price"] * ((100 - sD[discountRateKey]) / 100);
-  });
 };
 
 const form = ref(
@@ -83,7 +44,6 @@ const form = ref(
   })
 );
 
-// const selectedProduct = ref(null);
 const selectedCustomer = ref(null);
 
 const customerForm = ref(
@@ -133,8 +93,6 @@ const handleAddBookingItem = (index) => {
     notes: null,
     estimated_cost: null,
   };
-
-  // form.value.booking_item_details.splice(index, 0, newBookingItem);
   form.value.booking_item_details.push(newBookingItem);
 };
 
@@ -167,6 +125,8 @@ const handleSubmit = async () => {
               params: { id: response.data.id },
             });
             window.open(routeData.href, "_blank");
+          } else {
+            router.push({ name: "booking.items.index" });
           }
         });
     }

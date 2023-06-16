@@ -37,8 +37,8 @@ const app = createApp(App);
 app.config.globalProperties.$filters = {
   currencyPound(value) {
     // return '£' + value
-    let val = (value/1).toFixed(2).replace('.', ',')
-        return '£' + val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+    let val = (value/1).toFixed(2).replace(',', '.')
+        return '£' + val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")
   }
 }
 

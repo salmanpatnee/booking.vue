@@ -10,6 +10,9 @@ import { useFlash } from "@@/composables/useFlash";
 // Data
 let modal = null;
 let modalID = "messageModal";
+let statusModal = null;
+let statusModalID = "statusModal";
+
 const baseEndpoint = "/api/booking-items";
 const { flash } = useFlash();
 const route = useRoute();
@@ -40,6 +43,15 @@ const messageForm = ref(
   new Form({
     message: null,
     phone: null,
+  })
+);
+
+const statusForm = ref(
+  new Form({
+    id: null,
+    status: null,
+    estimated_cost: null,
+    charges: null,
   })
 );
 
@@ -76,10 +88,10 @@ const handleSubmit = async () => {
     if (response.status == "success") {
       form.value.reset();
       flash(response.message);
-      router.push({ name: "booking.items.index"});
+      router.push({ name: "booking.items.index" });
     }
   } catch (error) {
-    flash(response.message, 'error');
+    flash(response.message, "error");
     console.log(error);
   }
 };
@@ -90,6 +102,46 @@ const printBarcode = (id) => {
     params: { id },
   });
   window.open(routeData.href, "_blank");
+};
+
+const printSaleInvoice = (item) => {
+
+  if(!item.charges){
+    flash('Kindly add charges to generate sale invoice.', 'error');
+    return;
+  }
+
+  const routeData = router.resolve({
+    name: "bookings.invoice",
+    params: { id: item.id },
+  });
+  window.open(routeData.href, "_blank");
+
+  
+};
+
+const showStatusModal = (selectedItem) => {
+  statusForm.value.id = selectedItem.id;
+  statusForm.value.status = selectedItem.status;
+  statusForm.value.estimated_cost = selectedItem.estimated_cost;
+  statusModal.show();
+};
+
+const updateStatus = async () => {
+  try {
+    const { data: response } = await statusForm.value.patch(
+      `/api/booking-items/${statusForm.value.id}/update-status`
+    );
+
+    if (response.status == "success") {
+      statusModal.hide();
+      statusForm.value.reset();
+      flash(response.message);
+      await getItems();
+    }
+  } catch (error) {
+    flash(response.message, "error");
+  }
 };
 
 const showMessageModal = (selectedItem) => {
@@ -120,6 +172,10 @@ onMounted(async () => {
   await getItems();
 
   modal = new Modal(document.getElementById(modalID), {
+    keyboard: false,
+  });
+
+  statusModal = new Modal(document.getElementById(statusModalID), {
     keyboard: false,
   });
 });
@@ -178,17 +234,46 @@ onMounted(async () => {
             <div
               class="mb-3 d-flex justify-content-between align-content-center"
             >
-              <h4 class="badge bg-primary text-white fs-4">
-                Booking Item <b>#{{ index + 1 }}</b>
-              </h4>
               <div>
-                <button type="button"
+                <h4 class="badge bg-primary text-white fs-4 me-3">
+                  Booking Item <b>#{{ index + 1 }}</b>
+                </h4>
+                <span
+                  class="text-capitalize badge bg-success me-2"
+                  v-if="item.status == 'repaired'"
+                  >{{ item.status }}</span
+                >
+                <span class="text-capitalize badge bg-info me-2" v-else>{{
+                  item.status
+                }}</span>
+
+                <span class="badge bg-black"># {{ item.reference_id }}</span>
+              </div>
+
+              <div>
+                <button
+                  type="button"
+                  @click="showStatusModal(item)"
+                  class="btn btn-sm me-2 btn-outline-primary"
+                >
+                  Update Status
+                </button>
+                <button
+                  type="button"
                   @click="printBarcode(item.id)"
                   class="btn btn-sm me-2 btn-outline-primary"
                 >
                   Print Barcode
                 </button>
-                <button type="button"
+                <button
+                  type="button"
+                  @click="printSaleInvoice(item)"
+                  class="btn btn-sm me-2 btn-outline-primary"
+                >
+                  Print Sale Invoice
+                </button>
+                <button
+                  type="button"
                   @click="showMessageModal(item)"
                   class="btn btn-sm me-2 btn-outline-primary"
                 >
@@ -456,6 +541,65 @@ onMounted(async () => {
       <AppLoader />
     </div>
   </form>
+
+  <VueModal :id="statusModalID" @onSubmit="updateStatus">
+    <template #title>
+      Update Status
+    </template>
+
+    <div class="row mb-3">
+      <div class="col">
+        <label class="form-label" for="status"><b>Status:</b></label>
+        <select class="form-select" v-model="statusForm.status" id="status">
+          <option value="">Select Status</option>
+          <option value="in progress">In Progress</option>
+          <option value="repaired">Repaired</option>
+          <option value="complete">Complete</option>
+          <option value="can not be repaired">Can't Repaired</option>
+          <option value="customer collected CBR">Customer Collected CBR</option>
+          <option value="customer collected payment pending">
+            Payment Pending
+          </option>
+          <option value="shop property">Shop Property</option>
+          <option value="awaiting customer response">Awaiting Response</option>
+          <option value="awaiting parts">Awaiting Parts</option>
+        </select>
+        <HasError :form="statusForm" field="status" />
+        <small>Mark invoice as <b>repaired, completed or can't repaired</b> to update charges.</small>
+      </div>
+    </div>
+    <div class="row" v-if="statusForm.estimated_cost">
+      <div class=".col">
+        <p >Estimated Cost: <b>{{ statusForm.estimated_cost }}</b></p>
+      </div>
+    </div>
+    <div
+      class="row"
+      v-if="
+        statusForm.status != 'in progress' &&
+        statusForm.status != 'shop property' &&
+        statusForm.status != 'awaiting customer response' &&
+        statusForm.status != 'awaiting parts'
+      "
+    >
+      <div class="col">
+        <label class="form-label" for="charges"><b>Charges:</b></label>
+        <input
+          type="number"
+          class="form-control"
+          v-model="statusForm.charges"
+          placeholder="500"
+          id="charges"
+        />
+
+        <HasError :form="statusForm" field="charges" />
+      </div>
+    </div>
+
+    <template #footer>
+      <Button :form="statusForm" class="btn btn-primary">Update</Button>
+    </template>
+  </VueModal>
 
   <VueModal :id="modalID" @onSubmit="sendMessage">
     <template #title>
