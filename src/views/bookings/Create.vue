@@ -125,9 +125,8 @@ const handleSubmit = async () => {
               params: { id: response.data.id },
             });
             window.open(routeData.href, "_blank");
-          } else {
-            router.push({ name: "booking.items.index" });
           }
+          router.push({ name: "booking.items.index" });
         });
     }
   } catch (error) {

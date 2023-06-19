@@ -44,7 +44,7 @@ const handlePrint = () => {
 
 const totalEstimatedCostDisplay = computed(() => {
   return sale.value.booking_list_details.reduce((accumulator, object) => {
-    return accumulator + parseFloat(object.estimated_cost);
+    return accumulator + parseFloat((object.estimated_cost) ? object.estimated_cost : 0);
   }, 0);
 });
 
@@ -162,7 +162,7 @@ onMounted(async () => {
               <hr class="mb-2 mt-2" />
               <p style="font-size: 12px; margin-bottom: 0px;" class="mb-0"><b>Total Items:</b> {{ sale.booking_items_count }}</p>
               <p style="font-size: 12px; margin-bottom: 0px;" class="mb-0">
-                <b>Total Estimated Cost:</b> {{ totalEstimatedCostDisplay }}
+                <b>Total Estimated Cost:</b> {{ $filters.currencyPound(totalEstimatedCostDisplay) }}
               </p>
             </div>
           </div>

@@ -105,9 +105,8 @@ const printBarcode = (id) => {
 };
 
 const printSaleInvoice = (item) => {
-
-  if(!item.charges){
-    flash('Kindly add charges to generate sale invoice.', 'error');
+  if (!item.charges) {
+    flash("Kindly add charges to generate sale invoice.", "error");
     return;
   }
 
@@ -116,14 +115,13 @@ const printSaleInvoice = (item) => {
     params: { id: item.id },
   });
   window.open(routeData.href, "_blank");
-
-  
 };
 
 const showStatusModal = (selectedItem) => {
   statusForm.value.id = selectedItem.id;
   statusForm.value.status = selectedItem.status;
   statusForm.value.estimated_cost = selectedItem.estimated_cost;
+  statusForm.value.charges = selectedItem.charges;
   statusModal.show();
 };
 
@@ -145,7 +143,7 @@ const updateStatus = async () => {
 };
 
 const showMessageModal = (selectedItem) => {
-  messageForm.value.message = `Hello ${selectedItem.account.name}, your device (Ref: ${selectedItem.reference_id}) is repaired.\n\nhttps://g.page/r/Cd5T4cka7ogJEBM/review`;
+  messageForm.value.message = `Hello ${selectedItem.account.name}, your device (Ref: ${selectedItem.reference_id}) is ${selectedItem.status}.\n\nhttps://g.page/r/Cd5T4cka7ogJEBM/review`;
   messageForm.value.phone = selectedItem.account.phone;
   modal.show();
 };
@@ -565,12 +563,17 @@ onMounted(async () => {
           <option value="awaiting parts">Awaiting Parts</option>
         </select>
         <HasError :form="statusForm" field="status" />
-        <small>Mark invoice as <b>repaired, completed or can't repaired</b> to update charges.</small>
+        <small
+          >Mark invoice as <b>repaired, completed or can't repaired</b> to
+          update charges.</small
+        >
       </div>
     </div>
     <div class="row" v-if="statusForm.estimated_cost">
       <div class=".col">
-        <p >Estimated Cost: <b>{{ statusForm.estimated_cost }}</b></p>
+        <p>
+          Estimated Cost: <b>{{ statusForm.estimated_cost }}</b>
+        </p>
       </div>
     </div>
     <div

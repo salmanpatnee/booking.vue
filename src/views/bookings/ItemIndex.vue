@@ -126,6 +126,10 @@ const refreshData = async () => {
 }
 
 const handleShow = () => {
+  if(!selectedRowId.value) {
+    flash('Please select an item to view details.', 'error'); 
+    return;
+  }
   router.push({ name: "bookings.edit", params: { id: selectedRowId.value } });
 };
 
@@ -138,24 +142,13 @@ const selectRow = (item, id) => {
   }
 };
 
-const printBarcode = () => {
-  const routeData = router.resolve({
-    name: "bookings.barcode.print",
-    params: { id: selectedRowId.value },
-  });
-  window.open(routeData.href, "_blank");
-};
-
-const printInvoice = () => {
-  const routeData = router.resolve({
-    name: "bookings.proceed.invoice",
-    params: { id: selectedItem.value.booking_list_id },
-  });
-  window.open(routeData.href, "_blank");
-};
-
 const showMessageModal = () => {
-  messageForm.value.message = `Hello ${selectedItem.value.account.name}, your device (Ref: ${selectedItem.value.reference_id}) is repaired.\n\nhttps://g.page/r/Cd5T4cka7ogJEBM/review`;
+  if(!selectedRowId.value) {
+    flash('Please select an item to send sms to.', 'error'); 
+    return;
+  }
+
+  messageForm.value.message = `Hello ${selectedItem.value.account.name}, your device (Ref: ${selectedItem.value.reference_id}) is ${selectedItem.value.status}.\n\nhttps://g.page/r/Cd5T4cka7ogJEBM/review`;
   messageForm.value.phone = selectedItem.value.account.phone;
   modal.show();
 };
@@ -176,6 +169,33 @@ const sendMessage = async () => {
   } catch (error) {
     flash(response.message, "error");
   }
+};
+
+const printBarcode = () => {
+
+  if(!selectedRowId.value) {
+    flash('Please select an item to print barcode for.', 'error'); 
+    return;
+  }
+
+  const routeData = router.resolve({
+    name: "bookings.barcode.print",
+    params: { id: selectedRowId.value },
+  });
+  window.open(routeData.href, "_blank");
+};
+
+const printInvoice = () => {
+  if(!selectedRowId.value) {
+    flash('Please select an item to print invoice for.', 'error'); 
+    return;
+  }
+
+  const routeData = router.resolve({
+    name: "bookings.proceed.invoice",
+    params: { id: selectedItem.value.booking_list_id },
+  });
+  window.open(routeData.href, "_blank");
 };
 
 // Hooks
@@ -261,16 +281,14 @@ onMounted(() => {
         <button
           class="btn me-2"
           :class="!selectedRowId ? 'btn-outline-primary' : 'btn-primary'"
-          :disabled="!selectedRowId"
           @click="handleShow"
         >
-          View Details
+          View/Edit Details 
         </button>
         
         <button
           @click="showMessageModal"
           class="btn me-2"
-          :disabled="!selectedRowId"
           :class="!selectedRowId ? 'btn-outline-primary' : 'btn-primary'"
         >
           Send SMS
@@ -278,7 +296,6 @@ onMounted(() => {
         <button
           @click="printBarcode"
           class="btn me-2"
-          :disabled="!selectedRowId"
           :class="!selectedRowId ? 'btn-outline-primary' : 'btn-primary'"
         >
           Print Barcode
@@ -286,7 +303,6 @@ onMounted(() => {
         <button
           @click="printInvoice"
           class="btn me-2"
-          :disabled="!selectedRowId"
           :class="!selectedRowId ? 'btn-outline-primary' : 'btn-primary'"
         >
           Print Booking Invoice
@@ -311,7 +327,7 @@ onMounted(() => {
       <table class="table table-bordered table-booking table-sm">
         <thead class="bg-primary text-bg-dark">
           <tr>
-            <th>ID</th>
+            <th>Barcode</th>
             <th>Status</th>
             <th>Item</th>
             <th>Fault</th>

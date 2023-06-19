@@ -128,13 +128,52 @@ const { can } = useCan();
           </ul>
         </li>
 
+        <li class="sidebar-item">
+          <a
+            data-bs-target="#invoices"
+            data-bs-toggle="collapse"
+            class="sidebar-link collapsed"
+            aria-expanded="false"
+          >
+            <i class="fa fa-calendar" aria-hidden="true"></i>
+            <span class="align-middle">Invoices</span>
+          </a>
+          <ul
+            id="invoices"
+            class="sidebar-dropdown list-unstyled collapse"
+            data-bs-parent="#sidebar"
+            style=""
+          >
+            <!-- <li class="sidebar-item">
+              <router-link
+                class="sidebar-link"
+                :to="{ name: 'bookings.create' }"
+              >
+                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                <span class="align-middle">Add Booking</span>
+              </router-link>
+            </li> -->
+
+            <li class="sidebar-item">
+              <router-link
+                class="sidebar-link"
+                :to="{ name: 'invoices.index' }"
+              >
+                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                <span class="align-middle">Manage Invoices</span>
+              </router-link>
+            </li>
+          </ul>
+        </li>
+
         <!-- <li class="sidebar-item">
           <router-link class="sidebar-link" :to="{ name: 'locations.index' }">
             <i class="fa fa-location-arrow" aria-hidden="true"></i>
             <span class="align-middle">Locations</span>
           </router-link>
         </li> -->
-        <li class="sidebar-item">
+
+        <!-- <li class="sidebar-item">
           <a
             data-bs-target="#products"
             data-bs-toggle="collapse"
@@ -160,12 +199,12 @@ const { can } = useCan();
               </router-link>
             </li>
 
-            <!-- <li class="sidebar-item">
+             <li class="sidebar-item">
               <router-link class="sidebar-link" :to="{ name: 'brands.index' }">
                 <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
                 <span class="align-middle">Brands</span>
               </router-link>
-            </li> -->
+            </li> 
             <li class="sidebar-item">
               <router-link
                 class="sidebar-link"
@@ -185,9 +224,9 @@ const { can } = useCan();
               </router-link>
             </li>
           </ul>
-        </li>
+        </li> -->
 
-        <li class="sidebar-item">
+        <!-- <li class="sidebar-item">
           <a
             data-bs-target="#purchases"
             data-bs-toggle="collapse"
@@ -220,8 +259,8 @@ const { can } = useCan();
                 <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
                 <span class="align-middle">Manage Purchases</span>
               </router-link>
-            </li>
-            <!-- <li class="sidebar-item">
+            </li> -->
+        <!-- <li class="sidebar-item">
               <router-link
                 class="sidebar-link"
                 :to="{ name: 'purchases.return.index' }"
@@ -229,11 +268,11 @@ const { can } = useCan();
                 <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
                 <span class="align-middle">Purchase Return</span>
               </router-link>
-            </li> -->
+            </li> 
           </ul>
-        </li>
+        </li>-->
 
-        <li class="sidebar-item">
+        <!-- <li class="sidebar-item">
           <a
             data-bs-target="#stock"
             data-bs-toggle="collapse"
@@ -249,7 +288,7 @@ const { can } = useCan();
             data-bs-parent="#sidebar"
             style=""
           >
-            <!-- <li class="sidebar-item">
+            <li class="sidebar-item">
               <router-link
                 class="sidebar-link"
                 :to="{ name: 'stock.management.index' }"
@@ -266,7 +305,7 @@ const { can } = useCan();
                 <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
                 <span class="align-middle">Stock Transfer</span>
               </router-link>
-            </li> -->
+            </li> 
 
             <li class="sidebar-item">
               <router-link
@@ -277,7 +316,7 @@ const { can } = useCan();
                 <span class="align-middle">Stock Report</span>
               </router-link>
             </li>
-            <!-- <li class="sidebar-item">
+             <li class="sidebar-item">
               <router-link
                 class="sidebar-link"
                 :to="{ name: 'stock.checker.index' }"
@@ -285,11 +324,11 @@ const { can } = useCan();
                 <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
                 <span class="align-middle">Stock Checker</span>
               </router-link>
-            </li> -->
+            </li> 
           </ul>
-        </li>
+        </li> -->
 
-        <li class="sidebar-item">
+        <!-- <li class="sidebar-item">
           <a
             data-bs-target="#sale"
             data-bs-toggle="collapse"
@@ -311,14 +350,14 @@ const { can } = useCan();
                 <span class="align-middle">Sales</span>
               </router-link>
             </li>
-            <!-- <li class="sidebar-item">
+            <li class="sidebar-item">
               <router-link class="sidebar-link" :to="{ name: 'pos.create' }">
                 <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
                 <span class="align-middle">POS</span>
               </router-link>
-            </li> -->
+            </li>
           </ul>
-        </li>
+        </li> -->
 
         <!-- <li class="sidebar-item">
           <a

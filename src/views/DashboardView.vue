@@ -53,18 +53,25 @@ onMounted(async () => {
             </div>
             <div class="col">
               <stat-card
+                title="TOTAL BOOKINGS"
+                :figure="stats.data.todays_total_orders"
+                type="success"
+              />
+
+
+              <!-- <stat-card
                 title="TOTAL PRODUCTS"
                 :figure="stats.data.total_products"
                 type="success"
-              />
+              /> -->
             </div>
           </div>
         </div>
       </div>
     </div>
     <div class="row my-2">
-      <h3 class="my-2">Todays Summary</h3>
-      <div class="col d-flex mt-4">
+      <!-- <h3 class="my-2">Todays Summary</h3> -->
+      <!-- <div class="col d-flex mt-4">
         <div class="w-100">
           <div class="row row-cols-1 row-cols-md-3 g-3">
             <div class="col">
@@ -74,13 +81,13 @@ onMounted(async () => {
                 type="info"
               />
             </div>
-            <!-- <div class="col">
+             <div class="col">
               <stat-card
                 title="TOTAL PURCHASES"
                 :figure="parseFloat(stats.data.todays_total_purchase_amount)"
                 type="info"
               />
-            </div> -->
+            </div>
             <div class="col">
               <stat-card
                 title="TOTAL SALES"
@@ -90,7 +97,7 @@ onMounted(async () => {
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
     <!-- <div class="row">
       <div class="col d-flex">

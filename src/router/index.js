@@ -57,6 +57,7 @@ import BookingsProceedInvoice from "@@/views/bookings/ProceedInvoice.vue";
 import BookingsBarcodePrint from "@@/views/bookings/BarcodePrint.vue";
 import BookingsInvoice from "@@/views/bookings/Invoice.vue";
 
+import InvoiceIndex from "@@/views/invoices/Index.vue";
 import InvoiceCreate from "@@/views/invoices/Create.vue";
 
 import SaleIndex from "@@/views/sales/Index.vue";
@@ -373,7 +374,11 @@ const router = createRouter({
           name: "bookings.invoice",
           component: BookingsInvoice,
         },
-
+        {
+          path: "/invoices",
+          name: "invoices.index",
+          component: InvoiceIndex,
+        },
         {
           path: "/invoices/create",
           name: "invoices.create",
