@@ -42,7 +42,8 @@ const form = ref(
 const messageForm = ref(
   new Form({
     message: null,
-    phone: null,
+    phone: null, 
+    review_link: null
   })
 );
 
@@ -143,7 +144,7 @@ const updateStatus = async () => {
 };
 
 const showMessageModal = (selectedItem) => {
-  messageForm.value.message = `Hello ${selectedItem.account.name}, your device (Ref: ${selectedItem.reference_id}) is ${selectedItem.status}.\n\nhttps://g.page/r/Cd5T4cka7ogJEBM/review`;
+  messageForm.value.message = `Hello ${selectedItem.account.name}, your device (Ref: ${selectedItem.reference_id}) is ${selectedItem.status}.\n\n ${messageForm.value.review_link}`;
   messageForm.value.phone = selectedItem.account.phone;
   modal.show();
 };
@@ -164,8 +165,22 @@ const sendMessage = async () => {
   }
 };
 
+const settings = ref({
+  data: [], 
+  isLoading: true
+})
+
+const getSettings = async () => {
+  settings.value.isLoading = true;
+  const response = await axios.get(`api/settings`);
+  settings.value.data = response.data.data;
+  messageForm.value.review_link = settings.value.data[3].value;
+  settings.value.isLoading = false;
+};
+
 // Hooks
 onMounted(async () => {
+  await getSettings();
   await getEmployees();
   await getItems();
 

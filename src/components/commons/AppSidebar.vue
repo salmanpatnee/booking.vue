@@ -135,7 +135,7 @@ const { can } = useCan();
             class="sidebar-link collapsed"
             aria-expanded="false"
           >
-            <i class="fa fa-calendar" aria-hidden="true"></i>
+            <i class="fa fa-file" aria-hidden="true"></i>
             <span class="align-middle">Invoices</span>
           </a>
           <ul
@@ -161,6 +161,35 @@ const { can } = useCan();
               >
                 <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
                 <span class="align-middle">Manage Invoices</span>
+              </router-link>
+            </li>
+          </ul>
+        </li>
+
+        <li class="sidebar-item">
+          <a
+            data-bs-target="#settings"
+            data-bs-toggle="collapse"
+            class="sidebar-link collapsed"
+            aria-expanded="false"
+          >
+            <i class="fa fa-cog" aria-hidden="true"></i>
+            <span class="align-middle">Settings</span>
+          </a>
+          <ul
+            id="settings"
+            class="sidebar-dropdown list-unstyled collapse"
+            data-bs-parent="#sidebar"
+            style=""
+          >
+
+            <li class="sidebar-item">
+              <router-link
+                class="sidebar-link"
+                :to="{ name: 'settings.index' }"
+              >
+                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                <span class="align-middle">Manage Settings</span>
               </router-link>
             </li>
           </ul>

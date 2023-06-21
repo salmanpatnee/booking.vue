@@ -37,8 +37,21 @@ const handlePrint = () => {
   window.onafterprint = window.close;
 };
 
+const settings = ref({
+  data: [], 
+  isLoading: true
+})
+
+const getSettings = async () => {
+  settings.value.isLoading = true;
+  const response = await axios.get(`api/settings`);
+  settings.value.data = response.data.data;
+  settings.value.isLoading = false;
+};
+
 // Hooks
 onMounted(async () => {
+  await getSettings();
   await getBookingItem();
   document.body.classList.add("sale-print");
   isLoaded.value = true;
@@ -46,7 +59,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div v-if="isLoaded">
+  <div v-if="isLoaded && !settings.isLoading">
     <div id="printable">
       <div
         class="print-invoice"
@@ -68,7 +81,7 @@ onMounted(async () => {
           <h1
             style="font-family: monospace; font-weight: 900; font-size: 22px;"
           >
-            <storng>iCrack</storng>
+            <storng>{{settings.data[0].value}}</storng>
           </h1>
         </div>
     

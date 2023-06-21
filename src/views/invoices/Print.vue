@@ -6,18 +6,24 @@ import "vue-select/dist/vue-select.css";
 import axios from "axios";
 
 // Data
-const baseEndpoint = "/api/booking-items";
-const sale = ref({});
+const baseEndpoint = "/api/invoices";
+const invoice = ref({});
 const route = useRoute();
 let isLoaded = ref(false);
 let imageLoaded = 0;
 
+const displayVatAmount = computed(() => {
+    if(invoice.value.value != ''){
+        return invoice.value.total * invoice.value.vat / 100 ;
+    }
+    return false;
+})
 // Methods
-const getBooking = async () => {
+const getInvoice = async () => {
   const response = await axios.get(
-    `${baseEndpoint}/${route.params.id}?for=print`
+    `${baseEndpoint}/${route.params.id}`
   );
-  sale.value = response.data.data;
+  invoice.value = response.data.data;
 };
 
 const handleImageLoad = () => {
@@ -51,9 +57,10 @@ const getSettings = async () => {
   settings.value.isLoading = false;
 };
 
+
 onMounted(async () => {
   await getSettings();
-  await getBooking();
+  await getInvoice();
   document.body.classList.add("sale-print");
   isLoaded.value = true;
 });
@@ -89,65 +96,58 @@ onMounted(async () => {
                       </p>
                       <p>{{settings.data[2].value}}</p>
                     </div>
-
+                    <!-- <pre>{{ invoice }}</pre> -->
                     <div class="row mb-4">
                       <div class="col-6 text-start">
                         <div class="text-muted">
                           Bill to:
-                          <strong> {{ sale.account.name }} </strong>
+                          <strong> {{ invoice.client_name }} </strong>
                         </div>
                         <div class="text-muted">
-                          Phone:
-                          <strong> {{ sale.account.phone }} </strong>
+                          Email:
+                          <strong> {{ invoice.client_email }} </strong>
                         </div>
-                        <div class="text-muted">
-                          Trade Name:
-                          <strong> {{ sale.account.trade_name }} </strong>
-                        </div>
+
                       </div>
                       <div class="col-6 text-end">
                         <div class="text-muted">
-                          Booking Reference:
-                          <strong>{{ sale.booking_list_reference_id }}</strong>
+                          Invoice No:
+                          <strong>{{ invoice.invoice_no }}</strong>
                         </div>
-                        <div class="text-muted">
-                          Booking Item Reference:
-                          <strong>{{ sale.reference_id }}</strong>
-                        </div>
-
                         <div class="text-muted">
                           Date:
-                          <strong><AppDate :timestamp="sale.date" /></strong>
+                          <strong><AppDate :timestamp="invoice.date" /></strong>
                         </div>
                       </div>
                     </div>
                     <table class="table table-sm">
                       <thead>
                         <tr>
-                          <th>Items</th>
                           <th>Description</th>
-                          <th>Price</th>
                           <th>Amount</th>
+                          <th>&nbsp;</th>
                         </tr>
                       </thead>
                       <tbody>
                         <tr>
-                          <td>{{ sale.device_name }}</td>
-                          <td>{{ sale.issue }}</td>
-                          <td>{{ sale.charges }}</td>
-                          <td>{{ sale.charges }}</td>
+                          <td>{{ invoice.description }}</td>
+                          <td>{{ $filters.currencyPound(invoice.total) }}</td>
+                          <th>&nbsp;</th>
                         </tr>
                         <tr>
-                          <th>&nbsp;</th>
-                          <th>&nbsp;</th>
+                            <th>&nbsp;</th>
                           <th>Subtotal</th>
-                          <th>{{ sale.charges }}</th>
+                          <th>{{$filters.currencyPound(invoice.total)}}</th>
+                        </tr>
+                        <tr v-if="invoice.vat">
+                            <th>&nbsp;</th>
+                          <th>VAT</th>
+                          <th>{{ invoice.vat }}% ({{$filters.currencyPound(displayVatAmount)}})</th>
                         </tr>
                         <tr>
-                          <th>&nbsp;</th>
-                          <th>&nbsp;</th>
+                            <th>&nbsp;</th>
                           <th>Total</th>
-                          <th>{{ sale.charges }}</th>
+                          <th>{{ $filters.currencyPound(invoice.net_total) }}</th>
                         </tr>
                       </tbody>
                     </table>

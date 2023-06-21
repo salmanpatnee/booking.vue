@@ -14,6 +14,10 @@ const sale = ref({});
 const route = useRoute();
 let isLoaded = ref(false);
 let imageLoaded = 0;
+const settings = ref({
+  data: [], 
+  isLoading: true
+})
 
 // Methods
 const getBooking = async () => {
@@ -48,8 +52,16 @@ const totalEstimatedCostDisplay = computed(() => {
   }, 0);
 });
 
+const getSettings = async () => {
+  settings.value.isLoading = true;
+  const response = await axios.get(`api/settings`);
+  settings.value.data = response.data.data;
+  settings.value.isLoading = false;
+};
+
 // Hooks
 onMounted(async () => {
+  await getSettings();
   await getBooking();
   document.body.classList.add("sale-print");
   isLoaded.value = true;
@@ -57,7 +69,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div v-if="isLoaded">
+  <div v-if="isLoaded && !settings.isLoading">
     <div id="printable">
       <div
         class="print-invoice"
@@ -79,13 +91,12 @@ onMounted(async () => {
           <h1
             style="font-family: monospace; font-weight: 900; font-size: 22px;"
           >
-            <storng>iCrack</storng>
+            <storng>{{settings.data[0].value}}</storng>
           </h1>
           <p style="font-size: 10px; margin-bottom: 5px;">
-            84 Gracechurch Shopping Centre, The Parade, Birmingham, Sutton
-            Coldfield B72 1PH, United Kingdom
+            {{settings.data[1].value}}
           </p>
-          <p style="font-size: 10px; margin-bottom: 5px;">07883 731494</p>
+          <p style="font-size: 10px; margin-bottom: 5px;">{{settings.data[2].value}}</p>
           <p>Attention: This is not a sale invoice.</p>
           <!-- <img src="/img/pharma-logo-black.png" /> -->
         </div>

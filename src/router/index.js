@@ -59,6 +59,8 @@ import BookingsInvoice from "@@/views/bookings/Invoice.vue";
 
 import InvoiceIndex from "@@/views/invoices/Index.vue";
 import InvoiceCreate from "@@/views/invoices/Create.vue";
+import InvoicePrint from "@@/views/invoices/Print.vue";
+import SettingIndex from "@@/views/settings/Index.vue";
 
 import SaleIndex from "@@/views/sales/Index.vue";
 // import TodaySaleIndex from "@@/views/sales/TodaySaleIndex.vue";
@@ -384,7 +386,17 @@ const router = createRouter({
           name: "invoices.create",
           component: InvoiceCreate,
         },
+        {
+          path: "/invoices/:id/print",
+          name: "invoices.print",
+          component: InvoicePrint,
+        },
 
+        {
+          path: "/settings",
+          name: "settings.index",
+          component: SettingIndex,
+        },
         {
           path: "/sales",
           name: "sales.index",

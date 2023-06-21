@@ -1,19 +1,73 @@
 <script setup>
 import axios from "axios";
 import { onMounted, ref, inject, computed, watch } from "vue";
+import { useRouter } from "vue-router";
 
 let baseEndpoint = `/api/invoices`;
 
 import { Modal } from "bootstrap";
+const router = useRouter();
 let modal = null;
 let modalID = "invoiceModal";
-const showInvoiceModal = () => modal.show();
+const editMode = ref(false);
+
+const showInvoiceModal = () => {
+  editMode.value = false;
+  modal.show();
+};
+
+const showEditModal = (invoice) => {
+  editMode.value = true;
+  invoiceForm.value.id = invoice.id;
+  invoiceForm.value.invoice_no = invoice.invoice_no;
+  invoiceForm.value.client_name = invoice.client_name;
+  invoiceForm.value.client_email = invoice.client_email;
+  invoiceForm.value.description = invoice.description;
+  invoiceForm.value.vat = invoice.vat;
+  invoiceForm.value.total = invoice.total;
+  modal.show();
+};
+
+const editInvoice = async () => {
+  try {
+    const { data: response } = await invoiceForm.value.patch(
+      `${baseEndpoint}/${invoiceForm.value.id}`
+    );
+
+    if (response.status == "success") {
+      invoiceForm.value.reset();
+      modal.hide();
+      swal
+        .fire({
+          title: "Success!",
+          text: "Do You Want To Print ?",
+          icon: "success",
+          showCancelButton: true,
+          confirmButtonText: "Yes!",
+        })
+        .then(async (result) => {
+          if (result.isConfirmed) {
+            let routeData = router.resolve({
+              name: "invoices.print",
+              params: { id: response.data.id },
+            });
+            window.open(routeData.href, "_blank");
+          }
+        });
+
+      await fetchInvoices();
+    }
+  } catch (error) {
+    false(error.message, "error");
+  }
+};
 
 import moment from "moment";
 import Form from "vform";
 
 const invoiceForm = ref(
   new Form({
+    id: "",
     invoice_no: "",
     client_name: "",
     client_email: "",
@@ -59,18 +113,17 @@ const generateInvoice = async () => {
         .then(async (result) => {
           if (result.isConfirmed) {
             let routeData = router.resolve({
-              name: "bookings.proceed.invoice",
+              name: "invoices.print",
               params: { id: response.data.id },
             });
             window.open(routeData.href, "_blank");
           }
-          router.push({ name: "booking.items.index" });
         });
 
-        await fetchInvoices();
+      await fetchInvoices();
     }
   } catch (error) {
-    console.log(error);
+    false(error.message, "error");
   }
 };
 
@@ -79,12 +132,22 @@ const invoices = ref({
   data: [],
 });
 
+const search = ref("");
+
+watch(
+  () => search.value,
+  (search, prevCount) => {
+    fetchInvoices();
+  }
+);
+
 const fetchInvoices = async (page) => {
   invoices.value.isLoading = true;
   try {
     const response = await axios.get(baseEndpoint, {
       params: {
         page,
+        search: search.value,
       },
     });
 
@@ -106,11 +169,19 @@ onMounted(async () => {
   <Panel>
     <template #header>
       <h1 class="h3 mb-0 text-middle">Invoices</h1>
-      <button @click="showInvoiceModal" type="button" class="btn btn-primary">
-        New Invoice
-      </button>
+      <div class="d-flex">
+        <button @click="showInvoiceModal" type="button" class="btn btn-primary">
+          New Invoice
+        </button>
+      </div>
     </template>
-
+    <div class="mb-3 row">
+      <div class="col"></div>
+      <div class="col"></div>
+      <div class="align-items-center col d-flex">
+        <Search v-model="search" />
+      </div>
+    </div>
     <div class="table-responsive" v-if="!invoices.isLoading">
       <table class="table table-bordered table-hover table-striped">
         <thead class="bg-primary text-bg-dark">
@@ -129,12 +200,20 @@ onMounted(async () => {
             <td>{{ invoice.invoice_no }}</td>
             <td><AppDate :timestamp="invoice.date" /></td>
             <td>{{ invoice.client_name }}</td>
-            <td>{{  $filters.currencyPound(invoice.net_total) }}</td>
+            <td>{{ $filters.currencyPound(invoice.net_total) }}</td>
             <td class="text-center">
-              <router-link class="btn btn-sm btn-outline-info me-2" :to="{}">
+              <button
+                class="btn btn-sm btn-outline-info me-2"
+                type="button"
+                @click="showEditModal(invoice)"
+              >
                 <i class="fa fa-pencil"></i>
-              </router-link>
-              <router-link class="btn btn-sm btn-outline-warning me-2" :to="{}">
+              </button>
+              <router-link
+                class="btn btn-sm btn-outline-warning me-2"
+                target="_blank"
+                :to="{ name: 'invoices.print', params: { id: invoice.id } }"
+              >
                 <i class="fa fa-print"></i>
               </router-link>
             </td>
@@ -161,9 +240,12 @@ onMounted(async () => {
     </template>
   </Panel>
 
-  <VueModal :id="modalID" @onSubmit="generateInvoice">
+  <VueModal
+    :id="modalID"
+    @onSubmit="editMode ? editInvoice() : generateInvoice()"
+  >
     <template #title>
-      Generate Invoice
+      {{editMode ? 'Update Invoice' : 'Generate Invoice'}}
     </template>
 
     <div class="row mb-3">
@@ -178,12 +260,15 @@ onMounted(async () => {
         <p>Leave empty to generate automatically.</p>
       </div>
     </div>
-    
+
     <div class="row mb-3">
       <div class="col">
-        <label class="form-label" for="client_name"><b>Client Name:</b></label>
+        <label class="form-label" for="client_name"
+          ><b>Client Name: <span class="text-danger">*</span></b></label
+        >
         <input
           type="text"
+          required
           class="form-control"
           id="client_name"
           v-model="invoiceForm.client_name"
@@ -207,8 +292,11 @@ onMounted(async () => {
 
     <div class="row mb-3">
       <div class="col">
-        <label class="form-label" for="description"><b>Description:</b></label>
+        <label class="form-label" for="description"
+          ><b>Description: <span class="text-danger">*</span></b></label
+        >
         <textarea
+          required
           class="form-control"
           id="description"
           v-model="invoiceForm.description"
@@ -233,9 +321,12 @@ onMounted(async () => {
 
     <div class="row mb-3">
       <div class="col">
-        <label class="form-label" for="amount"><b>Amount:</b></label>
+        <label class="form-label" for="amount"
+          ><b>Amount: <span class="text-danger">*</span></b></label
+        >
         <input
           type="number"
+          required
           min="0"
           class="form-control"
           id="amount"
@@ -255,7 +346,7 @@ onMounted(async () => {
 
     <template #footer>
       <Button :form="invoiceForm" class="btn btn-primary"
-        >Generate Invoice</Button
+        >{{editMode ? 'Update Invoice' : 'Generate Invoice'}}</Button
       >
     </template>
   </VueModal>

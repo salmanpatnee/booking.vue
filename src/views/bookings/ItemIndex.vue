@@ -28,6 +28,7 @@ const messageForm = ref(
   new Form({
     message: null,
     phone: null,
+    review_link: null
   })
 );
 
@@ -148,7 +149,7 @@ const showMessageModal = () => {
     return;
   }
 
-  messageForm.value.message = `Hello ${selectedItem.value.account.name}, your device (Ref: ${selectedItem.value.reference_id}) is ${selectedItem.value.status}.\n\nhttps://g.page/r/Cd5T4cka7ogJEBM/review`;
+  messageForm.value.message = `Hello ${selectedItem.value.account.name}, your device (Ref: ${selectedItem.value.reference_id}) is ${selectedItem.value.status}.\n\n ${messageForm.value.review_link}`;
   messageForm.value.phone = selectedItem.value.account.phone;
   modal.show();
 };
@@ -198,11 +199,24 @@ const printInvoice = () => {
   window.open(routeData.href, "_blank");
 };
 
-// Hooks
-onMounted(() => {
-  document.getElementById("sidebar").classList.add("collapsed");
+const settings = ref({
+  data: [], 
+  isLoading: true
+})
 
-  getBookingItems();
+const getSettings = async () => {
+  settings.value.isLoading = true;
+  const response = await axios.get(`api/settings`);
+  settings.value.data = response.data.data;
+  messageForm.value.review_link = settings.value.data[3].value;
+  settings.value.isLoading = false;
+};
+
+// Hooks
+onMounted(async() => {
+  document.getElementById("sidebar").classList.add("collapsed");
+  await getSettings();
+  await getBookingItems();
 
   modal = new Modal(document.getElementById(modalID), {
     keyboard: false,
