@@ -1,424 +1,266 @@
 <script setup>
-import Form from "vform";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import { ref } from "vue";
+import Form from "vform";
+import moment from "moment";
+import { useFlash } from "@@/composables/useFlash";
+import { v4 as uuidv4 } from "uuid";
 
+// Data
+const baseEndpoint = "/api/invoices";
+const { flash } = useFlash();
 const router = useRouter();
-const printMode = ref(false);
-let imageLoaded = 0;
 
 const form = ref(
   new Form({
-    client_name: null,
-    description: null,
-    amount: null,
+    invoice_no: "",
+    client_name: "",
+    phone: "",
+    date: moment().format("YYYY-MM-DD"),
+    notes: "",
+    invoice_item_details: [],
   })
 );
 
-const generateInvoice = async () => {
-  document.body.classList.add("sale-print");
-  printMode.value = true;
-  //   let routeData = router.resolve({
-  //     name: "bookings.invoice",
-  //     params: {
-  //       name: form.value.client_name,
-  //       description: form.value.description,
-  //       amount: form.value.amount,
-  //     },
-  //   });
-  //   window.open(routeData.href, "_blank");
+// Methods
+const handleAddInvoiceItem = (index) => {
+  const newInvoiceItem = {
+    id: uuidv4(),
+    item: "",
+    amount: null,
+    qty: 1,
+    vat: null,
+    sub_total: "",
+    net_total: "",
+  };
+  form.value.invoice_item_details.push(newInvoiceItem);
 };
 
-const handlePrint = () => {
-  const printContents = document.getElementById("printable").innerHTML;
-  // const originalContents = document.body.innerHTML;
-
-  document.body.innerHTML = printContents;
-
-  window.print();
-
-  // document.body.innerHTML = originalContents;
-  window.onafterprint = window.close;
+const handleDeleteInvoiceItem = (booingItem) => {
+  form.value.invoice_item_details = form.value.invoice_item_details.filter(
+    (q) => q.id !== booingItem.id
+  );
 };
 
-const handleImageLoad = () => {
-  imageLoaded++;
-  if (imageLoaded == 1) {
-    handlePrint();
+const handleSubmit = async () => {
+  try {
+    const { data: response } = await form.value.post(`/api/booking-list`);
+
+    if (response.status == "success") {
+      form.value.reset();
+      selectedCustomer.value = "";
+
+      swal
+        .fire({
+          title: "Success!",
+          text: "Do You Want To Print ?",
+          icon: "success",
+          showCancelButton: true,
+          confirmButtonText: "Yes!",
+        })
+        .then(async (result) => {
+          if (result.isConfirmed) {
+            let routeData = router.resolve({
+              name: "bookings.proceed.invoice",
+              params: { id: response.data.id },
+            });
+            window.open(routeData.href, "_blank");
+          }
+          router.push({ name: "booking.items.index" });
+        });
+    }
+  } catch (error) {
+    console.log(error);
   }
 };
+
+onMounted(() => {
+  const newInvoiceItem = {
+    id: uuidv4(),
+    item: "",
+    amount: null,
+    qty: 1,
+    vat: null,
+    sub_total: "",
+    net_total: "",
+  };
+  form.value.invoice_item_details.push(newInvoiceItem);
+})
 
 </script>
 
 <template>
-  <div v-if="!printMode">
-    <form @submit.prevent="generateInvoice">
-      <Panel>
-        <template #header>
-          <h1 class="h3 mb-0 text-middle">Generate Invoice</h1>
-          <router-link
-            class="btn btn-primary"
-            :to="{ name: 'invoices.create' }"
-          >
-            All Sales
-          </router-link>
-        </template>
-        <div class="row">
-          <div class="col-6 mb-4">
-            <label class="form-label" for="client_name">Client Name:</label>
+  <form @submit.prevent="handleSubmit">
+    <Panel>
+      <template #header>
+        <h1 class="h3 mb-0 text-middle">Create Invoice</h1>
+      </template>
+      <div class="row mt-5">
+        <div class="col">
+          <div class="mb-3">
+            <label class="form-label" for="reference_number"
+              ><b>Invoice No:</b></label
+            >
             <input
-              v-model="form.client_name"
               type="text"
-              class="form-control form-control-lg"
+              class="form-control"
+              v-model="form.invoice_no"
+              id="invoice_no"
+              required
+            />
+            <small>Leave empty to generate automatically.</small>
+            <HasError :form="form" field="invoice_no" />
+          </div>
+        </div>
+        <div class="col">
+          <div class="mb-3">
+            <label class="form-label" for="reference_number"
+              ><b>Client Name:</b></label
+            >
+            <input
+              type="text"
+              class="form-control"
+              v-model="form.client_name"
               id="client_name"
-              required=""
-              autofocus
+              required
             />
             <HasError :form="form" field="client_name" />
           </div>
         </div>
-        <div class="row">
-          <div class="col-6 mb-4">
-            <label class="form-label" for="description">Description:</label>
-            <textarea
-              v-model="form.description"
-              type="text"
-              class="form-control form-control-lg"
-              id="description"
-              required=""
-            ></textarea>
-            <HasError :form="form" field="description" />
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-6 mb-4">
-            <label class="form-label" for="amount">Amount Paid:</label>
+        <div class="col">
+          <div class="mb-3">
+            <label class="form-label" for="phone"><b>Phone:</b></label>
             <input
-              v-model="form.amount"
-              type="number"
-              class="form-control form-control-lg"
-              id="amount"
-              required=""
+              type="tel"
+              class="form-control"
+              v-model="form.phone"
+              id="phone"
+              required
             />
-            <HasError :form="form" field="amount" />
+            <HasError :form="form" field="phone" />
           </div>
         </div>
-        <template #footer>
-          <Button :form="form" class="btn btn-lg btn-primary">
-            Generate
-          </Button>
-        </template>
-      </Panel>
-    </form>
-  </div>
-  <div v-else>
-    <div id="printable">
-      <div
-        class="print-invoice"
-        style="
-          border: 1px solid #a1a1a1;
-          /* width: 88mm; */
-          background: white;
-          padding: 10px;
-          margin: 0 auto;
-          text-align: center;
-        "
-      >
-        <div align="center">
-          <img
-            @load="handleImageLoad"
-            src="/img/pharma-logo-black.png"
-            style="display: none;"
-          />
-          <h1
-            style="
-              font-family: monospace;
-              font-weight: 900;
-              text-transform: uppercase;
-            "
-          >
-            <storng>Bookings</storng>
-          </h1>
-          <!-- <img src="/img/pharma-logo-black.png" /> -->
-        </div>
-        <!-- <div align="left">
-          <div class="row">
-            <div
-              class="col"
-              style="font-weight: bold; font-family: monospace; color: black"
-            >
-              <strong style="font-family: monospace; color: black"
-                >Invoice No</strong
-              >:
-            </div>
-            <div
-              class="col"
-              style="font-weight: bold; font-family: monospace; color: black"
-            >
-              <strong style="font-family: monospace; color: black">{{
-                sale.id
-              }}</strong>
-            </div>
-          </div>
-          <div class="row">
-            <div
-              class="col"
-              style="font-weight: bold; font-family: monospace; color: black"
-            >
-              <strong style="font-family: monospace; color: black"
-                >Date:</strong
-              >
-            </div>
-            <div
-              class="col"
-              style="font-weight: bold; font-family: monospace; color: black"
-            >
-              <strong style="font-family: monospace; color: black"
-                ><AppDate :timestamp="sale.date"
-              /></strong>
-            </div>
-          </div>
-          <div class="row">
-            <div
-              class="col"
-              style="font-weight: bold; font-family: monospace; color: black"
-            >
-              <strong style="font-family: monospace; color: black"
-                >Customer:</strong
-              >
-            </div>
-            <div
-              class="col"
-              style="font-weight: bold; font-family: monospace; color: black"
-            >
-              <strong style="font-family: monospace; color: black">{{
-                sale.account.name
-              }}</strong>
-            </div>
-          </div>
-          <div class="row">
-            <div
-              class="col"
-              style="font-weight: bold; font-family: monospace; color: black"
-            >
-              <strong style="font-family: monospace; color: black"
-                >Phone:</strong
-              >
-            </div>
-            <div
-              class="col"
-              style="font-weight: bold; font-family: monospace; color: black"
-            >
-              <strong style="font-family: monospace; color: black">{{
-                sale.account.phone
-              }}</strong>
-            </div>
-          </div>
-          <div class="row">
-            <div
-              class="col"
-              style="font-weight: bold; font-family: monospace; color: black"
-            >
-              <strong style="font-family: monospace; color: black"
-                >Paid By:</strong
-              >
-            </div>
-            <div
-              class="col"
-              style="font-weight: bold; font-family: monospace; color: black"
-            >
-              <strong style="font-family: monospace; color: black">{{
-                sale.payment_method_id == 1 ? "Cash" : "Bank"
-              }}</strong>
-            </div>
+        <div class="col">
+          <div class="mb-3">
+            <label class="form-label" for="date"><b>Date:</b></label>
+            <input
+              type="date"
+              class="form-control"
+              v-model="form.date"
+              id="date"
+              required
+            />
+            <HasError :form="form" field="date" />
           </div>
         </div>
-
-        <div align="left" style="margin-top: 20px; margin-bottom: 10px">
-          <table class="table" style="border-spacing: 0px">
-            <tr style="border-top: 1px solid">
-              <th style="font-family: monospace; color: black" align="center">
-                Item
-              </th>
-              <th style="font-family: monospace; color: black" align="center">
-                Qty
-              </th>
-              <th style="font-family: monospace; color: black" align="center">
-                Price
-              </th>
-              <th style="font-family: monospace; color: black" align="center">
-                Dis
-              </th>
-              <th style="font-family: monospace; color: black" align="center">
-                Amount
-              </th>
-            </tr>
-            <tr
-              v-for="(sale_details, i) in sale.sale_details"
-              :key="sale_details.id"
-            >
-              <td style="font-family: monospace; color: black" align="center">
-                {{ sale_details.product.name }}
-              </td>
-              <td style="font-family: monospace; color: black" align="center">
-                {{ sale_details.quantity }}
-              </td>
-              <td style="font-family: monospace; color: black" align="center">
-                {{ sale_details.original_price.toFixed(2) }}
-              </td>
-              <td style="font-family: monospace; color: black" align="center">
-                {{ sale_details.discount_rate }}
-              </td>
-              <td style="font-family: monospace; color: black" align="center">
-                {{ sale_details.amount.toFixed(2) }}
-              </td>
-            </tr>
-          </table>
-        </div>
-
-        <div class="row" align="left">
-          <div class="col">
-            <span style="font-family: monospace; color: black">Subtotal:</span>
-          </div>
-          <div class="col">
-            <span style="font-family: monospace; color: black">{{
-              sale.gross_amount
-            }}</span>
-          </div>
-        </div>
-        <div
-          class="row"
-          align="left"
-          style="border-bottom: 1px solid; margin-bottom: 0.5em"
-        >
-          <div class="col">
-            <span style="font-family: monospace; color: black">Discount:</span>
-          </div>
-          <div class="col">
-            <span style="font-family: monospace; color: black">{{
-              totalDiscountDisplay
-            }}</span>
-          </div>
-        </div>
-        <div
-          v-if="sale.shipping_charges"
-          class="row"
-          align="left"
-          style="border-bottom: 1px solid; margin-bottom: 0.5em"
-        >
-          <div class="col">
-            <span style="font-family: monospace; color: black"
-              >Delivery Charges:</span
-            >
-          </div>
-          <div class="col">
-            <span style="font-family: monospace; color: black">{{
-              sale.shipping_charges
-            }}</span>
-          </div>
-        </div>
-
-        <div
-          class="row"
-          align="left"
-          style="border-bottom: 1px solid; margin-bottom: 1em"
-        >
-          <div class="col" style="font-weight: bold">
-            <strong style="font-family: monospace; color: black">Total:</strong>
-          </div>
-          <div class="col" style="font-weight: bold">
-            <strong style="font-family: monospace; color: black">{{
-              sale.net_amount
-            }}</strong>
-          </div>
-        </div>
-        <div
-          class="row"
-          align="left"
-          style="border-bottom: 1px solid; margin-bottom: 1em"
-        >
-          <div class="col">
-            <strong style="font-family: monospace; color: black">Paid:</strong>
-          </div>
-          <div class="col">
-            <strong style="font-family: monospace; color: black">{{
-              sale.paid_amount
-            }}</strong>
-          </div>
-        </div>
-        <div
-          v-if="sale.returned_amount"
-          class="row"
-          align="left"
-          style="border-bottom: 1px solid; margin-bottom: 1em"
-        >
-          <div class="col">
-            <strong style="font-family: monospace; color: black"
-              >Change:</strong
-            >
-          </div>
-          <div class="col">
-            <strong style="font-family: monospace; color: black">{{
-              sale.returned_amount
-            }}</strong>
-          </div>
-        </div>
-
-        <div
-          align="center"
-          v-if="sale.discount_amount != '0.00'"
-          style="border-bottom: 1px solid"
-        >
-          <h4 style="font-family: monospace; color: black">
-            You Have Saved Rs.{{ totalDiscountDisplay }}!
-          </h4>
-        </div>
-        <div align="center" style="margin-top: 1em">
-          <img width="60" :src="sale.qr_code" alt="Qr Code" srcset="" />
-        </div>
-        <div align="left" style="margin-top: 10px">
-          <h4 style="font-size: 14px; font-family: monospace; color: black">
-            <strong>Terms & Conditions</strong>
-          </h4>
-          <ol
-            style="
-              margin: 0;
-              padding-left: 20px;
-              font-family: monospace;
-              color: black;
-              font-size: 11px;
-            "
-          >
-            <li style="font-family:'monospace' color:black;, Times, serif;">
-              GST Included where applicable.
-            </li>
-            <li style="font-family:'monospace' color:black;, Times, serif;">
-              No exchange & refund without receipt.
-            </li>
-            <li style="font-family:'monospace' color:black;, Times, serif;">
-              Exchange & refund within 3 days.
-            </li>
-            <li style="font-family:'monospace' color:black;, Times, serif;">
-              No Exchange & Refund on fridge and surgical items.
-            </li>
-          </ol>
-        </div>
-
-        <div align="center" style="margin-top: 20px">
-          <hr />
-
-          <p style="font-family: monospace; color: black; margin-bottom: 0">
-            <strong>Address</strong>: Plot # 118/1, Block A, Alamgeer Society
-            Model Colony Malir Karachi.
-          </p>
-          <p style="font-family: monospace; color: black; margin-bottom: 0">
-            <strong>Contact No</strong>: 03000742762
-          </p>
-          <p style="font-family: monospace; color: black; margin-bottom: 0">
-            <strong>Email</strong>: info@pharmasquare.com.pk
-          </p>
-        </div> -->
       </div>
-    </div>
-  </div>
+      <div class="mt-5">
+        <div class="d-flex justify-content-between mt-4 mb-4">
+          <h3>Invoice Details</h3>
+        </div>
+        <hr />
+
+        <div class="mb-5">
+          <div class="table-responsive">
+            <table
+              class="card-1 mb-0 table table-bordered table-hover table-striped"
+            >
+              <thead class="bg-primary text-light">
+                <tr>
+                  <th>#</th>
+                  <th>Item</th>
+                  <th>Amount</th>
+                  <th>Qty</th>
+                  <th>VAT</th>
+                  <th>Total</th>
+                  <th class="text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(item, index) in form.invoice_item_details" :key="item.id">
+                  <td>{{index + 1}}</td>
+                  <td>
+                    <input
+                      type="text"
+                      class="form-control"
+                      placeholder="" v-model="item.item"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      class="form-control"
+                      placeholder="" v-model="item.amount"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      class="form-control"
+                      placeholder="" v-model="item.qty"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      class="form-control" v-model="item.vat"
+                      placeholder=""
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      class="form-control readonly"
+                      placeholder="" readonly v-model="item.total"
+                    />
+                  </td>
+              
+                  <td class="text-center">
+                    <button
+                      @click="handleDeleteInvoiceItem(item)"
+                      type="button"
+                      class="btn btn-sm btn-danger"
+                    >
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="text-end mt-4">
+              <button
+                v-if="!form.invoice_item_details.length"
+                type="button"
+                @click="handleAddInvoiceItem()"
+                class="btn btn-primary"
+              >
+                <i class="fa fa-plus"></i>
+              </button>
+            </div>
+          </div>
+ 
+          <div class="text-end" v-if="form.invoice_item_details.length">
+            <button
+              @click="handleAddInvoiceItem(index)"
+              type="button"
+              class="btn btn-primary me-2"
+            >
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <template #footer>
+        <div class="text-end">
+          <Button
+            :form="form"
+            :disabled="!form.invoice_item_details.length"
+            class="btn btn-lg btn-primary"
+            >Save</Button
+          >
+        </div>
+      </template>
+    </Panel>
+  </form>
 </template>

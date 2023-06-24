@@ -11,11 +11,6 @@ let modal = null;
 let modalID = "invoiceModal";
 const editMode = ref(false);
 
-const showInvoiceModal = () => {
-  editMode.value = false;
-  modal.show();
-};
-
 const showEditModal = (invoice) => {
   editMode.value = true;
   invoiceForm.value.id = invoice.id;
@@ -170,9 +165,9 @@ onMounted(async () => {
     <template #header>
       <h1 class="h3 mb-0 text-middle">Invoices</h1>
       <div class="d-flex">
-        <button @click="showInvoiceModal" type="button" class="btn btn-primary">
+        <router-link class="btn btn-primary" :to="{name: 'invoices.create'}">
           New Invoice
-        </button>
+        </router-link>
       </div>
     </template>
     <div class="mb-3 row">
@@ -190,12 +185,13 @@ onMounted(async () => {
             <th>Invoice No</th>
             <th>Date</th>
             <th>Customer Name</th>
+            <th>Phone</th>
             <th>Total</th>
             <th class="text-center">Action</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(invoice, index) in invoices.data.data" :key="invoice.id">
+          <!-- <tr v-for="(invoice, index) in invoices.data.data" :key="invoice.id">
             <td>{{ index + 1 }}</td>
             <td>{{ invoice.invoice_no }}</td>
             <td><AppDate :timestamp="invoice.date" /></td>
@@ -217,7 +213,7 @@ onMounted(async () => {
                 <i class="fa fa-print"></i>
               </router-link>
             </td>
-          </tr>
+          </tr> -->
         </tbody>
       </table>
     </div>
@@ -240,12 +236,12 @@ onMounted(async () => {
     </template>
   </Panel>
 
-  <VueModal
+  <!-- <VueModal
     :id="modalID"
     @onSubmit="editMode ? editInvoice() : generateInvoice()"
   >
     <template #title>
-      {{editMode ? 'Update Invoice' : 'Generate Invoice'}}
+      {{ editMode ? "Update Invoice" : "Generate Invoice" }}
     </template>
 
     <div class="row mb-3">
@@ -345,9 +341,9 @@ onMounted(async () => {
     </div>
 
     <template #footer>
-      <Button :form="invoiceForm" class="btn btn-primary"
-        >{{editMode ? 'Update Invoice' : 'Generate Invoice'}}</Button
-      >
+      <Button :form="invoiceForm" class="btn btn-primary">{{
+        editMode ? "Update Invoice" : "Generate Invoice"
+      }}</Button>
     </template>
-  </VueModal>
+  </VueModal> -->
 </template>
