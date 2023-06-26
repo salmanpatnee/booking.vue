@@ -13,16 +13,14 @@ let isLoaded = ref(false);
 let imageLoaded = 0;
 
 const displayVatAmount = computed(() => {
-    if(invoice.value.value != ''){
-        return invoice.value.total * invoice.value.vat / 100 ;
-    }
-    return false;
-})
+  if (invoice.value.value != "") {
+    return (invoice.value.total * invoice.value.vat) / 100;
+  }
+  return false;
+});
 // Methods
 const getInvoice = async () => {
-  const response = await axios.get(
-    `${baseEndpoint}/${route.params.id}`
-  );
+  const response = await axios.get(`${baseEndpoint}/${route.params.id}`);
   invoice.value = response.data.data;
 };
 
@@ -46,9 +44,9 @@ const handlePrint = () => {
 };
 
 const settings = ref({
-  data: [], 
-  isLoading: true
-})
+  data: [],
+  isLoading: true,
+});
 
 const getSettings = async () => {
   settings.value.isLoading = true;
@@ -56,7 +54,6 @@ const getSettings = async () => {
   settings.value.data = response.data.data;
   settings.value.isLoading = false;
 };
-
 
 onMounted(async () => {
   await getSettings();
@@ -90,11 +87,14 @@ onMounted(async () => {
                 <div class="card">
                   <div class="card-body m-sm-3 m-md-5">
                     <div class="mb-3 text-center">
-                      <h1>{{settings.data[0].value}}</h1>
-                      <p>
-                        {{settings.data[1].value}}
+                      <h1>{{ settings.data[0].value }}</h1>
+                      <div style="width:400px; margin:0 auto;">
+                        <p>
+                        {{ settings.data[1].value }}
                       </p>
-                      <p>{{settings.data[2].value}}</p>
+                      <p>{{ settings.data[2].value }}</p>
+                      </div>
+                      
                     </div>
                     <!-- <pre>{{ invoice }}</pre> -->
                     <div class="row mb-4">
@@ -104,10 +104,9 @@ onMounted(async () => {
                           <strong> {{ invoice.client_name }} </strong>
                         </div>
                         <div class="text-muted">
-                          Email:
-                          <strong> {{ invoice.client_email }} </strong>
+                          Phone:
+                          <strong> {{ invoice.phone }} </strong>
                         </div>
-
                       </div>
                       <div class="col-6 text-end">
                         <div class="text-muted">
@@ -125,29 +124,56 @@ onMounted(async () => {
                         <tr>
                           <th>Description</th>
                           <th>Amount</th>
-                          <th>&nbsp;</th>
+                          <th>Qty</th>
+                          <th>VAT</th>
+                          <th>Subtotal</th>
+                          <th>Net Total</th>
                         </tr>
                       </thead>
                       <tbody>
+                        <tr
+                          v-for="item in invoice.invoice_items"
+                          :key="item.id"
+                        >
+                          <td>{{ item.item }}</td>
+                          <td>{{ item.amount }}</td>
+                          <td>{{ item.qty }}</td>
+                          <td>{{ item.vat }}%</td>
+                          <td>{{ item.sub_total }}</td>
+                          <td>{{ item.net_total }}</td>
+                          <!-- <td>{{ $filters.currencyPound(invoice.total) }}</td> -->
+                        </tr>
                         <tr>
-                          <td>{{ invoice.description }}</td>
-                          <td>{{ $filters.currencyPound(invoice.total) }}</td>
+                          <th>&nbsp;</th>
+                          <th>&nbsp;</th>
+                          <th>&nbsp;</th>
+                          <th>&nbsp;</th>
+                          <th>&nbsp;</th>
                           <th>&nbsp;</th>
                         </tr>
                         <tr>
-                            <th>&nbsp;</th>
-                          <th>Subtotal</th>
-                          <th>{{$filters.currencyPound(invoice.total)}}</th>
+                          <th>&nbsp;</th>
+                          <th>&nbsp;</th>
+                          <th>&nbsp;</th>
+                          <th>&nbsp;</th>
+                          <th style="text-align: right;">Subtotal</th>
+                          <th style="text-align: right;">{{ $filters.currencyPound(invoice.total) }}</th>
                         </tr>
-                        <tr v-if="invoice.vat">
-                            <th>&nbsp;</th>
-                          <th>VAT</th>
-                          <th>{{ invoice.vat }}% ({{$filters.currencyPound(displayVatAmount)}})</th>
+                        <tr v-if="invoice.tax_amount">
+                          <th>&nbsp;</th>
+                          <th>&nbsp;</th>
+                          <th>&nbsp;</th>
+                          <th>&nbsp;</th>
+                          <th style="text-align: right;">Tax</th>
+                          <th style="text-align: right;">{{ $filters.currencyPound(invoice.tax_amount) }}</th>
                         </tr>
                         <tr>
-                            <th>&nbsp;</th>
-                          <th>Total</th>
-                          <th>{{ $filters.currencyPound(invoice.net_total) }}</th>
+                          <th>&nbsp;</th>
+                          <th>&nbsp;</th>
+                          <th>&nbsp;</th>
+                          <th>&nbsp;</th>
+                          <th style="text-align: right;">Net Total</th>
+                          <th style="text-align: right;">{{ $filters.currencyPound(invoice.net_total) }}</th>
                         </tr>
                       </tbody>
                     </table>

@@ -1,61 +1,13 @@
 <script setup>
 import axios from "axios";
-import { onMounted, ref, inject, computed, watch } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 
 let baseEndpoint = `/api/invoices`;
 
-import { Modal } from "bootstrap";
 const router = useRouter();
-let modal = null;
-let modalID = "invoiceModal";
+
 const editMode = ref(false);
-
-const showEditModal = (invoice) => {
-  editMode.value = true;
-  invoiceForm.value.id = invoice.id;
-  invoiceForm.value.invoice_no = invoice.invoice_no;
-  invoiceForm.value.client_name = invoice.client_name;
-  invoiceForm.value.client_email = invoice.client_email;
-  invoiceForm.value.description = invoice.description;
-  invoiceForm.value.vat = invoice.vat;
-  invoiceForm.value.total = invoice.total;
-  modal.show();
-};
-
-const editInvoice = async () => {
-  try {
-    const { data: response } = await invoiceForm.value.patch(
-      `${baseEndpoint}/${invoiceForm.value.id}`
-    );
-
-    if (response.status == "success") {
-      invoiceForm.value.reset();
-      modal.hide();
-      swal
-        .fire({
-          title: "Success!",
-          text: "Do You Want To Print ?",
-          icon: "success",
-          showCancelButton: true,
-          confirmButtonText: "Yes!",
-        })
-        .then(async (result) => {
-          if (result.isConfirmed) {
-            let routeData = router.resolve({
-              name: "invoices.print",
-              params: { id: response.data.id },
-            });
-            window.open(routeData.href, "_blank");
-          }
-        });
-
-      await fetchInvoices();
-    }
-  } catch (error) {
-    false(error.message, "error");
-  }
-};
 
 import moment from "moment";
 import Form from "vform";
@@ -89,38 +41,6 @@ watch(
   (newVal, preVal) => (invoiceForm.value.net_total = newVal)
 );
 
-const swal = inject("$swal");
-const generateInvoice = async () => {
-  try {
-    const { data: response } = await invoiceForm.value.post(baseEndpoint);
-
-    if (response.status == "success") {
-      invoiceForm.value.reset();
-      modal.hide();
-      swal
-        .fire({
-          title: "Success!",
-          text: "Do You Want To Print ?",
-          icon: "success",
-          showCancelButton: true,
-          confirmButtonText: "Yes!",
-        })
-        .then(async (result) => {
-          if (result.isConfirmed) {
-            let routeData = router.resolve({
-              name: "invoices.print",
-              params: { id: response.data.id },
-            });
-            window.open(routeData.href, "_blank");
-          }
-        });
-
-      await fetchInvoices();
-    }
-  } catch (error) {
-    false(error.message, "error");
-  }
-};
 
 const invoices = ref({
   isLoading: true,
@@ -154,9 +74,6 @@ const fetchInvoices = async (page) => {
 onMounted(async () => {
   await fetchInvoices();
 
-  modal = new Modal(document.getElementById(modalID), {
-    keyboard: false,
-  });
 });
 </script>
 
@@ -191,20 +108,21 @@ onMounted(async () => {
           </tr>
         </thead>
         <tbody>
-          <!-- <tr v-for="(invoice, index) in invoices.data.data" :key="invoice.id">
+          <tr v-for="(invoice, index) in invoices.data.data" :key="invoice.id">
             <td>{{ index + 1 }}</td>
             <td>{{ invoice.invoice_no }}</td>
             <td><AppDate :timestamp="invoice.date" /></td>
             <td>{{ invoice.client_name }}</td>
+            <td>{{ invoice.phone }}</td>
             <td>{{ $filters.currencyPound(invoice.net_total) }}</td>
             <td class="text-center">
-              <button
+              <!-- <button
                 class="btn btn-sm btn-outline-info me-2"
                 type="button"
                 @click="showEditModal(invoice)"
               >
                 <i class="fa fa-pencil"></i>
-              </button>
+              </button> -->
               <router-link
                 class="btn btn-sm btn-outline-warning me-2"
                 target="_blank"
@@ -213,7 +131,7 @@ onMounted(async () => {
                 <i class="fa fa-print"></i>
               </router-link>
             </td>
-          </tr> -->
+          </tr>
         </tbody>
       </table>
     </div>
@@ -236,114 +154,5 @@ onMounted(async () => {
     </template>
   </Panel>
 
-  <!-- <VueModal
-    :id="modalID"
-    @onSubmit="editMode ? editInvoice() : generateInvoice()"
-  >
-    <template #title>
-      {{ editMode ? "Update Invoice" : "Generate Invoice" }}
-    </template>
-
-    <div class="row mb-3">
-      <div class="col">
-        <label class="form-label" for="invoice_no"><b>Invoice No:</b></label>
-        <input
-          type="text"
-          class="form-control"
-          id="invoice_no"
-          v-model="invoiceForm.invoice_no"
-        />
-        <p>Leave empty to generate automatically.</p>
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <div class="col">
-        <label class="form-label" for="client_name"
-          ><b>Client Name: <span class="text-danger">*</span></b></label
-        >
-        <input
-          type="text"
-          required
-          class="form-control"
-          id="client_name"
-          v-model="invoiceForm.client_name"
-        />
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <div class="col">
-        <label class="form-label" for="client_email"
-          ><b>Client Email:</b></label
-        >
-        <input
-          type="email"
-          class="form-control"
-          id="client_email"
-          v-model="invoiceForm.client_email"
-        />
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <div class="col">
-        <label class="form-label" for="description"
-          ><b>Description: <span class="text-danger">*</span></b></label
-        >
-        <textarea
-          required
-          class="form-control"
-          id="description"
-          v-model="invoiceForm.description"
-          rows="5"
-        >
-        </textarea>
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <div class="col">
-        <label class="form-label" for="vat"><b>VAT (%):</b></label>
-        <input
-          type="number"
-          min="0"
-          class="form-control"
-          id="vat"
-          v-model="invoiceForm.vat"
-        />
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <div class="col">
-        <label class="form-label" for="amount"
-          ><b>Amount: <span class="text-danger">*</span></b></label
-        >
-        <input
-          type="number"
-          required
-          min="0"
-          class="form-control"
-          id="amount"
-          v-model="invoiceForm.total"
-        />
-      </div>
-    </div>
-
-    <div class="row mb-3">
-      <div class="col">
-        <label class="form-label readonly" for="net_total"
-          ><b>Net Total:</b></label
-        >
-        {{ displaynet_totalAmount }}
-      </div>
-    </div>
-
-    <template #footer>
-      <Button :form="invoiceForm" class="btn btn-primary">{{
-        editMode ? "Update Invoice" : "Generate Invoice"
-      }}</Button>
-    </template>
-  </VueModal> -->
+  
 </template>

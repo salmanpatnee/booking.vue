@@ -157,6 +157,15 @@ const { can } = useCan();
             <li class="sidebar-item">
               <router-link
                 class="sidebar-link"
+                :to="{ name: 'invoices.create' }"
+              >
+                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                <span class="align-middle">Add Invoice</span>
+              </router-link>
+            </li>
+            <li class="sidebar-item">
+              <router-link
+                class="sidebar-link"
                 :to="{ name: 'invoices.index' }"
               >
                 <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
