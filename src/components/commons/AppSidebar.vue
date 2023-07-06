@@ -177,6 +177,54 @@ const { can } = useCan();
 
         <li class="sidebar-item">
           <a
+            data-bs-target="#products"
+            data-bs-toggle="collapse"
+            class="sidebar-link collapsed"
+            aria-expanded="false"
+          >
+            <i class="fa fa-th" aria-hidden="true"></i>
+            <span class="align-middle">Products</span>
+          </a>
+          <ul
+            id="products"
+            class="sidebar-dropdown list-unstyled collapse"
+            data-bs-parent="#sidebar"
+            style=""
+          >
+            <li class="sidebar-item">
+              <router-link
+                class="sidebar-link"
+                :to="{ name: 'parts.create' }"
+              >
+                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                <span class="align-middle">Add Product</span>
+              </router-link>
+            </li>
+
+
+            <li class="sidebar-item">
+              <router-link
+                class="sidebar-link"
+                :to="{ name: 'parts.index' }"
+              >
+                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                <span class="align-middle">Manage Products</span>
+              </router-link>
+            </li>
+            <li class="sidebar-item">
+              <router-link
+                class="sidebar-link"
+                :to="{ name: 'categories.index' }"
+              >
+                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                <span class="align-middle">Categories</span>
+              </router-link>
+            </li>
+          </ul>
+        </li>
+        
+        <li class="sidebar-item">
+          <a
             data-bs-target="#settings"
             data-bs-toggle="collapse"
             class="sidebar-link collapsed"
@@ -211,58 +259,7 @@ const { can } = useCan();
           </router-link>
         </li> -->
 
-        <!-- <li class="sidebar-item">
-          <a
-            data-bs-target="#products"
-            data-bs-toggle="collapse"
-            class="sidebar-link collapsed"
-            aria-expanded="false"
-          >
-            <i class="fa fa-th" aria-hidden="true"></i>
-            <span class="align-middle">Products</span>
-          </a>
-          <ul
-            id="products"
-            class="sidebar-dropdown list-unstyled collapse"
-            data-bs-parent="#sidebar"
-            style=""
-          >
-            <li class="sidebar-item">
-              <router-link
-                class="sidebar-link"
-                :to="{ name: 'products.create' }"
-              >
-                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-                <span class="align-middle">Add Product</span>
-              </router-link>
-            </li>
-
-             <li class="sidebar-item">
-              <router-link class="sidebar-link" :to="{ name: 'brands.index' }">
-                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-                <span class="align-middle">Brands</span>
-              </router-link>
-            </li> 
-            <li class="sidebar-item">
-              <router-link
-                class="sidebar-link"
-                :to="{ name: 'products.index' }"
-              >
-                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-                <span class="align-middle">Manage Products</span>
-              </router-link>
-            </li>
-            <li class="sidebar-item">
-              <router-link
-                class="sidebar-link"
-                :to="{ name: 'categories.index' }"
-              >
-                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-                <span class="align-middle">Categories</span>
-              </router-link>
-            </li>
-          </ul>
-        </li> -->
+      
 
         <!-- <li class="sidebar-item">
           <a

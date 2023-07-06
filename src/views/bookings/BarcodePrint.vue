@@ -38,9 +38,9 @@ const handlePrint = () => {
 };
 
 const settings = ref({
-  data: [], 
-  isLoading: true
-})
+  data: [],
+  isLoading: true,
+});
 
 const getSettings = async () => {
   settings.value.isLoading = true;
@@ -59,53 +59,79 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div v-if="isLoaded && !settings.isLoading">
-    <div id="printable">
-      <div
-        class="print-invoice"
-        style="
-          border: 1px solid #a1a1a1;
-          width: 100mm;
-          background: white;
-          padding: 10px;
-          margin: 0 auto;
-          text-align: center;
-        "
-      >
-        <div align="center">
-          <img
-            @load="handleImageLoad"
-            src="/img/pharma-logo-black.png"
-            style="display: none;"
-          />
-          <h1
-            style="font-family: monospace; font-weight: 900; font-size: 22px;"
+  <div id="printable" v-if="isLoaded && !settings.isLoading">
+    <table
+      align="center"
+      style="border-spacing: 0in 0in; overflow: hidden !important;"
+    >
+      <img
+        @load="handleImageLoad"
+        src="/img/pharma-logo-black.png"
+        style="display: none;"
+      />
+      <!-- create a new row -->
+      <tr>
+        <!-- <columns column-count="4" column-gap="0"> -->
+        <td align="center" valign="center">
+          <div
+            style="
+              overflow: hidden !important;
+              display: flex;
+              flex-wrap: wrap;
+              align-content: center;
+              width: 2in;
+              height: 1.25in;
+              justify-content: center;
+            "
           >
-            <storng>{{settings.data[0].value}}</storng>
-          </h1>
-        </div>
-    
-        <div align="center">
-          <p style="margin-bottom:5px; margin-top: 0;"><b>Issue:</b> {{ item.issue }}</p>
-        </div>
-        <div align="center">
-          <p style="margin-bottom:5px; margin-top: 0; text-transform: capitalize;"><b>Status:</b> {{ item.status }}</p>
-        </div>
-        <div align="center">
-          <p style="margin-bottom:5px; margin-top: 0;"><b>Date:</b> <AppDate :timestamp="item.date"/></p>
-        </div>
-        <div align="center">
-          <small style="margin-bottom:5px; margin-top: 0;"><b>Barcode:</b> {{item.reference_id}}</small>
-        </div>
-      </div>
-    </div>
+            <div>
+              <b style="display: block !important; font-size: 20px;">{{ settings.data[0].value }}</b>
+
+              <span style="display: block !important; font-size: 15px;">
+                Issue <b>{{ item.issue }}</b>
+              </span>
+              <span style="display: block !important; font-size: 15px;">
+                Status <b>{{ item.status }}</b>
+              </span>
+              <span style="display: block !important; font-size: 15px;">
+                Date <b><AppDate :timestamp="item.date" /></b>
+              </span>
+              <span style="display: block !important; font-size: 15px;">
+                # <b>{{ item.reference_id }}</b>
+              </span>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </table>
   </div>
 </template>
 
-<style scoped>
+<style type="text/css" scoped>
+body {
+  margin: 10px;
+  font-family: Courier, monospace;
+}
+td {
+  border: 1px dotted #ccc;
+}
+.main {
+  background: white;
+}
 @media print {
-  .sale-print {
-    font-family: "Times New Roman" !important;
+  table {
+    page-break-after: always;
+  }
+
+  @page {
+    size: 8.5in 11in;
+
+    /*width: 8.5in !important;*/
+    /*height:11in !important ;*/
+    margin-top: 0.5in !important;
+    margin-bottom: 0.5in !important;
+    margin-left: 0.25in !important;
+    margin-right: 0.25in !important;
   }
 }
 </style>

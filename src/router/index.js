@@ -28,6 +28,10 @@ import Products from "@@/views/products/ProductList.vue";
 import ProductsShow from "@@/views/products/ProductShow.vue";
 import ProductCreate from "@@/views/products/ProductCreate.vue";
 
+import Parts from "@@/views/products/PartList.vue";
+import PartShow from "@@/views/products/PartShow.vue";
+import PartCreate from "@@/views/products/PartCreate.vue";
+
 // import Discounts from "@@/views/discounts/DiscountList.vue";
 
 import Purchases from "@@/views/purchases/PurchaseList.vue";
@@ -226,7 +230,26 @@ const router = createRouter({
           component: ProductCreate,
           // meta: { authorize: ["product-edit"] },
         },
-
+        {
+          path: "/parts",
+          name: "parts.index",
+          component: Parts,
+        },
+        {
+          path: "/parts/part/:id",
+          name: "parts.show",
+          component: PartShow,
+        },
+        {
+          path: "/parts/create",
+          name: "parts.create",
+          component: PartCreate,
+        },
+        {
+          path: "/parts/edit/:id",
+          name: "parts.edit",
+          component: PartCreate,
+        },
         // {
         //   path: "/discounts",
         //   name: "discounts.index",

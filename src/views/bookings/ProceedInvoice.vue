@@ -77,7 +77,7 @@ onMounted(async () => {
           border: 1px solid #a1a1a1;
           width: 100mm;
           background: white;
-          padding: 10px;
+          padding: 12px;
           margin: 0 auto;
           text-align: center;
         "
@@ -89,14 +89,14 @@ onMounted(async () => {
             style="display: none;"
           />
           <h1
-            style="font-family: monospace; font-weight: 900; font-size: 22px;"
+            style="font-weight: 900; font-size: 22px;"
           >
             <storng>{{settings.data[0].value}}</storng>
           </h1>
-          <p style="font-size: 10px; margin-bottom: 5px;">
+          <p style="font-size: 12px; margin-bottom: 5px;">
             {{settings.data[1].value}}
           </p>
-          <p style="font-size: 10px; margin-bottom: 5px;">{{settings.data[2].value}}</p>
+          <p style="font-size: 12px; margin-bottom: 5px;">{{settings.data[2].value}}</p>
           <p>Attention: This is not a sale invoice.</p>
           <!-- <img src="/img/pharma-logo-black.png" /> -->
         </div>
@@ -181,22 +181,22 @@ onMounted(async () => {
             <div class="col text-center">
               <strong>Terms &amp; Conditions</strong>
               <hr class="mb-2 mt-2" />
-              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+              <p class="text-start" style="font-size: 12px; color: black; margin-bottom: 7px;">
                 Any repair items not collected within 30 days will be disposed
-                off or sold to recove repairs cost. iCrack Technologies Limited
+                off or sold to recove repairs cost. iCrack
                 is not liaiable for reimbursing the cost of item.
               </p>
-              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+              <p class="text-start" style="font-size: 12px; color: black; margin-bottom: 7px;">
                 All items needs to be checked by customer before leaving iCrack
-                Technologies premises or personnel.
+                 premises or personnel.
               </p>
-              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+              <p class="text-start" style="font-size: 12px; color: black; margin-bottom: 7px;">
                 True Condition of the items booked in for repair diagnosis needs
                 to be fully clarified by the customer upon which the quote will
                 be provided. Any fault or condition identified during diagnosis
                 might change the quotation.
               </p>
-              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+              <p class="text-start" style="font-size: 12px; color: black; margin-bottom: 7px;">
                 Hardware repairs have 90 days warranty. Water/Liquid damage
                 repairs have 15 days warranty. Batteries come with 30 days
                 warranty. Warranty excludes faults relating to physical or
@@ -205,51 +205,51 @@ onMounted(async () => {
                 of your warranty or guarantee, then you may incur a charge for
                 the repair.
               </p>
-              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+              <p class="text-start" style="font-size: 12px; color: black; margin-bottom: 7px;">
                 If you take your device to a third party after it has been
-                repaired by iCrack Technologies this will void the warranty on
+                repaired by iCrack  this will void the warranty on
                 your device. This includes both repaired and purchashed devices.
               </p>
-              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+              <p class="text-start" style="font-size: 12px; color: black; margin-bottom: 7px;">
                 All software related repairs will not be covered by our
                 warranty.
               </p>
-              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+              <p class="text-start" style="font-size: 12px; color: black; margin-bottom: 7px;">
                 The warranty only covers the original repair. For example, if
                 you pay for a screen repair and the screen becomes faulty, you
                 will be covered with a 6-Month warranty. If any additional
                 faults occur that are not related to the original repair this
                 will not be covered under warranty and will need to be paid for.
               </p>
-              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+              <p class="text-start" style="font-size: 12px; color: black; margin-bottom: 7px;">
                 If the device is damaged it shall not be covered under warranty.
               </p>
-              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+              <p class="text-start" style="font-size: 12px; color: black; margin-bottom: 7px;">
                 All warranty claims have to be reported within the warranty
                 period and returned to our premises within two weeks from this
                 date.
               </p>
-              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+              <p class="text-start" style="font-size: 12px; color: black; margin-bottom: 7px;">
                 If the device you returned has been reset we will need the
                 iCloud/Google account information we will not provide a
                 warranty.
               </p>
-              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
-                Warranty on all accessories sole by iCrack Technologies for 30
+              <p class="text-start" style="font-size: 12px; color: black; margin-bottom: 7px;">
+                Warranty on all accessories sole by iCrack  for 30
                 Days.
               </p>
-              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+              <p class="text-start" style="font-size: 12px; color: black; margin-bottom: 7px;">
                 We will not be reponsible for Loss of Sim Card/ Memory Card
                 During Repairs, it is your responsibility to take them out
                 before sending device or leaving our premises.
               </p>
-              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+              <p class="text-start" style="font-size: 12px; color: black; margin-bottom: 7px;">
                 Liquid Damage repairs can take up to 7 - 14 days.
               </p>
-              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+              <p class="text-start" style="font-size: 12px; color: black; margin-bottom: 7px;">
                 Any Motherboard related repairs can take up to 7 - 14 days.
               </p>
-              <p class="text-start" style="font-size: 8px; margin-bottom: 7px;">
+              <p class="text-start" style="font-size: 12px; color: black; margin-bottom: 7px;">
                 Any software related repairs can take up to 7 - 14 days.
               </p>
             </div>
@@ -266,14 +266,14 @@ onMounted(async () => {
         <!-- <div align="center" style="margin-top: 20px">
           <hr />
 
-          <p style="font-family: monospace; color: black; margin-bottom: 0">
+          <p style="color: black; margin-bottom: 0">
             <strong>Address</strong>: Plot # 118/1, Block A, Alamgeer Society
             Model Colony Malir Karachi.
           </p>
-          <p style="font-family: monospace; color: black; margin-bottom: 0">
+          <p style="color: black; margin-bottom: 0">
             <strong>Contact No</strong>: 03000742762
           </p>
-          <p style="font-family: monospace; color: black; margin-bottom: 0">
+          <p style="color: black; margin-bottom: 0">
             <strong>Email</strong>: info@pharmasquare.com.pk
           </p>
         </div> -->
@@ -283,9 +283,18 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+body {
+  margin: 10px;
+  font-family: Courier, monospace;
+  color: black;
+}
+body p {
+  color: black;
+
+}
 @media print {
   .sale-print {
-    font-family: "Times New Roman" !important;
+    font-family: Courier, monospace;
   }
 }
 </style>
