@@ -138,7 +138,7 @@ onMounted(async () => {
                           <td>{{ item.item }}</td>
                           <td>{{ item.amount }}</td>
                           <td>{{ item.qty }}</td>
-                          <td>{{ item.vat }}%</td>
+                          <td><span v-if="item.vat">{{ item.vat }}%</span></td>
                           <td>{{ item.sub_total }}</td>
                           <td>{{ item.net_total }}</td>
                           <!-- <td>{{ $filters.currencyPound(invoice.total) }}</td> -->

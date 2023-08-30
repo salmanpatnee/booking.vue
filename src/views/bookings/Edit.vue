@@ -6,8 +6,12 @@ import Form from "vform";
 import moment from "moment";
 import { Modal } from "bootstrap";
 import { useFlash } from "@@/composables/useFlash";
+import "vue-select/dist/vue-select.css";
+import FormAjaxSelect from "@@/components/commons/FormAjaxSelect.vue";
+import partService from "@@/services/PartService.js";
 
 // Data
+const selectedProduct = ref(null);
 let modal = null;
 let modalID = "messageModal";
 let statusModal = null;
@@ -42,8 +46,8 @@ const form = ref(
 const messageForm = ref(
   new Form({
     message: null,
-    phone: null, 
-    review_link: null
+    phone: null,
+    review_link: null,
   })
 );
 
@@ -57,6 +61,59 @@ const statusForm = ref(
 );
 
 // Methods
+const handleProductSelect = (selectedOption) => {
+  
+  selectedProduct.value = selectedOption.selectedOption;
+
+  const product = selectedOption.selectedOption;
+  
+  if(!product.quantity){
+    flash('Part is out of stock', 'error');
+    setTimeout(() => {
+      selectedProduct.value = null;
+    }, 300);
+    return;
+  }
+
+  /* Check whether product already selected */
+  const productExist = selectedOption.item.parts.findIndex((sD) => {
+    return sD.part_id === product.id;
+  });
+
+  if (productExist !== -1) {
+    alert("This product is already selected");
+    setTimeout(() => {
+      selectedProduct.value = null;
+    }, 300);
+    return;
+  }
+
+  const obj = {
+    part_id: product.id,
+    product_name: product.name,
+    cost: product.cost,
+    price: product.price,
+    stock: product.quantity,
+    quantity: 1,
+    is_new: true,
+  };
+
+  selectedOption.item.parts.push(obj);
+  setTimeout(() => {
+    selectedProduct.value = null;
+  }, 300);
+};
+
+const handleRemoveItem = ($event, item, productId) => {
+  console.log(productId);
+
+  const parts = item.parts.filter((pD) => {
+    console.log(pD)
+    return pD.part_id !== productId
+  });
+  item.parts = parts;
+};
+
 const getEmployees = async (page = 1) => {
   employees.value.loading = true;
   const { data: response } = await axios.get(`/api/employees`);
@@ -166,9 +223,9 @@ const sendMessage = async () => {
 };
 
 const settings = ref({
-  data: [], 
-  isLoading: true
-})
+  data: [],
+  isLoading: true,
+});
 
 const getSettings = async () => {
   settings.value.isLoading = true;
@@ -538,6 +595,83 @@ onMounted(async () => {
 
                 <HasError :form="form" field="notes" />
               </div>
+            </div>
+            <div class="row mb-3">
+              <FormAjaxSelect
+                name="parts"
+                label="Select Parts"
+                slug="parts" 
+                :item="item" 
+                v-model="selectedProduct" 
+                @update:modelValue="handleProductSelect"
+              />
+            </div>
+
+            <div class="table-responsive">
+              <table
+                class="card-1 mb-0 table table-bordered table-hover table-striped"
+              >
+                <thead class="bg-primary text-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Part</th>
+                    <th>Qty</th>
+                    <th>Unit Cost</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
+                    <th class="text-center">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(part, i) in item.parts">
+                    <td>{{ i + 1 }}</td>
+                    <td class="text-center">
+                      {{ part.product_name }}
+                      <small class="d-block"
+                        >Current stock: {{ part.stock }} Pc(s)</small
+                      >
+                    </td>
+
+                    <td>
+                      <input
+                        :id="`purchase-details-${i}-quantity`"
+                        type="number"
+                        class="form-control"
+                        v-model="part.quantity"
+                        min="1"
+                        :max="part.stock" :readonly="!part.is_new"
+                      />
+                    </td>
+                    <td>
+                      {{ part.cost ? parseFloat(part.cost).toFixed(2) : null }}
+                    </td>
+
+                    <td class="text-center">
+                      <input
+                        :id="`purchase-details-${i}-sale_price`"
+                        type="number"
+                        class="form-control"
+                        v-model="part.price"
+                        @input="handleBoxSalePriceChange(i)"
+                        :min="part.cost.toFixed(2)"
+                        step="any" :readonly="!part.is_new"
+                      />
+                    </td>
+                    <td>
+                      {{ (part.quantity * part.price).toFixed(2) }}
+                    </td>
+                    <td class="text-center">
+                      <button v-if="part.is_new"
+                        type="button"
+                        class="btn btn-sm btn-danger"
+                        @click="handleRemoveItem($event, item, part.part_id)"
+                      >
+                        <i class="fa fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
             <hr class="my-5" />
           </div>

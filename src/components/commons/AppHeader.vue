@@ -219,6 +219,15 @@ onMounted(() => {
             New Incoice
           </router-link>
         </li>
+        <li class="nav-item">
+          <router-link
+            class="btn btn-primary btn-lg mx-2"
+            :to="{ name: 'parts.create' }"
+          >
+            <i class="fa fa-th-large" aria-hidden="true"></i>
+            Add Product
+          </router-link>
+        </li>
         <!-- <li class="nav-item">
           <router-link
             class="btn btn-primary btn-lg mx-2"

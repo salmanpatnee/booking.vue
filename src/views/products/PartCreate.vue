@@ -24,9 +24,9 @@ const form = ref(
     name: "",
     code: "",
     category_id: "",
-    cost: 0,
-    price: 0,
-    quantity: 0,
+    cost: null,
+    price: null,
+    // quantity: 0,
   })
 );
 
@@ -234,7 +234,7 @@ onMounted(() => {
             <HasError :form="form" field="code" />
           </div>
           <div class="col mb-3">
-            <label class="form-label" for="quantity"
+            <!-- <label class="form-label" for="quantity"
               >Quantity:</label
             >
             <input
@@ -244,7 +244,7 @@ onMounted(() => {
               class="form-control form-control-lg"
               id="quantity"
             />
-            <HasError :form="form" field="quantity" />
+            <HasError :form="form" field="quantity" /> -->
           </div>
           <!-- <div class="col mb-3">
           <label class="form-label" for="vat_amount">VAT:</label>

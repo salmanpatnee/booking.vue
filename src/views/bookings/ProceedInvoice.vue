@@ -136,7 +136,7 @@ onMounted(async () => {
               <p
                 style="font-size: 12px; margin-bottom: 0px;"
               >
-                <b>Barcode:</b> {{ sale.reference_id }}
+                <b>Barcode:</b> {{ booking_list_detail.reference_id }}
               </p>
               <p style="font-size: 12px; margin-bottom: 0px;">
                 <b>Item</b>: {{ booking_list_detail.device_name }}

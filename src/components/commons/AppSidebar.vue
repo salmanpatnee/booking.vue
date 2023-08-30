@@ -208,7 +208,16 @@ const { can } = useCan();
                 :to="{ name: 'parts.index' }"
               >
                 <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-                <span class="align-middle">Manage Products</span>
+                <span class="align-middle">Manage Product</span>
+              </router-link>
+            </li>
+            <li class="sidebar-item">
+              <router-link
+                class="sidebar-link"
+                :to="{ name: 'stock.index' }"
+              >
+                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                <span class="align-middle">Manage Inventory</span>
               </router-link>
             </li>
             <li class="sidebar-item">

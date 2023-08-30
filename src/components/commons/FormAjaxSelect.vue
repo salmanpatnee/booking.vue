@@ -10,9 +10,9 @@ const props = defineProps([
   "label",
   "modelValue",
   "slug",
-  "q",
+  "q", "item"
 ]);
-const { forRoute, name, label, modelValue, slug } = toRefs(props);
+const { forRoute, name, label, modelValue, slug, item } = toRefs(props);
 const internalModel = ref(null);
 const modelRef = ref(null);
 
@@ -50,7 +50,12 @@ const getData = async (query) => {
 };
 
 const handleSelect = (selectedOption) => {
-  emit("update:modelValue", selectedOption);
+  if(name.value !== 'parts') {
+    emit("update:modelValue", selectedOption);
+  } else {
+    emit("update:modelValue", {selectedOption, item: item.value});
+  }
+    
 };
 
 const onSearch = (query, loading) => {

@@ -32,6 +32,8 @@ import Parts from "@@/views/products/PartList.vue";
 import PartShow from "@@/views/products/PartShow.vue";
 import PartCreate from "@@/views/products/PartCreate.vue";
 
+import StockIndex from "@@/views/products/StockList.vue";
+
 // import Discounts from "@@/views/discounts/DiscountList.vue";
 
 import Purchases from "@@/views/purchases/PurchaseList.vue";
@@ -249,6 +251,11 @@ const router = createRouter({
           path: "/parts/edit/:id",
           name: "parts.edit",
           component: PartCreate,
+        },
+        {
+          path: "/stock/index",
+          name: "stock.index",
+          component: StockIndex,
         },
         // {
         //   path: "/discounts",
